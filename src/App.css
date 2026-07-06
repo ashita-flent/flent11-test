@@ -1,53 +1,11 @@
 /* ============================================================
-   App shell + placeholder next section
+   App shell — stacked landing-page sections
    ============================================================ */
 
 main {
   width: 100%;
 }
 
-/* The full-bleed cover box is box-grey, so the next section shares it
-   for a seamless hand-off, then reveals editorial copy on top. */
-.next {
-  min-height: 100vh;
-  background: var(--box);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10vh 8vw;
-}
-
-.next__inner {
-  max-width: 44rem;
-  text-align: center;
-}
-
-.next__eyebrow {
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: 0.85rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 1.4rem;
-}
-
-.next__headline {
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: clamp(2rem, 4.6vw, 3.6rem);
-  line-height: 1.02;
-  letter-spacing: -0.015em;
-  color: var(--ink);
-  margin-bottom: 1.6rem;
-}
-
-.next__body {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: clamp(1rem, 1.5vw, 1.2rem);
-  line-height: 1.55;
-  color: var(--ink-soft);
-  max-width: 34rem;
-  margin: 0 auto;
+.section {
+  position: relative;
 }
