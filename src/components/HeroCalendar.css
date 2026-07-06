@@ -65,8 +65,21 @@
   cursor: default;
 }
 
+/* 12th cell — disabled: this month doesn't exist, the stay is 11 months.
+   Washed out + slanted hairline pattern. */
 .cal__cell--empty {
   cursor: default;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.55) 0px,
+      rgba(255, 255, 255, 0.55) 1px,
+      transparent 1px,
+      transparent 12px
+    ),
+    rgba(250, 248, 244, 0.35);
+  backdrop-filter: saturate(0.55) brightness(1.06);
+  -webkit-backdrop-filter: saturate(0.55) brightness(1.06);
 }
 
 .cal__label {
