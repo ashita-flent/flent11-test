@@ -82,7 +82,9 @@
   pointer-events: none;
 }
 
-/* ---- hover payment card ------------------------------------------ */
+/* ---- payment cards ------------------------------------------------ */
+/* paid months: frosted glass — 1% white + 14px backdrop blur, revealed
+   on hover so they read as payable months */
 .cal__card {
   position: absolute;
   inset: 0;
@@ -92,7 +94,9 @@
   justify-content: center;
   overflow: hidden;
 
-  background: #fdfcfa;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   opacity: 0;
   transition: opacity 0.28s ease;
 }
@@ -100,6 +104,14 @@
 .cal__cell:hover .cal__card,
 .cal__cell:focus-visible .cal__card {
   opacity: 1;
+}
+
+/* Month 1 — always on: solid card, always visible, never blurred away */
+.cal__cell--free .cal__card {
+  opacity: 1;
+  background: #fdfcfa;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .cal__card-label {
@@ -110,14 +122,23 @@
   font-weight: 500;
   font-size: clamp(0.8rem, 1.15vw, 1.05rem);
   letter-spacing: 0.02em;
-  color: var(--ink);
+  color: #fff;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
 }
 
 .cal__card-value {
   font-family: var(--serif);
   font-weight: 500;
   font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+  color: #fff;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.4);
+}
+
+/* dark ink on the free month's solid card */
+.cal__cell--free .cal__card-label,
+.cal__cell--free .cal__card-value {
   color: var(--ink);
+  text-shadow: none;
 }
 
 /* green corner fold on the free month's card */
