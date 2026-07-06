@@ -1,0 +1,76 @@
+/* ============================================================
+   Hero · "pluck one month out" scroll choreography
+   ============================================================ */
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: var(--bg);
+}
+
+.hero__stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---- headline ---------------------------------------------------- */
+.hero__headline {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 60; /* rides above the growing box (Components 16–17) */
+
+  margin: 0;
+  text-align: center;
+  color: var(--red);
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 6.4vw, 6rem);
+  line-height: 0.96;
+  letter-spacing: -0.015em;
+  font-optical-sizing: auto;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ---- month boxes ------------------------------------------------- */
+.hero__box {
+  position: absolute;
+  z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  background: var(--box);
+  border: 1px solid var(--box-line);
+  border-radius: 6px;
+  will-change: transform, opacity;
+}
+
+.hero__box--free {
+  z-index: 40; /* the plucked month rides above its siblings */
+}
+
+.box__tag {
+  padding: 7px 9px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(0.66rem, 0.92vw, 0.82rem);
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+}
+
+/* ---- ghost / trace left in Jun's slot ---------------------------- */
+.hero__ghost {
+  position: absolute;
+  z-index: 20;
+  opacity: 0;
+  background: var(--ghost);
+  border: 1px dashed rgba(26, 23, 20, 0.18);
+  border-radius: 6px;
+  will-change: opacity;
+}

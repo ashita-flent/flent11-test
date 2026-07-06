@@ -1,0 +1,60 @@
+/* ============================================================
+   Flent — rent credit · Hero prototype
+   Light / editorial treatment (matches Figma Components 14–17)
+   ============================================================ */
+
+:root {
+  /* palette */
+  --bg:        #faf8f4;   /* warm near-white */
+  --bg-2:      #f2efe9;   /* slightly deeper warm */
+  --ink:       #1a1714;   /* near-black warm */
+  --ink-soft:  #6b645c;   /* muted label ink */
+  --red:       #be3b2c;   /* editorial vermillion */
+  --box:       #dcdad4;   /* placeholder box fill */
+  --box-line:  rgba(26, 23, 20, 0.10);
+  --ghost:     #e7e4de;   /* trace / ghost fill */
+
+  /* type */
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  overflow-x: hidden;
+}
+
+/* Lenis smooth-scroll requirements */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+#root {
+  width: 100%;
+}
