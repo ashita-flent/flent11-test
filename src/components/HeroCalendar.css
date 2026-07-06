@@ -1,0 +1,161 @@
+/* ============================================================
+   Hero · calendar grid over the home (Component 33)
+   Sharp image inside the grid frame, blurred wash outside.
+   Hover a month to reveal its payment card.
+   ============================================================ */
+
+.cal {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: var(--bg);
+}
+
+.cal__stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---- image layers ------------------------------------------------ */
+.cal__blur,
+.cal__sharp {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.cal__blur {
+  z-index: 1;
+  filter: blur(18px);
+  transform: scale(1.06); /* hide blur edge bleed */
+}
+
+.cal__wash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(250, 248, 244, 0.42);
+}
+
+.cal__sharp {
+  z-index: 3;
+}
+
+/* ---- grid frame --------------------------------------------------- */
+.cal__frame {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.cal__cell {
+  position: relative;
+  border: 0.5px solid rgba(255, 255, 255, 0.65);
+  outline: none;
+  cursor: default;
+}
+
+.cal__cell--empty {
+  cursor: default;
+}
+
+.cal__label {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(0.8rem, 1.15vw, 1.05rem);
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+/* ---- hover payment card ------------------------------------------ */
+.cal__card {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  background: #fdfcfa;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.cal__cell:hover .cal__card,
+.cal__cell:focus-visible .cal__card {
+  opacity: 1;
+}
+
+.cal__card-label {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(0.8rem, 1.15vw, 1.05rem);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.cal__card-value {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+  color: var(--ink);
+}
+
+/* green corner fold on the free month's card */
+.cal__fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 46px solid #7ce8a2;
+  border-left: 46px solid transparent;
+}
+
+/* the free month keeps a whisper of green even at rest */
+.cal__cell--free .cal__label::after {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: #7ce8a2;
+  vertical-align: 2px;
+}
+
+/* ---- tagline in the top margin ------------------------------------ */
+.cal__tagline {
+  position: absolute;
+  left: 50%;
+  top: 5.2%;
+  transform: translateX(-50%);
+  z-index: 5;
+
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(0.95rem, 1.4vw, 1.25rem);
+  letter-spacing: 0.04em;
+  color: var(--red);
+  white-space: nowrap;
+  pointer-events: none;
+}

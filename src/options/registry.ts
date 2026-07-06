@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import OptionPluck from "./OptionPluck";
 import OptionMask from "./OptionMask";
+import OptionCalendar from "./OptionCalendar";
 
 export type HeroOption = {
   id: string;
@@ -27,5 +28,11 @@ export const OPTIONS: HeroOption[] = [
     index: "02",
     label: "Unmask",
     Component: OptionMask,
+  },
+  {
+    id: "calendar",
+    index: "03",
+    label: "Calendar",
+    Component: OptionCalendar,
   },
 ];
