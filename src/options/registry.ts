@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import OptionPluck from "./OptionPluck";
-import OptionPlaceholder from "./OptionPlaceholder";
+import OptionMask from "./OptionMask";
 
 export type HeroOption = {
   id: string;
@@ -23,10 +23,9 @@ export const OPTIONS: HeroOption[] = [
     Component: OptionPluck,
   },
   {
-    id: "option-2",
+    id: "mask",
     index: "02",
-    label: "Option 2",
-    Component: OptionPlaceholder,
-    props: { label: "Option 02" },
+    label: "Unmask",
+    Component: OptionMask,
   },
 ];

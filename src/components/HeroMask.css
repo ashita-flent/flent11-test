@@ -1,0 +1,82 @@
+/* ============================================================
+   Hero · masking-puzzle reveal (Components 19–21)
+   ============================================================ */
+
+.mask {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: var(--bg);
+}
+
+.mask__stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* base image — peeks through the gaps between white tiles */
+.mask__base,
+.mask__reveal {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.mask__base {
+  z-index: 1;
+}
+
+/* white puzzle tiles masking the image */
+.mask__tile {
+  position: absolute;
+  z-index: 2;
+  background: #faf8f4;
+  border-radius: 3px;
+  box-shadow: 0 6px 20px rgba(26, 23, 20, 0.06);
+}
+
+/* the reveal square — sits above the white tiles and opens onto the image,
+   wiping the mask away as its clip expands */
+.mask__reveal {
+  z-index: 3;
+  will-change: clip-path, filter, transform;
+  transform-origin: center;
+}
+
+/* darkening scrim for the Component-21 settle */
+.mask__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mask__headline {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+
+  margin: 0;
+  text-align: center;
+  color: var(--red);
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 6.4vw, 6rem);
+  line-height: 0.96;
+  letter-spacing: -0.015em;
+  font-optical-sizing: auto;
+  pointer-events: none;
+  white-space: nowrap;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.12);
+}
