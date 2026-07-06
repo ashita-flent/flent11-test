@@ -1,30 +1,31 @@
-import HeroPluck from "./components/HeroPluck";
+import { useEffect, useState } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import OptionNav from "./components/OptionNav";
+import { OPTIONS } from "./options/registry";
 import { useSmoothScroll } from "./lib/useSmoothScroll";
 import "./App.css";
 
 export default function App() {
-  useSmoothScroll();
+  const lenisRef = useSmoothScroll();
+  const [active, setActive] = useState(OPTIONS[0].id);
+
+  const current = OPTIONS.find((o) => o.id === active) ?? OPTIONS[0];
+  const Current = current.Component;
+
+  // Reset to the top and re-measure whenever the active option changes, so
+  // each pinned scroll experience starts clean.
+  useEffect(() => {
+    lenisRef.current?.scrollTo(0, { immediate: true });
+    const id = requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => cancelAnimationFrame(id);
+  }, [active, lenisRef]);
 
   return (
     <main>
-      <HeroPluck />
+      {/* key forces a clean remount → old ScrollTriggers revert, new ones build */}
+      <Current key={current.id} {...current.props} />
 
-      {/* Placeholder next section — the full-bleed cover resolves into this.
-          Shares the box grey so the hand-off reads as continuous. */}
-      <section className="next">
-        <div className="next__inner">
-          <p className="next__eyebrow">The Flent&nbsp;11 exchange</p>
-          <h2 className="next__headline">
-            You complete eleven&nbsp;months.
-            <br />
-            You pay for ten.
-          </h2>
-          <p className="next__body">
-            One month, lifted out and handed back to you — while you stay for the
-            whole experience. No percentages, no fine print. Just a month on us.
-          </p>
-        </div>
-      </section>
+      <OptionNav options={OPTIONS} active={active} onSelect={setActive} />
     </main>
   );
 }
