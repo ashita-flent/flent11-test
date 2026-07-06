@@ -7,9 +7,14 @@ gsap.registerPlugin(ScrollTrigger);
 
 const IMG = "/home.jpg";
 
-/** 10 white masking tiles (%-of-viewport rects). The 11th "box" is the reveal
- *  square, expressed as the clip-path start below. */
-const TILES = [
+/**
+ * The 11 boxes are all WINDOWS onto the same full-bleed image — each one is
+ * the identical <img> clipped to its own rect (inset in %). Negative space
+ * between them is the page background; the photo is only visible THROUGH the
+ * boxes. Box #REVEAL_INDEX is the special one that expands to inset(0),
+ * filling in the whole picture.
+ */
+const BOXES = [
   { l: 4, t: 6, w: 19, h: 33 },
   { l: 25, t: 5, w: 21, h: 20 },
   { l: 54, t: 7, w: 18, h: 27 },
@@ -20,34 +25,33 @@ const TILES = [
   { l: 4, t: 71, w: 20, h: 24 },
   { l: 26, t: 55, w: 22, h: 24 },
   { l: 68, t: 70, w: 28, h: 25 },
+  { l: 41, t: 37, w: 22, h: 29 }, // ← the reveal square (centre)
 ];
+const REVEAL_INDEX = BOXES.length - 1;
 
-/** Reveal square — one of the 11 boxes, the one that opens onto the image.
- *  clip-path inset() derived: top / right / bottom / left. */
-const REVEAL = { l: 41, t: 37, w: 22, h: 29 };
-const CLIP0 = {
-  t: REVEAL.t,
-  r: 100 - (REVEAL.l + REVEAL.w),
-  b: 100 - (REVEAL.t + REVEAL.h),
-  l: REVEAL.l,
-};
+const insetOf = (b: (typeof BOXES)[number]) => ({
+  t: b.t,
+  r: 100 - (b.l + b.w),
+  b: 100 - (b.t + b.h),
+  l: b.l,
+});
 
 export default function HeroMask() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const revealRef = useRef<HTMLImageElement>(null);
   const scrimRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
+  const winsRef = useRef<HTMLImageElement[]>([]);
 
   useLayoutEffect(() => {
     const wrap = wrapRef.current!;
-    const reveal = revealRef.current!;
     const scrim = scrimRef.current!;
     const headline = headlineRef.current!;
+    const reveal = winsRef.current[REVEAL_INDEX];
 
     const ctx = gsap.context(() => {
-      // clip driven imperatively for rock-solid interpolation
-      const clip = { ...CLIP0 };
+      // reveal window's clip, driven imperatively for solid interpolation
+      const clip = insetOf(BOXES[REVEAL_INDEX]);
       const applyClip = () => {
         reveal.style.clipPath = `inset(${clip.t}% ${clip.r}% ${clip.b}% ${clip.l}%)`;
       };
@@ -68,7 +72,7 @@ export default function HeroMask() {
       // 1 · the square opens to full WIDTH (a band across the frame)
       tl.to(clip, { r: 0, l: 0, duration: 1.2, onUpdate: applyClip }, 0);
 
-      // 2 · then opens to full HEIGHT — whole image unmasked (Component 20)
+      // 2 · then opens to full HEIGHT — whole image filled in (Component 20)
       tl.to(clip, { t: 0, b: 0, duration: 1.4, onUpdate: applyClip }, 1.2);
 
       // hold (2.6 → 3.4): sharp image + red headline
@@ -94,22 +98,25 @@ export default function HeroMask() {
   return (
     <section className="mask" ref={wrapRef}>
       <div className="mask__stage" ref={stageRef}>
-        <img className="mask__base" src={IMG} alt="" aria-hidden />
+        {BOXES.map((b, i) => {
+          const c = insetOf(b);
+          return (
+            <img
+              key={i}
+              className={`mask__win${i === REVEAL_INDEX ? " mask__win--reveal" : ""}`}
+              src={IMG}
+              alt=""
+              aria-hidden
+              style={{
+                clipPath: `inset(${c.t}% ${c.r}% ${c.b}% ${c.l}%)`,
+              }}
+              ref={(el) => {
+                if (el) winsRef.current[i] = el;
+              }}
+            />
+          );
+        })}
 
-        {TILES.map((t, i) => (
-          <div
-            key={i}
-            className="mask__tile"
-            style={{
-              left: `${t.l}%`,
-              top: `${t.t}%`,
-              width: `${t.w}%`,
-              height: `${t.h}%`,
-            }}
-          />
-        ))}
-
-        <img className="mask__reveal" ref={revealRef} src={IMG} alt="" />
         <div className="mask__scrim" ref={scrimRef} aria-hidden />
 
         <h1 className="mask__headline" ref={headlineRef}>

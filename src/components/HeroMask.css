@@ -1,5 +1,8 @@
 /* ============================================================
    Hero · masking-puzzle reveal (Components 19–21)
+   The image is visible only THROUGH the boxes: every box is the
+   same full-bleed <img> clipped to its own rect. Negative space
+   is the page background.
    ============================================================ */
 
 .mask {
@@ -14,37 +17,26 @@
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  background: var(--bg); /* the negative space between windows */
 }
 
-/* base image — peeks through the gaps between white tiles */
-.mask__base,
-.mask__reveal {
+/* every window = the identical full-bleed image, clipped to its rect,
+   so all fragments stay perfectly aligned with each other */
+.mask__win {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
+  z-index: 2;
   user-select: none;
   -webkit-user-drag: none;
 }
 
-.mask__base {
-  z-index: 1;
-}
-
-/* white puzzle tiles masking the image */
-.mask__tile {
-  position: absolute;
-  z-index: 2;
-  background: #faf8f4;
-  border-radius: 3px;
-  box-shadow: 0 6px 20px rgba(26, 23, 20, 0.06);
-}
-
-/* the reveal square — sits above the white tiles and opens onto the image,
-   wiping the mask away as its clip expands */
-.mask__reveal {
+/* the special square rides above its siblings; expanding its clip
+   "fills in" the rest of the picture seamlessly */
+.mask__win--reveal {
   z-index: 3;
   will-change: clip-path, filter, transform;
   transform-origin: center;
