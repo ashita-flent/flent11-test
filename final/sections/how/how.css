@@ -1,0 +1,2784 @@
+/* ============================================================
+   Section · How it works — Figma Page 2 (node 13:3), exact build
+   One background image dollied by scroll; intro + step frames
+   cross-fade over it; journey indicator along the bottom.
+   All metrics are proportional to the 1512-wide Figma frame via
+   --u (1 Figma px). Vertical anchors use % of the 982-tall frame.
+   ============================================================ */
+
+.how {
+  /* 1 Figma px. Bounded by BOTH axes (contain-fit) so type and layout never
+     outgrow a wide-but-short viewport — the 1512×982 frame always fits. */
+  --u: min(calc(100vw / 1512), calc(100vh / 982));
+  --how-accent: #b26025;
+
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 620px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.how__stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* The 1512×982 design frame, contain-fit and centred; all content lives in
+   here so its geometry matches Figma at any viewport aspect. */
+.how__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--u) * 1512);
+  height: calc(var(--u) * 982);
+}
+
+/* ---- shared background (Figma 33:305 placement = intro) ---------- */
+/* Base = intro placement: 2019×1132 @ (-95,-88) in the 1512×982 frame.
+   Steps translate+scale this layer (origin top-left) to their own
+   Figma placements. Sized off the full viewport (not the contain-fit
+   frame) so the image always bleeds edge to edge. */
+.how__bg {
+  --uw: calc(100vw / 1512);
+  position: absolute;
+  left: calc(var(--uw) * -95);
+  top: -8.961%;
+  width: calc(var(--uw) * 2019);
+  height: 115.275%;
+  will-change: transform, opacity, filter;
+}
+
+.how__bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* the olive rendition (33:369 fill, 1614×816) — every beat past the
+   intro lives here. Sized to its EXACT ratio, anchored to the box's
+   top-left, so the design nodes (all ≈1.98) map with zero cover-crop:
+   height = 2019 × 816/1614 ÷ 1132 = 90.173% */
+.how__bg img.how__bg-b {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 90.173%;
+  object-fit: fill;
+  opacity: 0;
+}
+
+/* the completion's darker evening rendition (39:310 fill, 1024×429 —
+   ratio 2.387): height = 2019 ÷ 2.387 ÷ 1132 = 74.722% */
+.how__bg img.how__bg-c {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 74.722%;
+  object-fit: fill;
+  opacity: 0;
+}
+
+/* ---- dark gradient scrims ----------------------------------------- */
+/* step 2 (Figma 34:442): 30% black → clear over the top 562px */
+.how__scrim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.how__scrim--a {
+  height: 57.23%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0));
+}
+
+/* step 3 (Figma 36:307): 60% black → clear across the full frame */
+/* completion's grounding wash (39:311 — flipped: black 10% at the
+   floor, clearing upward; the olive room carries the contrast itself) */
+.how__scrim--b {
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+}
+
+/* the financing loop's wash (252:2354): 50% black fading down WITH a
+   10px backdrop blur. Figma masks background-blur by the fill's alpha;
+   CSS backdrop-filter fills the whole box, so the same gradient rides
+   mask-image to fade the blur alongside the darkness. */
+/* 252:2354 — one full-frame surface: uniform 10px backdrop blur, with
+   only the darkening fading down from 0.5. (No mask: masking the layer
+   would multiply into the gradient and square the falloff — the wash
+   then reads far lighter than design at mid-frame.) */
+.how__scrim--d {
+  height: 100%;
+  /* 322:2154 — black 50% fading to 136.86%. SOLID fill through the
+     gradient mask (the file's construction): one attenuation, so the
+     fill ramp matches the design AND the 10px blur fades on the same
+     ramp. (Gradient-in-both squared the falloff — the frame's lower
+     half ran far lighter than the design and white copy drowned on
+     the bright dapples.) */
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0) 136.86%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0) 136.86%);
+}
+
+/* the twin frame riding above the veil — carries only the intro copy
+   and the indicator; it must never trap the scene's pointer events */
+.how__frame--over {
+  pointer-events: none;
+}
+
+/* ---- intro frame (Figma 329:2687) --------------------------------- */
+/* copy + lead ride ABOVE the veil; the room and window sleep under it */
+.how__intro {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* the two statements (329:2689 — 809 col centred at (696.5, 411)) */
+.how__intro-copy {
+  position: absolute;
+  left: calc(var(--u) * 292);
+  top: calc(var(--u) * 233);
+  width: calc(var(--u) * 809);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 80);
+}
+
+.how__intro-kicker {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 32);
+  line-height: calc(var(--u) * 48);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.how__intro-kicker strong {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.how__intro-state {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 56);
+  line-height: calc(var(--u) * 90);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* "Your first month is free." — the one warm line (329:2692) */
+.how__intro-state em {
+  font-style: normal;
+  font-weight: 500;
+  color: #b0510c;
+}
+
+.how__intro-state strong {
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* the way in (329:2694) — text + chevrons at (1186, 802) */
+.how__intro-lead {
+  position: absolute;
+  left: calc(var(--u) * 1186);
+  top: calc(var(--u) * 802);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 10);
+  padding: 0;
+  background: none;
+  border: 0;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 24);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.how__intro-chev {
+  width: calc(var(--u) * 48);
+  height: calc(var(--u) * 48);
+  color: rgba(0, 0, 0, 0.6);
+  animation: how-chev-nudge 2.2s ease-in-out infinite;
+}
+
+@keyframes how-chev-nudge {
+  0%,
+  60%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateX(calc(var(--u) * 8));
+    opacity: 1;
+  }
+}
+
+.how__accent {
+  color: var(--how-accent);
+}
+
+/* the intro's white veil (329:2749) — solid white through a gradient
+   mask so the backdrop blur fades in step with the wash (gradient runs
+   to 1248 of the 982 frame ⇒ 127.1%). The file runs a PROGRESSIVE
+   background blur on this layer (radius 12 at the top easing to 4 at
+   the rect's foot); one masked layer approximates the ramp — 6px
+   (≈ radius 12) at the top, the mask fading it out with the wash.
+   Gotcha: the window rig's panes carry their own backdrop-filter and
+   Chromium never re-blurs another backdrop-filter's output, so this
+   veil can't haze the calendar — the rig self-blurs through the intro
+   instead (see the timeline in HowItWorks). */
+.how__iwash {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  mask-image: linear-gradient(to bottom, #000, transparent 127.1%);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 127.1%);
+  pointer-events: none;
+}
+
+.how__rentfield {
+  display: inline-flex;
+  align-items: baseline;
+  gap: calc(var(--u) * 4);
+  padding: 0 calc(var(--u) * 2) calc(var(--u) * 6);
+  border-bottom: calc(var(--u) * 1.5) dashed rgba(0, 0, 0, 0.35);
+  cursor: text;
+  transition: border-color 0.2s ease;
+}
+
+/* inline variant — the ₹ figure sits inside the move-in sub, white on
+   the darkened wall, still every bit the fill-in-the-blank */
+.how__rentfield--inline {
+  padding: 0 calc(var(--u) * 2) calc(var(--u) * 1);
+  border-bottom-color: rgba(255, 255, 255, 0.45);
+  vertical-align: baseline;
+}
+
+.how__rentfield--inline:hover,
+.how__rentfield--inline:focus-within {
+  border-bottom-color: rgba(255, 255, 255, 0.8);
+}
+
+.how__rentfield--inline .how__rentfield-rupee,
+.how__rentfield--inline .how__rentfield-sizer {
+  font-weight: 600;
+  font-size: calc(var(--u) * 20);
+  color: #fff;
+}
+
+.how__rentfield--inline .how__rentfield-input {
+  color: #fff;
+  caret-color: #fff;
+}
+
+.how__rentfield--inline .how__rentfield-pencil {
+  width: calc(var(--u) * 14);
+  height: calc(var(--u) * 14);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.how__rentfield:hover {
+  border-color: rgba(0, 0, 0, 0.6);
+}
+
+.how__rentfield:focus-within {
+  border-bottom-style: solid;
+  border-color: var(--how-accent);
+}
+
+.how__rentfield-rupee {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 26);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* grid twin: the hidden span sets the width, so the input hugs the
+   value exactly at any length */
+.how__rentfield-sizer {
+  display: inline-grid;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 26);
+  letter-spacing: -0.02em;
+}
+
+.how__rentfield-sizer > span {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  white-space: pre;
+}
+
+.how__rentfield-input {
+  grid-area: 1 / 1;
+  width: 100%;
+  min-width: calc(var(--u) * 30);
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  color: #000;
+  caret-color: var(--how-accent);
+  outline: none;
+}
+
+.how__rentfield-input::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.how__rentfield-pencil {
+  width: calc(var(--u) * 17);
+  height: calc(var(--u) * 17);
+  margin-left: calc(var(--u) * 6);
+  align-self: center;
+  color: rgba(0, 0, 0, 0.4);
+  transition: color 0.2s ease;
+}
+
+.how__rentfield:hover .how__rentfield-pencil,
+.how__rentfield:focus-within .how__rentfield-pencil {
+  color: var(--how-accent);
+}
+
+/* ---- full-bleed greenery (Figma 39:383 — 1624×2162 @ (-8,-617)) ------
+   Centred and sized to COVER the viewport at any aspect (the Figma box is
+   proportional at the design ratio, but must never leave gaps on wide or
+   short screens). Centring is done via gsap xPercent/yPercent −50. */
+.how__green-full {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(calc(var(--u) * 1624), 103vw, calc(103vh * 0.7512));
+  aspect-ratio: 1624 / 2162;
+  overflow: hidden;
+  will-change: transform, opacity, filter;
+}
+
+.how__green-full img {
+  position: absolute;
+  left: -0.14%;
+  top: -12.39%;
+  width: 100.14%;
+  height: 112.56%;
+  object-fit: cover;
+}
+
+/* progressive blur (Figma frame 6) — the heavy frost owns most of the
+   frame (top → ~60%) and only melts to crisp grass/bokeh in the bottom
+   strip; the whole scene sits darker and richer than the raw photo.
+   A near-sharp darkened base + a heavy-blur copy masked over it. The
+   container's own blur is only used for the soft entry settle. */
+.how__gf-base {
+  filter: blur(1px) brightness(0.88) saturate(1.05);
+}
+
+.how__gf-blur {
+  filter: blur(22px) brightness(0.85) saturate(1.05);
+  transform: scale(1.02); /* hide the blur's soft edge */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 58%,
+    transparent 92%
+  );
+  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 92%);
+}
+
+/* ---- step frames -------------------------------------------------- */
+.how__step {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+}
+
+/* ---- step copy (Figma 17:31 @ (97,566), gap 24) ------------------- */
+.how__copy {
+  position: absolute;
+  left: calc(var(--u) * 96);
+  top: 57.637%;
+}
+
+.how__title {
+  max-width: calc(var(--u) * 694); /* Figma copy column — wraps clear of the window */
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 56);
+  line-height: normal;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+.how__body {
+  margin-top: calc(var(--u) * 24);
+  width: calc(var(--u) * 694);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 20);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: #000;
+}
+
+.how__body em {
+  font-weight: 500;
+  font-style: italic;
+}
+
+.how__body strong {
+  font-weight: 500;
+}
+
+/* steps 3–4 copy sits at Figma frame 5's position (97, 216) */
+.how__copy--scaffold {
+  top: 22%;
+}
+
+/* step 3 copy — white on the darkened, blurred room (Figma frame 5) */
+.how__copy--monthly .how__title,
+.how__copy--monthly .how__body {
+  color: #fff;
+}
+
+/* completion copy — white, right of the corner dive (39:363 — (854,471),
+   577 col) */
+.how__copy--complete {
+  left: calc(var(--u) * 854);
+  top: calc(var(--u) * 471);
+}
+
+.how__copy--complete .how__title,
+.how__copy--complete .how__body {
+  color: #fff;
+  max-width: calc(var(--u) * 577);
+}
+
+.how__copy--complete .how__body {
+  width: calc(var(--u) * 577);
+  margin-top: calc(var(--u) * 24);
+}
+
+/* step 2 copy — white, vertically centred (Figma 34:438 @ 50% − 189.5) */
+.how__copy--movein {
+  top: calc(50% - var(--u) * 180.5);
+  transform: translateY(-50%);
+}
+
+/* ── the financing loop (Figma 252:2352) ─────────────────────────── */
+.how__copy--emi {
+  left: calc(var(--u) * 85);
+  top: calc(var(--u) * 142);
+}
+
+.how__kicker {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 40);
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: calc(var(--u) * 20);
+}
+
+.how__title--emi {
+  color: #fff;
+  max-width: calc(var(--u) * 700);
+  font-size: calc(var(--u) * 48);
+  line-height: calc(var(--u) * 68);
+  letter-spacing: -0.04em;
+}
+
+/* ── the financed-upfront beat (Figma 322:2083) ────────────────────── */
+.how__copy--fin3 {
+  left: calc(var(--u) * 94);
+  top: calc(var(--u) * 157);
+}
+
+.how__title--fin3 {
+  color: rgba(255, 255, 255, 0.8);
+  max-width: calc(var(--u) * 730);
+  font-size: calc(var(--u) * 46);
+  line-height: 1.26;
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+
+.how__title--fin3 strong {
+  font-weight: 600;
+  color: #fff;
+}
+
+.how__fin3 {
+  position: absolute;
+  left: calc(var(--u) * 94);
+  top: calc(var(--u) * 333);
+  width: calc(var(--u) * 486);
+  height: calc(var(--u) * 116);
+}
+
+.how__fin3-gromor,
+.how__fin3-flent,
+.how__mon-gromor {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+}
+
+.how__fin3-gromor {
+  left: 0;
+}
+
+.how__fin3-flent {
+  left: calc(var(--u) * 406);
+  width: calc(var(--u) * 80);
+}
+
+.how__fin3-gtile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--u) * 68);
+  height: calc(var(--u) * 68);
+  border-radius: calc(var(--u) * 16);
+  background: #fff;
+  box-shadow: 0 calc(var(--u) * 3.2) calc(var(--u) * 13.6) rgba(0, 0, 0, 0.15);
+}
+
+.how__fin3-gcrop {
+  position: relative;
+  width: calc(var(--u) * 28.8);
+  height: calc(var(--u) * 48);
+  overflow: hidden;
+}
+
+.how__fin3-gcrop img {
+  position: absolute;
+  height: 116.67%;
+  width: 722.22%;
+  left: -55.56%;
+  top: -9.17%;
+  max-width: none;
+}
+
+/* flent receives on a glowing tile (0 0 36 white 75%) */
+.how__fin3-ftile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--u) * 68);
+  height: calc(var(--u) * 68);
+  border-radius: calc(var(--u) * 13.8);
+  background: #fff;
+  box-shadow: 0 0 calc(var(--u) * 36) rgba(255, 255, 255, 0.75);
+}
+
+.how__fin3-ftile svg {
+  width: calc(var(--u) * 28);
+  height: calc(var(--u) * 34);
+  display: block;
+}
+
+.how__fin3-tlabel {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 16);
+  line-height: calc(var(--u) * 20);
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.how__fin3-w1,
+.how__fin3-w2,
+.how__mon-wire {
+  position: absolute;
+  display: block;
+}
+
+.how__fin3-w1 {
+  left: calc(var(--u) * 68);
+  top: calc(var(--u) * 32);
+  width: calc(var(--u) * 116);
+}
+
+.how__fin3-w2 {
+  left: calc(var(--u) * 310);
+  top: calc(var(--u) * 32);
+  width: calc(var(--u) * 87);
+}
+
+.how__fin3-w1 .how__tflow-wire,
+.how__fin3-w2 .how__tflow-wire,
+.how__mon-wire .how__tflow-wire {
+  position: static;
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: none; /* the base art self-centres with translateY(-50%) */
+  color: rgba(255, 255, 255, 0.9); /* Vectors 9/10/11 — white dashes */
+}
+
+.how__fin3-amt {
+  position: absolute;
+  left: calc(var(--u) * 196);
+  top: calc(var(--u) * 21);
+  width: calc(var(--u) * 106);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 6);
+  font-family: var(--sans);
+  text-align: center;
+}
+
+.how__fin3-amt strong {
+  font-weight: 600;
+  font-size: calc(var(--u) * 20);
+  letter-spacing: -0.04em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.how__fin3-amt s {
+  font-weight: 400;
+  font-size: calc(var(--u) * 16);
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+.how__fin3-sub {
+  position: absolute;
+  left: calc(var(--u) * 94);
+  top: calc(var(--u) * 509);
+  width: calc(var(--u) * 429);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  line-height: calc(var(--u) * 30);
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.how__fin3-sub strong {
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ── the monthly-EMI beat (Figma 322:2152, 2026-07-16 redesign) ────── */
+.how__copy--mon {
+  left: calc(var(--u) * 85);
+  top: calc(var(--u) * 175);
+}
+
+/* headline (322:2224) — the second line carries the weight */
+.how__title--mon {
+  max-width: calc(var(--u) * 721);
+  font-weight: 400;
+  font-size: calc(var(--u) * 44);
+  line-height: calc(var(--u) * 60);
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.how__title--mon strong {
+  font-weight: 500;
+  color: #fff;
+}
+
+.how__mon-sub {
+  margin-top: calc(var(--u) * 42);
+  width: calc(var(--u) * 429);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  line-height: calc(var(--u) * 30);
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.how__mon-sub strong {
+  font-weight: 500;
+  color: #fff;
+}
+
+/* diagram origin (84, 488): tenant · wire · the EMI deck · Gromor */
+.how__mon {
+  position: absolute;
+  left: calc(var(--u) * 84);
+  top: calc(var(--u) * 488);
+  width: calc(var(--u) * 672);
+  height: calc(var(--u) * 220);
+}
+
+.how__mon-wire {
+  left: calc(var(--u) * 120);
+  top: calc(var(--u) * 56.86);
+  width: calc(var(--u) * 432);
+}
+
+/* the flanking cards — hairline-bordered glass (336:2793 / 344:2817) */
+.how__mon-tenant,
+.how__mon-gromor {
+  position: absolute;
+  top: 0;
+  width: calc(var(--u) * 120);
+  height: calc(var(--u) * 120);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 10);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: calc(var(--u) * 12);
+}
+
+.how__mon-tenant {
+  left: 0;
+}
+
+.how__mon-gromor {
+  left: calc(var(--u) * 552);
+}
+
+.how__mon-tenant img {
+  width: calc(var(--u) * 40);
+  height: calc(var(--u) * 40);
+  border: 1px solid #fff;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.how__mon-tenant span {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  letter-spacing: -0.04em;
+  color: #fff;
+  /* the diagram floats over the room, whose light drifts bright here —
+     a soft dark halo lifts the white clear of it (same play as the
+     indicator's .is-white shadow) so it reads as crisp as in Figma */
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 0 14px rgba(0, 0, 0, 0.4);
+}
+
+/* the gromor "9" — the wordmark sprite cropped to the glyph */
+.how__mon-gcrop {
+  position: relative;
+  width: calc(var(--u) * 23.04);
+  height: calc(var(--u) * 38.4);
+  overflow: hidden;
+}
+
+.how__mon-gcrop img {
+  position: absolute;
+  height: 116.67%;
+  width: 722.22%;
+  left: -55.56%;
+  top: -9.17%;
+  max-width: none;
+}
+
+.how__mon-gname {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  line-height: calc(var(--u) * 20);
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 0 14px rgba(0, 0, 0, 0.4);
+}
+
+.how__mon-gsum {
+  margin-top: calc(var(--u) * -8);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 12);
+  letter-spacing: -0.03em;
+  /* Figma keeps the total at 50% white; the halo carries it over the
+     brighter build backdrop without pushing the value past design */
+  color: rgba(255, 255, 255, 0.62);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 0 12px rgba(0, 0, 0, 0.38);
+}
+
+/* the EMI deck (344:2794) — January's card on the wire; the following
+   months recede behind at 0.8× steps, softer and fainter each row */
+.how__mon-card {
+  position: absolute;
+  left: calc(var(--u) * 233);
+  top: calc(var(--u) * 11);
+  width: calc(var(--u) * 185);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 12);
+  padding: calc(var(--u) * 12) calc(var(--u) * 16);
+  border-radius: calc(var(--u) * 12);
+  /* effectively OPAQUE: inside this pinned/composited subtree Chromium's
+     backdrop-filter blurs the ROOM but never the SIBLING cards (verified
+     by bisection), so the card's own body must do all the occluding — at
+     0.82 the deck card behind read straight through it. Kept a whisper of
+     translucency at the foot for a hint of glass, nothing more. */
+  background: linear-gradient(
+    to bottom,
+    #fff,
+    rgba(255, 255, 255, 0.985)
+  );
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow: 0 calc(var(--u) * 4) calc(var(--u) * 16) rgba(0, 0, 0, 0.1);
+  transform-origin: 50% 0;
+}
+
+.how__mon-card-head {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 12);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+
+.how__mon-card-head strong {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.how__mon-card-amt {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 24);
+  line-height: calc(var(--u) * 28);
+  letter-spacing: -0.03em;
+  color: #000;
+  white-space: nowrap;
+}
+
+.how__mon-card-label {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 12);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.how__mon-card-bank {
+  position: absolute;
+  right: calc(var(--u) * 15.6);
+  top: calc(var(--u) * 12);
+  width: calc(var(--u) * 15.4);
+  height: calc(var(--u) * 15.4);
+  color: #000;
+}
+
+/* every card in the deck is REAL glass — a body dense enough to
+   occlude whatever sits behind it (Chromium never lets one card's
+   backdrop-filter sample its siblings here), its own backdrop blur for
+   the room, and depth (y/scale/opacity/self-blur) driven entirely by
+   the monthly beat's timeline as the payment cycle advances the deck.
+   The cards behind stay FULL cards — laid one over the next, just
+   lighter and blurrier with depth — never masked into a half-cut sliver. */
+
+/* the closing card — takes the front slot once every cycle is paid */
+.how__mon-done {
+  align-items: center;
+  text-align: center;
+  gap: calc(var(--u) * 6);
+  padding: calc(var(--u) * 16) calc(var(--u) * 16);
+}
+
+.how__mon-done-check {
+  width: calc(var(--u) * 26);
+  height: calc(var(--u) * 26);
+  color: rgba(0, 100, 55, 0.85);
+}
+
+.how__mon-done-title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 16);
+  letter-spacing: -0.03em;
+  color: #000;
+}
+
+.how__mon-done-sub {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 12);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* ── the rent cycles in the glass (322:2189… + no-cost badges) ─────── */
+.how__pamt {
+  position: absolute;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 12);
+  line-height: normal;
+  letter-spacing: -0.04em;
+  color: #fff;
+  mix-blend-mode: overlay;
+}
+
+.how__pdisc {
+  position: absolute;
+  right: calc(var(--u) * 16);
+  top: calc(var(--u) * 12);
+  width: calc(var(--u) * 20);
+  height: calc(var(--u) * 20);
+  color: #fff;
+  mix-blend-mode: overlay;
+}
+
+.how__fin2 {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Gromor, the funder (252:2451) */
+.how__fin2-gromor {
+  position: absolute;
+  left: calc(var(--u) * 85);
+  top: calc(var(--u) * 444);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 16);
+}
+
+.how__fin2-gtile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--u) * 64);
+  height: calc(var(--u) * 64);
+  border-radius: calc(var(--u) * 12.8);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.how__fin2-gcrop {
+  position: relative;
+  width: calc(var(--u) * 23.04);
+  height: calc(var(--u) * 38.4);
+  overflow: hidden;
+}
+
+.how__fin2-gcrop img {
+  position: absolute;
+  height: 116.67%;
+  width: 722.22%;
+  left: -55.56%;
+  top: -9.17%;
+  max-width: none;
+}
+
+.how__fin2-gtext {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 16);
+  line-height: calc(var(--u) * 28);
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.how__fin2-gtext strong {
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+
+/* wires — reuse the flow-wire art; the funding leg runs straight down */
+.how__fin2-vwire {
+  position: absolute;
+  /* rotate(90°) maps the art's local +y to −x: the line paints 3.14u
+     left of the origin — offset the origin so it runs down x = 117,
+     the Gromor tile's centre */
+  left: calc(var(--u) * 120.14);
+  top: calc(var(--u) * 509);
+  width: calc(var(--u) * 89);
+  transform: rotate(90deg);
+  transform-origin: 0 0;
+  display: block;
+}
+
+.how__fin2-hwire {
+  position: absolute;
+  left: calc(var(--u) * 411);
+  /* the line sits 3.14u into the art — top 676.86 paints it at y 680,
+     the EMI squares' centreline */
+  top: calc(var(--u) * 676.86);
+  width: calc(var(--u) * 336);
+  display: block;
+}
+
+.how__fin2-vwire .how__tflow-wire,
+.how__fin2-hwire .how__tflow-wire {
+  position: static;
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: none; /* the base art self-centres with translateY(-50%) */
+  color: #000; /* 252:2420/2436 — black arrows on the daylit EMI beat */
+}
+
+/* the tenant's upfront card (252:2421) — frosted glass, brightening down */
+.how__fin2-card {
+  position: absolute;
+  left: calc(var(--u) * 85);
+  top: calc(var(--u) * 600);
+  width: calc(var(--u) * 339);
+  height: calc(var(--u) * 160);
+  padding: calc(var(--u) * 20) calc(var(--u) * 28);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 16);
+  border-radius: calc(var(--u) * 20);
+  border: 1px solid #fff;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.9)
+  );
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.how__fin2-tenant {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 12);
+}
+
+.how__fin2-tenant img {
+  width: calc(var(--u) * 36);
+  height: calc(var(--u) * 36);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.how__fin2-tname {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 2);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 12);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.how__fin2-tname strong {
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  letter-spacing: -0.01em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.how__fin2-amts {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 28);
+  letter-spacing: -0.04em;
+  color: #000;
+  line-height: 1;
+}
+
+.how__fin2-amts s {
+  font-weight: 400;
+  font-size: calc(var(--u) * 20);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.how__fin2-note {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 14);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.how__fin2-note strong {
+  font-weight: 500;
+  color: #000;
+}
+
+/* the split caption + per-month pill (252:2456) */
+.how__fin2-cap {
+  position: absolute;
+  left: calc(var(--u) * 455);
+  top: calc(var(--u) * 576);
+  width: calc(var(--u) * 264);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 12);
+  text-align: center;
+}
+
+.how__fin2-cap p {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  letter-spacing: -0.01em;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.how__fin2-pill {
+  padding: calc(var(--u) * 6) calc(var(--u) * 12);
+  border-radius: calc(var(--u) * 40);
+  background: rgba(255, 255, 255, 0.8);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 14);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.how__fin2-pill strong {
+  font-weight: 600;
+  color: #000;
+}
+
+/* the ten EMIs riding the wire (252:2437) — the paid one glows */
+.how__fin2-emis {
+  position: absolute;
+  left: calc(var(--u) * 464);
+  top: calc(var(--u) * 674);
+  width: calc(var(--u) * 246);
+  display: flex;
+  justify-content: space-between;
+}
+
+.how__fin2-emis i {
+  display: block;
+  width: calc(var(--u) * 12);
+  height: calc(var(--u) * 12);
+  border-radius: calc(var(--u) * 3);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(7.5px);
+  -webkit-backdrop-filter: blur(7.5px);
+}
+
+.how__fin2-emis i.is-paid {
+  border: 0;
+  background: #fff;
+  box-shadow: 0 0 20px #fff;
+}
+
+/* flent, where the rent lands (252:2357) */
+.how__fin2-flent {
+  position: absolute;
+  left: calc(var(--u) * 750);
+  top: calc(var(--u) * 628);
+  width: calc(var(--u) * 103);
+  height: calc(var(--u) * 103);
+}
+
+/* ── completion frame's onward chevrons (248:2134) ── */
+/* the completion step rides above the window rig: its chevrons rest ON
+   the frosted exit pane (the step's own transform traps child z-indexes,
+   so the STEP carries the layer; hidden beats drop visibility, so it
+   never intercepts elsewhere) */
+.how__step--complete {
+  z-index: 6;
+}
+
+/* the way onward — chevrons resting IN the frosted exit pane (329:2659;
+   pane on-screen at (230.7,291)→(630.4,690.4), centre (430.5, 490.7)).
+   The "Chevrons right" instance (329:2661) is 86.5-square, centred in the
+   398.7 pane — so the icon box tracks that, and the whole box is the hit
+   target. */
+.how__scroll-on {
+  position: absolute;
+  left: calc(var(--u) * 430.5);
+  top: calc(var(--u) * 490.7);
+  transform: translate(-50%, -50%);
+  width: calc(var(--u) * 86.5);
+  height: calc(var(--u) * 86.5);
+  padding: 0;
+  background: none;
+  border: 0;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  pointer-events: auto;
+  /* rides ABOVE the window rig — the chevrons rest ON the frosted pane */
+  z-index: 5;
+}
+
+.how__scroll-on svg {
+  width: 100%;
+  height: 100%;
+  /* a subtle onward drift RIGHT (the design is static; the old vertical
+     bob read as a jump against a right-pointing chevron) */
+  animation: how-chev-nudge 2.4s ease-in-out infinite;
+  transition: color 0.25s ease;
+}
+
+/* clear invitation on hover — brighten and lean into the direction */
+.how__scroll-on:hover svg,
+.how__scroll-on:focus-visible svg {
+  color: #fff;
+  animation-play-state: paused;
+}
+
+@keyframes how-chev-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(var(--u) * 4));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .how__scroll-on svg {
+    animation: none;
+  }
+}
+
+/* the catch-teaser resting low on the light floor band (241:1543) */
+.how__catch {
+  position: absolute;
+  left: calc(var(--u) * 99);
+  top: calc(var(--u) * 777);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 24);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.how__copy--movein .how__title,
+.how__copy--movein .how__body {
+  color: #fff;
+}
+
+/* ---- House-Rent card → flent app icon flow (Figma 174:522/174:685) ---
+   The card lands paid (avatar + green check, plan line, amount), the
+   wire draws right, and the black flent icon receives it. */
+.how__tflow {
+  position: absolute;
+  left: calc(var(--u) * 96);
+  top: calc(var(--u) * 519.8);
+  width: calc(var(--u) * 674.4);
+  height: calc(var(--u) * 74.4);
+}
+
+.how__paycard {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--u) * 333);
+  height: calc(var(--u) * 74.4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--u) * 10) calc(var(--u) * 16) calc(var(--u) * 10)
+    calc(var(--u) * 10);
+  background: #fff;
+  border-radius: calc(var(--u) * 16);
+  will-change: transform, opacity;
+}
+
+.how__paycard-left {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 14);
+}
+
+.how__paycard-avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: calc(var(--u) * 54.4);
+  height: calc(var(--u) * 54.4);
+}
+
+.how__paycard-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--u) * 10);
+  border: 0.8px solid #fff;
+  object-fit: cover;
+}
+
+.how__paycard-check {
+  position: absolute;
+  left: calc(var(--u) * 38);
+  bottom: calc(var(--u) * 0.2);
+  width: calc(var(--u) * 20);
+  height: calc(var(--u) * 20);
+}
+
+.how__paycard-text {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 4);
+}
+
+.how__paycard-title {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 16);
+  line-height: normal;
+  letter-spacing: -0.03em;
+  color: #000;
+  white-space: nowrap;
+}
+
+.how__paycard-sub {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 12);
+  line-height: normal;
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.how__paycard-amt {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 24);
+  line-height: normal;
+  letter-spacing: -0.04em;
+  color: #000;
+  white-space: nowrap;
+}
+
+.how__paycard-amt s {
+  font-size: calc(var(--u) * 12);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* the wire (174:587 — card edge → icon), white gradient + arrowhead */
+.how__tflow-wire {
+  position: absolute;
+  left: calc(var(--u) * 333);
+  top: 50%;
+  transform: translateY(-50%);
+  width: calc(var(--u) * 259);
+  height: calc(var(--u) * 5.78);
+  color: #fff; /* gradient stops ride currentColor; night contexts stay light */
+}
+
+/* the flent app icon (174:585) */
+.how__flenticon {
+  position: absolute;
+  left: calc(var(--u) * 600);
+  top: 0;
+  width: calc(var(--u) * 74.4);
+  height: calc(var(--u) * 74.4);
+  will-change: transform, opacity;
+}
+
+.how__flenticon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- pane window (Figma 33:410 — 510×680 @ (935,105)) ------------- */
+/* Shared by steps 2 & 3; the rig is transform-driven by the timeline
+   (zoomed 2.349× on step 2 → home on step 3). Frost, blends and borders
+   are live CSS so they stay crisp through the zoom. */
+.how__winrig {
+  --frost: 7px; /* pane blur — tweened with the zoom (16.445px ↔ 7px) */
+  --mull: #552f15; /* mullion/frame colour — glassy white in the final state */
+  position: absolute;
+  left: calc(var(--u) * 935);
+  top: calc(var(--u) * 155);
+  width: calc(var(--u) * 510);
+  height: calc(var(--u) * 680);
+  will-change: transform, opacity;
+}
+
+/* final state (Figma 39:469) — white glass mullions, brighter m1, no EMI */
+/* the corner dive reads SOLID espresso strokes (the design composites
+   its borders over the dark greenery; our overlay-blend against the
+   bright wall washes amber — raster wins, like the upfront variant) */
+.how__winrig.is-final {
+  --mull: #552f15;
+}
+
+.is-final .how__mulls {
+  mix-blend-mode: normal;
+}
+
+/* glass area — clips the greenery's -12% top crop; the wooden frame is an
+   OUTSIDE stroke so it wraps this box rather than eating into the panes */
+.how__winclip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* sharp greenery behind the panes (Figma 33:411 — 112.56% tall crop) */
+.how__win-green {
+  position: absolute;
+  left: -0.14%;
+  top: -12.39%;
+  width: 100.14%;
+  height: 112.56%;
+  object-fit: cover;
+}
+
+/* frosted panes — 170px cells, full-bleed glass (the month-1 card reads
+   white to its very edge); the mullion strokes live on their own layer
+   above (see .how__mulls) */
+.how__pane {
+  position: absolute;
+  width: calc(var(--u) * 170);
+  height: calc(var(--u) * 170);
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(var(--frost));
+  -webkit-backdrop-filter: blur(var(--frost));
+  transition:
+    backdrop-filter 0.35s ease,
+    -webkit-backdrop-filter 0.35s ease,
+    background 0.5s ease,
+    box-shadow 0.5s ease;
+}
+
+/* payment flash — a soft white bloom pulsed on a pane the instant its EMI
+   dissolves in (opacity driven by the monthly beat, then cleared). Its own
+   layer with no transition so the beat owns the timing entirely. */
+.how__pflash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 42%,
+    rgba(255, 255, 255, 1),
+    rgba(255, 255, 255, 0.92) 45%,
+    rgba(255, 255, 255, 0) 85%
+  );
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* mullion strokes — outside-aligned on the 170 grid (Figma), drawn as
+   their own layer ABOVE the glass: under a neighbouring pane's
+   backdrop-filter they'd be smeared into the frost. The overlay blend
+   melds them with the frosted greenery (raster: dark chocolate over the
+   green, lifting warm where the light does). Colour rides --mull so the
+   final/upfront variants re-skin them. */
+.how__mulls {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.how__mull-grid {
+  fill: var(--mull);
+  transition: fill 0.5s ease;
+}
+
+/* the corner dive swaps to the 5u no-thinning grid (329:2632) — full
+   crisp borders around the frosted exit pane, hairlines rest */
+.how__mull-grid {
+  transition: fill 0.5s ease, opacity 0.8s ease;
+}
+
+.how__mull-final {
+  fill: var(--mull);
+  opacity: 0;
+  transition: opacity 0.8s ease, fill 0.5s ease;
+}
+
+.is-final .how__mull-final {
+  opacity: 1;
+}
+
+.is-final .how__mull-grid {
+  opacity: 0;
+}
+
+/* the lit strokes ride their own layer (solid, not blended) so the warm
+   tint reads true over the night glass */
+.how__mulls--lit {
+  mix-blend-mode: normal;
+}
+
+.how__mull-lit {
+  fill: rgba(255, 235, 194, 0.4);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* hover: frost deepens (7 → 22px) and the EMI reveals — armed on step 3
+   only (.is-hoverable), not in the zoomed step 2 or the final frame */
+.is-hoverable .how__pane:hover {
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+
+/* month 1 — bright, always-on (Figma 35:447; brighter in 39:474).
+   NO box-shadow here: the pane sits at the window's clipped top-left
+   corner, so its own shadow could only render right/down (the uneven
+   bloom) — the even halo lives on the unclipped glow rig instead. */
+.how__pane--m1 {
+  background: rgba(255, 255, 255, 0.7); /* Figma 35:447: white 70% */
+  backdrop-filter: blur(16.445px);
+  -webkit-backdrop-filter: blur(16.445px);
+}
+
+/* final frame (Figma 39:474): month 1 stays the bright card — brighter
+   still (white 90%) — with the accent ₹0, black label and dark etch.
+   That contrast is what keeps it legible over the full-bleed greenery. */
+/* final state (39:309): the labels rest — the corner dive is wordless;
+   EMI reveal retired */
+.is-final .how__plabel {
+  opacity: 0;
+}
+
+.is-final .how__preveal,
+.is-final .how__preveal-avatar {
+  display: none;
+}
+
+/* the exit pane frosts over on the completion beat (329:2660 — white
+   40% + 16.4 blur) and receives the onward chevrons */
+.how__pane-exit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* over the sharp greenery slice */
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16.4px);
+  -webkit-backdrop-filter: blur(16.4px);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.is-final .how__pane-exit::before {
+  opacity: 1;
+}
+
+/* etched month labels — white, overlay blend (Figma 36:3…) */
+.how__plabel {
+  position: absolute;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 20);
+  line-height: normal;
+  letter-spacing: -0.04em;
+  color: #fff;
+  mix-blend-mode: overlay;
+  transition: opacity 0.3s ease;
+}
+
+/* hover reveal — solid-white amount + etched label (Figma 36:19 @ local
+   y 91) with the bank icon etched top-right (36:268 @ local (132,25)) */
+.how__preveal {
+  position: absolute;
+  top: calc(var(--u) * 91);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.is-hoverable .how__pane:hover .how__preveal {
+  opacity: 1;
+}
+
+.is-hoverable .how__pane:hover > .how__plabel {
+  opacity: 0;
+}
+
+.how__preveal-avatar {
+  position: absolute;
+  /* 252:2400 — chip at window (286, 199.41) → local (116, 29.4) */
+  top: calc(var(--u) * 29.4);
+  left: calc(var(--u) * 116);
+  width: calc(var(--u) * 34.8);
+  height: calc(var(--u) * 34.8);
+  border: calc(var(--u) * 0.512) solid #fff;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.is-hoverable .how__pane:hover > .how__preveal-avatar {
+  opacity: 1;
+}
+
+/* 252:2394 — solid-white ₹45,000 at 24, etched 20px label below */
+.how__preveal-amt {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 24);
+  line-height: normal;
+  letter-spacing: -0.04em;
+  color: #fff;
+}
+
+.how__preveal-label {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 20);
+  line-height: normal;
+  letter-spacing: -0.04em;
+  color: #fff;
+  mix-blend-mode: overlay;
+}
+
+/* etched flent mark on the month-1 pane (Figma 36:277 — black @ low alpha) */
+.how__m1-flent {
+  position: absolute;
+  left: calc(var(--u) * 111);
+  top: calc(var(--u) * 17);
+  width: calc(var(--u) * 41);
+  height: calc(var(--u) * 14.91); /* asset is 100%/100% sized — no intrinsic ratio */
+  opacity: 0.45; /* legible etch over the bright frost, still quiet */
+  transition:
+    filter 0.5s ease,
+    opacity 0.5s ease;
+}
+
+/* month 1 contents (Figma 35:449 @ local (15.81, 75.82)) */
+.how__m1 {
+  position: absolute;
+  left: calc(var(--u) * 15.81);
+  top: calc(var(--u) * 75.82);
+  display: flex;
+  flex-direction: column;
+}
+
+.how__m1-amt {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: calc(var(--u) * 40);
+  line-height: normal;
+  letter-spacing: -0.08em;
+  color: var(--how-accent);
+  margin-bottom: calc(var(--u) * -1.8);
+  transition: color 0.5s ease; /* accent → white on the final frame */
+}
+
+.how__m1-label {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 20);
+  line-height: normal;
+  letter-spacing: -0.04em;
+  color: #000;
+  transition: color 0.5s ease;
+}
+
+/* ---- stage-level window companions -------------------------------- */
+/* The wooden frame's overlay blend and the ₹0 glow must composite against
+   the WALL — inside the transformed rig they could only blend with rig
+   content. These rigs share the window's exact geometry + transforms.
+   Base position = the contain-fit frame's origin (50% − 756u, 50% − 491u)
+   plus the window's home offset (935, 155). */
+.how__glowrig,
+.how__framerig {
+  position: absolute;
+  left: calc(50% + var(--u) * 179);
+  top: calc(50% - var(--u) * 336);
+  width: calc(var(--u) * 510);
+  height: calc(var(--u) * 680);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.how__framerig {
+  --mull: #552f15;
+  mix-blend-mode: overlay; /* blend applied where it composites with the wall */
+}
+
+
+/* wooden frame — OUTSIDE stroke + soft white drop glow. Raster-verified
+   (33:368 pixel strip): the 10px stroke occupies the band just past the
+   glass bounds, so its overlay blend composites with the WALL (golden),
+   never with the glass/greenery. */
+.how__winframe {
+  position: absolute;
+  inset: calc(var(--u) * -10);
+  border: calc(var(--u) * 10) solid var(--mull);
+  background: transparent;
+  box-shadow: calc(var(--u) * 5) calc(var(--u) * 8) calc(var(--u) * 13) 0
+    rgba(255, 255, 255, 0.15);
+  transition: border-color 0.5s ease;
+}
+
+/* glowing white halo — the ONLY glow source, on the unclipped rig so it
+   radiates evenly on all four sides (subtle). Sits behind the ₹0 pane
+   through steps 2–3, then GLIDES to the exit pane (cell 3,2) on the final
+   frame — the focus shifts from the free month to the way out. */
+.how__m1-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--u) * 170);
+  height: calc(var(--u) * 170);
+  box-shadow: 0 0 calc(var(--u) * 110) 0 rgba(255, 255, 255, 0.8);
+  transition:
+    box-shadow 0.5s ease,
+    left 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    top 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* final frame: the glow stays with the bright month-1 card (Figma 39:474
+   keeps its 100px white shadow) — no retirement, no repositioning */
+
+/* exit pane (cell 3,2 — clear glass): its own clipped slice of the SHARP
+   greenery (original quality, exempt from every blur/darken pass) with the
+   door-open marker over it, revealed on the final frame */
+.how__pane-exit {
+  position: absolute;
+  width: calc(var(--u) * 170);
+  height: calc(var(--u) * 170);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+  /* a stacking context of its own: the frost ::before's z-index must
+     stay INSIDE the pane, never above the mullion layer */
+  isolation: isolate;
+}
+
+/* the window's greenery placement (510.7×765.4 @ (−0.71,−84.25) in window
+   coords) shifted into pane-local space (pane origin 340,510) */
+.how__exit-green {
+  position: absolute;
+  left: calc(var(--u) * -340.71);
+  top: calc(var(--u) * -594.25);
+  width: calc(var(--u) * 510.71);
+  height: calc(var(--u) * 765.41);
+  object-fit: cover;
+}
+
+.how__exit-icon {
+  width: calc(var(--u) * 46);
+  height: calc(var(--u) * 46);
+  color: #fff;
+  filter: drop-shadow(0 calc(var(--u) * 2) calc(var(--u) * 10) rgba(0, 0, 0, 0.35));
+}
+
+/* ---- journey indicator (Figma 22:286 @ y 881) ---------------------
+   The colours follow the backdrop each step settles on so caption,
+   track and dots stay legible: dark ink over the light room frames
+   (steps 1–3), white only over step 4's full-bleed greenery. */
+.how__indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 89.71%;
+  height: calc(var(--u) * 58);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  /* ink-on-light scheme (default). Dot fills are OPAQUE so the baseline
+     and whatever sits behind (window mullions) never show through. */
+  --ind-when: rgba(0, 0, 0, 0.5);
+  --ind-when-shadow: none;
+  --ind-track: rgba(0, 0, 0, 0.16);
+  --ind-progress: rgba(0, 0, 0, 0.45);
+  --ind-dot: #aca69c;
+}
+
+/* white-on-dark scheme; the soft shadow keeps the hairline type and
+   dots readable where the backdrop drifts mid-tone */
+.how__indicator.is-white {
+  --ind-when: rgba(255, 255, 255, 0.95);
+  --ind-when-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
+  --ind-track: rgba(255, 255, 255, 0.3);
+  --ind-progress: rgba(255, 255, 255, 0.85);
+  --ind-dot: #d9d9d9;
+}
+
+.how__indicator.is-live {
+  opacity: 1;
+}
+
+.how__when {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 14);
+  line-height: 2.14;
+  letter-spacing: 0.06em;
+  color: var(--ind-when);
+  text-shadow: var(--ind-when-shadow);
+  transition:
+    left 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s ease,
+    text-shadow 0.3s ease;
+}
+
+/* the baseline runs edge to edge of the VIEWPORT, not the contain-fit
+   frame — 50% − 50vw reaches back across the frame's side margin */
+.how__track {
+  position: absolute;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  top: calc(var(--u) * 50);
+  height: 1px;
+  background: var(--ind-track);
+  transition: background 0.3s ease;
+}
+
+.how__progress {
+  position: absolute;
+  left: calc(50% - 50vw);
+  top: calc(var(--u) * 50);
+  height: 1px;
+  background: var(--ind-progress);
+  transition:
+    width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s ease;
+}
+
+.how__dot {
+  position: absolute;
+  top: calc(var(--u) * 42);
+  width: calc(var(--u) * 16);
+  height: calc(var(--u) * 16);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ind-dot);
+  transform: translateX(-50%);
+  transition:
+    background 0.3s ease,
+    transform 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* the dots become jump-to-step controls once the indicator is live; a
+   transparent ::before widens the tap target well past the 16px circle */
+.how__indicator.is-live .how__dot {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.how__dot::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--u) * -12);
+  border-radius: 50%;
+}
+
+.how__dot:hover,
+.how__dot:focus-visible {
+  transform: translateX(-50%) scale(1.28);
+}
+
+.how__dot:focus-visible {
+  outline: 2px solid var(--how-accent);
+  outline-offset: calc(var(--u) * 4);
+}
+
+.how__dot.is-active {
+  background: var(--how-accent);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Upfront act (Figma 151:141 flow) — picks up after step 4.
+   The lights dim, the same window returns in its dark candle-lit
+   variant, month 2 lights up with the offer, then the view zooms out
+   to the direct-to-flent summary.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* flat dimmer over everything behind the window */
+/* the Figma wash for the upfront act (68:626): 30% black over a 10px
+   backdrop blur — softens and dims whatever sits behind the window */
+.how__scrim--c {
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* dark window variant — hairline white mullions, candle-lit months */
+.how__winrig.is-upfront {
+  --mull: rgba(255, 255, 255, 0.05);
+}
+
+/* warm lit-pane strokes during the act (151:202) */
+.is-upfront .how__mull-lit {
+  opacity: 1;
+}
+
+.is-upfront .how__pane--m1 {
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(var(--frost));
+  -webkit-backdrop-filter: blur(var(--frost));
+}
+
+/* the interior greenery goes to night */
+.is-upfront .how__win-green,
+.is-upfront .how__exit-green {
+  filter: brightness(0.45) saturate(0.85);
+}
+
+.how__win-green,
+.how__exit-green {
+  transition: filter 0.8s ease;
+}
+
+/* journey furniture rests during the act */
+.is-upfront .how__preveal,
+.is-upfront .how__preveal-avatar {
+  display: none;
+}
+
+/* labels hide in the close-up (Figma 151:141), return dim in the expanded
+   view (Frame 7) where they gather into the single payment */
+.is-upfront .how__plabel {
+  opacity: 0;
+}
+
+.is-upfront.is-uB .how__plabel {
+  opacity: 1;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* month 2's own label retires — its lit ₹0 block owns the pane */
+.is-upfront .how__pane--m2 .how__plabel {
+  display: none;
+}
+
+/* ---- lamp-lit evening wall (Figma 65:522 — act B backdrop) --------- */
+.how__warmbg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  will-change: opacity;
+}
+
+.how__warmbg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* candle-lit wash on months 1–2 (gradient + deep frost, 151:202/203) */
+.how__plit {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 235, 194, 0.7),
+    rgba(255, 235, 194, 0.07)
+  );
+  backdrop-filter: blur(16.445px);
+  -webkit-backdrop-filter: blur(16.445px);
+  pointer-events: none;
+}
+
+/* month contents go white in the dark variant */
+.is-upfront .how__m1-amt {
+  color: #fff;
+}
+
+.is-upfront .how__m1-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* the candle-lit panes are BRIGHT — the etch stays dark (174:685 raster),
+   a touch stronger than the journey's so it reads through the warm wash */
+.is-upfront .how__m1-flent {
+  display: block;
+  filter: none;
+  opacity: 0.55;
+}
+
+/* month-2 lit content (151:220) — reuses month-1 geometry inside pane 2 */
+.how__m2 {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* warm glows behind the lit panes (151:202 shadow) */
+.how__glowrig.is-upfront .how__m1-glow {
+  left: 0;
+  top: 0;
+  box-shadow: 0 0 calc(var(--u) * 100) 0 rgba(255, 255, 255, 0.4);
+}
+
+.how__m2-glow {
+  position: absolute;
+  left: calc(var(--u) * 170);
+  top: 0;
+  width: calc(var(--u) * 170);
+  height: calc(var(--u) * 170);
+  box-shadow: 0 0 calc(var(--u) * 100) 0 rgba(255, 255, 255, 0.4);
+}
+
+/* dark solid frame + drop shadows, no blend (151:199 — #250f00) */
+.how__framerig.is-upfront {
+  mix-blend-mode: normal;
+  --mull: #250f00;
+}
+
+/* the corner dive's frame — solid espresso, matching the design raster */
+.how__framerig.is-final {
+  mix-blend-mode: normal;
+  --mull: #552f15;
+}
+
+.how__framerig.is-upfront .how__winframe {
+  box-shadow:
+    calc(var(--u) * 4) calc(var(--u) * 4) calc(var(--u) * 12) 0
+      rgba(0, 0, 0, 0.25),
+    calc(var(--u) * 5) calc(var(--u) * 8) calc(var(--u) * 30) 0
+      rgba(0, 0, 0, 0.4);
+}
+
+/* ---- act A headline (151:297) — centred, glow behind the offer ----- */
+.how__uhead {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--u) * 144);
+  transform: translateX(-50%);
+  width: calc(var(--u) * 806);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 24);
+  text-align: center;
+}
+
+.how__uhead-kicker {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 40);
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.how__uhead-line {
+  position: relative;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 56);
+  letter-spacing: -0.04em;
+  color: #fff;
+}
+
+.how__uhead-line strong {
+  font-weight: 500;
+}
+
+/* blurred duplicate = the halo behind "2 months off" (151:302) */
+.how__uhead-glow {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-weight: 500;
+  filter: blur(11px);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ── the upfront break slide (Figma 18143458) — paper-white over the
+   room, the warm wall running in a strip on the right ── */
+.how__break-panel {
+  position: absolute;
+  /* frame centre −50vw = the viewport's left edge; the right edge stays
+     on the frame's x-1100 seam (centre +344u) where the peek begins */
+  left: calc(50% - 50vw);
+  top: 0;
+  bottom: 0;
+  width: calc(50vw + var(--u) * 344);
+  background: #fff;
+}
+
+.how__ustep--a .how__uhead {
+  left: calc(var(--u) * 114);
+  top: 50%;
+  transform: translateY(-50%);
+  width: calc(var(--u) * 900);
+  gap: calc(var(--u) * 14);
+  text-align: left;
+}
+
+.how__ustep--a .how__uhead-kicker {
+  font-size: calc(var(--u) * 20);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.how__ustep--a .how__uhead-line {
+  font-size: calc(var(--u) * 40);
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.how__ustep--a .how__uhead-line strong {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--how-accent);
+}
+
+/* the strip itself is the hover/tap zone — seam to viewport edge */
+.how__break-strip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--u) * 1100);
+  right: calc(50% - 50vw);
+  cursor: pointer;
+}
+
+/* the way in — resting on the warm strip */
+.how__break-see {
+  position: absolute;
+  left: calc(var(--u) * 1306);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: none;
+  border: 0;
+  padding: 12px;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 18);
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.how__break-see span {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.how__break-see:hover span {
+  transform: translateX(3px);
+}
+
+/* ── the detail page's way back — quiet white, top-left ── */
+.how__uback {
+  position: absolute;
+  left: calc(var(--u) * 96);
+  top: calc(var(--u) * 64);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px 10px 0;
+  background: none;
+  border: 0;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 18);
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.how__uback span {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.how__uback:hover {
+  color: #fff;
+}
+
+.how__uback:hover span {
+  transform: translateX(-3px);
+}
+
+/* the way past — chevrons resting low on the paper (248:2151) */
+.how__break-down {
+  position: absolute;
+  left: calc(var(--u) * 97);
+  top: calc(var(--u) * 796);
+  width: calc(var(--u) * 48);
+  height: calc(var(--u) * 48);
+  padding: 0;
+  background: none;
+  border: 0;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.how__break-down svg {
+  width: 100%;
+  height: 100%;
+  animation: how-chev-bob 2.2s ease-in-out infinite;
+}
+
+/* ---- month 1–11 totals in the glass (174:744 @ (157, 304.5)) ------- */
+.how__wprice {
+  position: absolute;
+  left: calc(var(--u) * 255.5);
+  top: calc(var(--u) * 304.5);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 16);
+  text-align: center;
+  pointer-events: none;
+}
+
+.how__wprice-label {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 20);
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.how__wprice-amts {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 24);
+  letter-spacing: -0.04em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.how__wprice-amts s {
+  font-size: calc(var(--u) * 20);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---- act B flow — Figma 174:685: wider card (the struck full price
+   rides inline), shorter wire, same icon spot ---- */
+/* ── the detail page's flow (Figma 253:2664/2663/2661): the shared
+   tenant card at its Frame-7 seat, wire to the big flent tile ── */
+.how__fin2-card--ub {
+  top: calc(var(--u) * 520);
+}
+
+.how__ub-wire {
+  position: absolute;
+  left: calc(var(--u) * 411);
+  /* the painted line sits 3.14u into the art — top 596.86 puts it on
+     y 600, the tile's centreline */
+  top: calc(var(--u) * 596.86);
+  width: calc(var(--u) * 271);
+  display: block;
+}
+
+.how__ub-wire .how__tflow-wire {
+  position: static;
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: none;
+}
+
+.how__ub-flent {
+  position: absolute;
+  left: calc(var(--u) * 687);
+  top: calc(var(--u) * 548);
+  width: calc(var(--u) * 103);
+  height: calc(var(--u) * 103);
+  display: block;
+}
+
+.how__ub-flent img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 6px 22px rgba(0, 0, 0, 0.35));
+}
+
+/* Frame 7 seats the copy a touch left and high of the scaffold default */
+.how__ustep--b .how__copy--scaffold {
+  left: calc(var(--u) * 85);
+  top: calc(var(--u) * 212);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Mobile (≤640px) — the frame becomes the viewport and the beats
+   re-stack vertically: copy + diagrams in the top half, the window
+   trio centred in the bottom half. Each Figma-exact assembly keeps
+   its internal geometry by redefining --u inside its own scope; the
+   background dolly keeps its poses (bigger canvas via --uw) so the
+   scaling transitions run unchanged.
+   ════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .how {
+    --u: calc(100vw / 640);
+    /* the window's mobile unit — fits 72vw wide or 44vh tall */
+    --uwin: min(calc(72vw / 510), calc(44vh / 680));
+  }
+
+  .how__frame {
+    left: 0;
+    top: 0;
+    transform: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* a larger dolly canvas so every pose keeps the frame covered */
+  .how__bg {
+    --uw: calc(100vw / 900);
+  }
+
+  /* ── window trio: bottom half, centred ── */
+  .how__winrig,
+  .how__glowrig,
+  .how__framerig {
+    --u: var(--uwin);
+    left: calc(50vw - var(--uwin) * 255);
+    top: calc(100vh - var(--uwin) * 680 - 8vh);
+    width: calc(var(--uwin) * 510);
+    height: calc(var(--uwin) * 680);
+  }
+
+  /* ── copy at the top ── */
+  .how__copy,
+  .how__copy--scaffold,
+  .how__copy--movein {
+    left: 6vw;
+    transform: none;
+  }
+
+  /* step 1 reads card-first: its diagram holds the top half and the
+     copy follows under it (the variants below return to the top zone).
+     The card is 88vw wide at 660/700 aspect, so its bottom lives at
+     9vh + 82.97vw — the copy tucks in 3vh under it at any aspect. */
+  .how__copy {
+    top: calc(12vh + 82.97vw);
+  }
+
+  .how__copy--scaffold,
+  .how__copy--movein {
+    top: 10vh;
+  }
+
+  .how__title {
+    max-width: none;
+    width: 88vw;
+    font-size: calc(var(--u) * 46);
+  }
+
+  .how__body {
+    width: 88vw;
+    max-width: 60ch;
+    margin-top: calc(var(--u) * 18);
+    font-size: calc(var(--u) * 26);
+    line-height: 1.42;
+  }
+
+  /* ── intro — copy in the top half, window sleeps below the veil ── */
+  .how__intro-copy {
+    left: 6vw;
+    top: 9vh;
+    width: 88vw;
+    gap: 22px;
+  }
+
+  .how__intro-kicker {
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  .how__intro-state {
+    font-size: 24px;
+    line-height: 34px;
+  }
+
+  .how__intro-lead {
+    left: auto;
+    right: 6vw;
+    top: auto;
+    bottom: calc(9px + 52px);
+    font-size: 15px;
+    /* it rests over the window's dark greenery on the phone */
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+  }
+
+  .how__intro-lead .how__intro-chev {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* ── the financing loop, stacked for the phone: Gromor → tenant card
+     → the EMI train running into flent, all in the top half above the
+     window ── */
+  .how__copy--emi {
+    left: 6vw;
+    top: 8vh;
+  }
+
+  .how__kicker {
+    font-size: calc(var(--u) * 26);
+    margin-bottom: calc(var(--u) * 10);
+  }
+
+  .how__title--emi {
+    font-size: calc(var(--u) * 40);
+    line-height: 1.3;
+  }
+
+  .how__fin2-gromor {
+    left: 6vw;
+    top: 23vh;
+    gap: 10px;
+  }
+
+  .how__fin2-gtile {
+    width: 40px;
+    height: 40px;
+    border-radius: 9px;
+  }
+
+  .how__fin2-gcrop {
+    width: 15px;
+    height: 25px;
+  }
+
+  .how__fin2-gtext {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .how__fin2-gtext strong {
+    font-size: 13px;
+  }
+
+  .how__fin2-vwire {
+    display: none;
+  }
+
+  .how__fin2-card {
+    left: 6vw;
+    top: 30vh;
+    width: min(64vw, 280px);
+    height: auto;
+    padding: 12px 16px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+
+  .how__fin2-tenant img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .how__fin2-tname {
+    font-size: 9px;
+  }
+
+  .how__fin2-tname strong {
+    font-size: 11px;
+  }
+
+  .how__fin2-amts {
+    font-size: 19px;
+  }
+
+  .how__fin2-amts s {
+    font-size: 13px;
+  }
+
+  .how__fin2-note {
+    font-size: 10px;
+  }
+
+  .how__fin2-cap {
+    display: none;
+  }
+
+  /* the run to flent is ~34px here — the scaled svg art collapses to
+     sub-pixel mush, so the wire redraws as a crisp css line + chevron */
+  .how__fin2-hwire {
+    left: calc(6vw + min(64vw, 280px) + 8px);
+    right: calc(6vw + 52px);
+    top: calc(30vh + 40px);
+    width: auto;
+    height: 7px;
+  }
+
+  .how__fin2-hwire .how__tflow-wire {
+    display: none;
+  }
+
+  .how__fin2-hwire::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 4px;
+    top: 50%;
+    border-top: 1.5px dotted rgba(0, 0, 0, 0.85);
+  }
+
+  .how__fin2-hwire::after {
+    content: "";
+    position: absolute;
+    right: 1px;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-top: 1.5px solid #000;
+    border-right: 1.5px solid #000;
+    transform: translate(0, -50%) rotate(45deg);
+    transform-origin: 50% 50%;
+  }
+
+  .how__fin2-emis {
+    display: none;
+  }
+
+  .how__fin2-flent {
+    left: auto;
+    right: 6vw;
+    top: calc(30vh + 24px);
+    width: 44px;
+    height: 44px;
+  }
+
+
+  /* ── step-3 payment flow ── */
+  .how__tflow {
+    --u: calc(88vw / 674.4);
+    left: 6vw;
+    top: 37vh;
+  }
+
+  .how__paycard-title {
+    font-size: max(calc(var(--u) * 16), 10px);
+  }
+
+  .how__paycard-sub {
+    font-size: max(calc(var(--u) * 12), 8.5px);
+  }
+
+  /* the catch teaser sits above the window's half */
+  .how__catch {
+    left: 6vw;
+    top: auto;
+    bottom: calc(var(--uwin) * 680 + 11vh);
+    font-size: max(calc(var(--u) * 26), 14px);
+  }
+
+  /* onward chevrons rest in the frosted exit pane (corner dive: pane BR
+     at (94vw, 90vh), 46vw square → centre (71vw, 90vh − 23vw)). Box tracks
+     the design's 21.7%-of-pane instance (46vw → ~10vw), floored for touch */
+  .how__scroll-on {
+    left: 71vw;
+    top: calc(90vh - 23vw);
+    bottom: auto;
+    width: max(10vw, 44px);
+    height: max(10vw, 44px);
+  }
+
+  /* the intro chevrons keep their rhythm at phone scale */
+  .how__intro-chev {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* ── upfront act header ── */
+  .how__uhead {
+    --u: calc(88vw / 806);
+    width: calc(var(--u) * 806);
+    top: 8vh;
+  }
+
+  .how__uhead-line {
+    font-size: calc(var(--u) * 62);
+  }
+
+  /* the break slide covers the phone frame; the link sits with the copy */
+  .how__break-panel {
+    left: 0;
+    width: 100%;
+  }
+
+  .how__ustep--a .how__uhead {
+    left: 6vw;
+    width: 88vw;
+  }
+
+  .how__ustep--a .how__uhead-kicker {
+    font-size: calc(var(--u) * 26);
+  }
+
+  .how__ustep--a .how__uhead-line {
+    font-size: calc(var(--u) * 44);
+  }
+
+  .how__break-see {
+    left: 6vw;
+    top: auto;
+    bottom: 16vh;
+    transform: none;
+    padding: 12px 12px 12px 0;
+    font-size: max(calc(var(--u) * 26), 14px);
+    color: var(--how-accent);
+    text-shadow: none;
+  }
+
+  .how__break-down {
+    left: 6vw;
+    top: auto;
+    bottom: 6vh;
+    width: 34px;
+    height: 34px;
+  }
+
+  .how__uback {
+    left: 6vw;
+    top: 3.5vh;
+    font-size: 15px;
+  }
+
+  .how__break-strip {
+    display: none;
+  }
+
+  .how__ustep--b .how__copy--scaffold {
+    left: 6vw;
+    top: 9vh;
+  }
+
+  .how__ustep--b .how__body {
+    font-size: 13px;
+  }
+
+  /* the card cluster tucks between the copy and the (nudged-down)
+     window — see the swap's mobile y-shift on the rigs */
+  .how__fin2-card--ub {
+    top: 30vh;
+  }
+
+  .how__ub-wire {
+    left: calc(6vw + min(64vw, 280px) + 8px);
+    right: calc(6vw + 52px);
+    top: calc(30vh + 43px);
+    width: auto;
+  }
+
+  .how__ub-flent {
+    left: auto;
+    right: 6vw;
+    top: calc(30vh + 24px);
+    width: 44px;
+    height: 44px;
+  }
+
+  /* ── journey indicator: pinned to the frame's bottom edge, clear
+     of the window above it ── */
+  .how__indicator {
+    top: auto;
+    bottom: 1.4vh;
+    height: calc(var(--u) * 58);
+  }
+
+  .how__when {
+    font-size: max(calc(var(--u) * 14), 9px);
+  }
+
+  /* ── the split financing beats: copy top, diagram mid, window low.
+     Each diagram rescopes --u to its own design width so the whole
+     assembly scales as one piece (the .how__tflow trick). ── */
+  .how__copy--fin3,
+  .how__copy--mon {
+    left: 6vw;
+    top: 8vh;
+  }
+
+  .how__title--fin3 {
+    max-width: 88vw;
+    font-size: max(calc(var(--u) * 40), 21px);
+    line-height: 1.3;
+  }
+
+  .how__mon-sub {
+    margin-top: 12px;
+    font-size: max(calc(var(--u) * 20), 12.5px);
+    line-height: 1.5;
+  }
+
+  .how__fin3 {
+    --u: calc(88vw / 486);
+    left: 6vw;
+    top: 24vh;
+    width: 88vw;
+  }
+
+  .how__fin3-sub {
+    left: 6vw;
+    top: calc(24vh + 88vw * 0.239 + 16px);
+    width: 88vw;
+    font-size: max(calc(var(--u) * 20), 12.5px);
+    line-height: 1.5;
+  }
+
+  .how__mon {
+    --u: calc(88vw / 672);
+    left: 6vw;
+    top: 25vh;
+    width: 88vw;
+  }
+
+  /* the glass rent-cycles keep a readable floor on the phone panes */
+  .how__pamt {
+    font-size: max(calc(var(--u) * 12.5), 8px);
+  }
+
+  .how__pdisc {
+    width: max(calc(var(--u) * 20), 12px);
+    height: max(calc(var(--u) * 20), 12px);
+  }
+}

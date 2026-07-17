@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320">
+  <filter id="g" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <!-- multi-octave fractal noise = organic, clumpy film grain (not regular) -->
+    <feTurbulence type="fractalNoise" baseFrequency="0.62" numOctaves="4" seed="5638" stitchTiles="stitch" result="n"/>
+    <!-- drop chroma so it reads as luminance grain, then force full opacity -->
+    <feColorMatrix in="n" type="saturate" values="0" result="s"/>
+    <feColorMatrix in="s" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 1" result="o"/>
+    <!-- gentle S-curve so grain sits around mid-grey (ideal for overlay blend) -->
+    <feComponentTransfer in="o">
+      <feFuncR type="gamma" amplitude="1" exponent="1.35" offset="0.08"/>
+      <feFuncG type="gamma" amplitude="1" exponent="1.35" offset="0.08"/>
+      <feFuncB type="gamma" amplitude="1" exponent="1.35" offset="0.08"/>
+    </feComponentTransfer>
+  </filter>
+  <rect width="100%" height="100%" filter="url(#g)"/>
+</svg>

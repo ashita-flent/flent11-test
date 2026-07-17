@@ -1,0 +1,769 @@
+/* ============================================================
+   Section · Trust — "Read everything, before you sign
+   anything." (Figma 268:3343). The exit sheet's peach runs on
+   under four cards: two bronze (handoff, slip pocket), two
+   glass (EMI loop, CIBIL dial). Every card is a 312.5-tall
+   design miniature laid out in its own unit --tc (1 design px);
+   desktop sets --tc from the frame-width unit --t, mobile
+   re-derives it from the card's own width so each card scales
+   whole.
+   ============================================================ */
+
+.tr {
+  /* width-fit frame unit: 1 px of the 1512 design frame — scaled
+     ×1.136 so the 1162-wide card rows span the site's 1320u column
+     (96u insets, same rhythm as proof/register/exit) */
+  --t: calc(min(100vw, 1720px) / 1512 * 1.136);
+
+  position: relative;
+  width: 100%;
+  /* one continuous wash out of the exit sheet: its bottom (#eedcd0) keeps
+     going and only fully dissolves into the page ground by the section's
+     end, so the cards live on the same warm surface as the calculator */
+  background: linear-gradient(to bottom, #eedcd0 0%, var(--bg) 100%);
+  /* tuck a few px under the exit sheet (which paints above at z 10): the
+     sections' antialiased boundary otherwise lets the black body ground
+     bleed through as a hairline at fractional scroll heights */
+  margin-top: -4px;
+  padding: clamp(96px, 15vh, 180px) 0 clamp(72px, 10vh, 130px);
+}
+
+/* content column — centred: even margins at every viewport */
+.tr__inner {
+  width: fit-content;
+  margin: 0 auto;
+}
+
+/* ---- heading — regular open, italic dim close (268:3345) -------------- */
+.tr__head {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: clamp(1.9rem, calc(var(--t) * 56), 3.5rem);
+  line-height: normal;
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.8);
+  margin-bottom: clamp(40px, calc(var(--t) * 87), 87px);
+}
+
+.tr__head-em {
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* ---- the card rows ----------------------------------------------------- */
+.tr__rows {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--t) * 24);
+}
+
+.tr__row {
+  display: flex;
+  align-items: center;
+}
+
+.tr__row--1 {
+  gap: calc(var(--t) * 24);
+}
+
+.tr__row--2 {
+  gap: calc(var(--t) * 30);
+}
+
+/* every card is a fixed-ratio miniature of its design frame; --cw is its
+   design width, --tc its local design-px */
+.tc {
+  --tc: var(--t);
+  position: relative;
+  width: calc(var(--tc) * var(--cw));
+  height: calc(var(--tc) * 312.5);
+  border-radius: calc(var(--tc) * 16);
+  background: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+}
+
+.tc--hand {
+  --cw: 474;
+}
+
+.tc--emi {
+  --cw: 664;
+}
+
+.tc--cibil {
+  --cw: 473;
+}
+
+/* the slip is tucked in a pocket — CLIPPED to the card's rounded rect so
+   its tilted corners and scalloped foot never spill past the card edge
+   (Figma 268:3454: slip at (378,−50.5) clipped by card) */
+.tc--slip {
+  overflow: hidden;
+  --cw: 665;
+}
+
+/* card copy — quiet ink with the load-bearing phrases darkened */
+.tc__copy {
+  position: absolute;
+  left: calc(var(--tc) * 48);
+  top: calc(var(--tc) * 39);
+  width: calc(var(--tc) * 371);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--tc) * 20);
+  line-height: calc(var(--tc) * 28);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.tc__copy strong {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.tc--emi .tc__copy {
+  width: calc(var(--tc) * 556);
+}
+
+/* ════ card 1 · the financing handoff (bronze) ════ */
+.tc__tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--tc) * 80);
+  height: calc(var(--tc) * 80);
+  border-radius: calc(var(--tc) * 16);
+}
+
+/* gromor's tile — white glass with the double glow (268:3353) */
+.tc__tile--gromor {
+  position: absolute;
+  left: calc(var(--tc) * 94);
+  top: calc(var(--tc) * 154);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 0 calc(var(--tc) * 12) rgba(0, 0, 0, 0.05),
+    0 0 calc(var(--tc) * 28) rgba(0, 0, 0, 0.15);
+}
+
+/* flent's tile — the black mark on the light card (268:3355) */
+.tc__tile--flent {
+  position: absolute;
+  left: calc(var(--tc) * 300);
+  top: calc(var(--tc) * 154);
+  width: calc(var(--tc) * 80);
+  height: calc(var(--tc) * 80);
+  border-radius: 0;
+  background: none;
+  filter: drop-shadow(0 calc(var(--tc) * 4) calc(var(--tc) * 14) rgba(0, 0, 0, 0.18));
+}
+
+/* the Gromor mark — the G cropped out of the wordmark sprite, exactly the
+   Figma window (28.8×48 box over a 722% sprite) */
+.tc__gromor-crop {
+  position: relative;
+  width: calc(var(--tc) * 28.8);
+  height: calc(var(--tc) * 48);
+  overflow: hidden;
+}
+
+.tc__gromor-crop img {
+  position: absolute;
+  height: 116.67%;
+  width: 722.22%;
+  left: -55.56%;
+  top: -9.17%;
+  max-width: none;
+}
+
+/* the chevrons carry the money — a travelling pulse (268:3348) */
+.tc__chev {
+  position: absolute;
+  left: calc(var(--tc) * 214.5);
+  top: calc(var(--tc) * 170);
+  width: calc(var(--tc) * 45);
+  height: calc(var(--tc) * 48);
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.22);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tc__chev path {
+  animation: tc-chev 1.6s ease-in-out infinite;
+}
+
+.tc__chev path:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.tc__chev path:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes tc-chev {
+  0%,
+  55%,
+  100% {
+    opacity: 0.3;
+  }
+  25% {
+    opacity: 1;
+  }
+}
+
+.tc__party-name {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--tc) * 16);
+  line-height: calc(var(--tc) * 28);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.tc__party-name--a,
+.tc__party-name--b {
+  position: absolute;
+  top: calc(var(--tc) * 242);
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.tc__party-name--a {
+  left: calc(var(--tc) * 134);
+}
+
+.tc__party-name--b {
+  left: calc(var(--tc) * 339.5);
+}
+
+/* ════ card 2 · the no-cost EMI loop (glass) ════ */
+/* the dashed wire with its arrowhead (268:3360 — art is 259×7.36 with
+   the line riding its middle) */
+.tc__wire {
+  position: absolute;
+  left: calc(var(--tc) * 233);
+  top: calc(var(--tc) * 188.32);
+  width: calc(var(--tc) * 259);
+  height: calc(var(--tc) * 7.36);
+}
+
+.tc__wire img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* January's chip — solid white, floating (268:3374) */
+.tc__emi-chip {
+  position: absolute;
+  left: calc(var(--tc) * 48);
+  top: calc(var(--tc) * 143);
+  width: calc(var(--tc) * 185);
+  padding: calc(var(--tc) * 12) calc(var(--tc) * 16);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--tc) * 12);
+  border-radius: calc(var(--tc) * 12);
+  background: #fff;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  filter: drop-shadow(0 calc(var(--tc) * 4) calc(var(--tc) * 8) rgba(0, 0, 0, 0.1));
+  font-family: var(--sans);
+  font-weight: 500;
+}
+
+.tc__emi-chip-label {
+  font-size: calc(var(--tc) * 12);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.tc__emi-chip-amt {
+  font-size: calc(var(--tc) * 24);
+  line-height: calc(var(--tc) * 28);
+  letter-spacing: -0.03em;
+  color: #000;
+}
+
+.tc__emi-chip-sub {
+  margin-top: calc(var(--tc) * -8);
+  font-size: calc(var(--tc) * 12);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* the queued payments — receding soft-focus ghosts (268:3367 / 268:3361) */
+.tc__emi-ghost {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: calc(var(--tc) * 9.6);
+  background: rgba(255, 255, 255, 0.8);
+  font-family: var(--sans);
+  font-weight: 500;
+}
+
+.tc__emi-ghost--feb {
+  left: calc(var(--tc) * 67);
+  top: calc(var(--tc) * 219);
+  width: calc(var(--tc) * 148);
+  height: calc(var(--tc) * 78.4);
+  padding: calc(var(--tc) * 9.6) calc(var(--tc) * 12.8);
+  gap: calc(var(--tc) * 9.6);
+  opacity: 0.8;
+  filter: blur(0.75px);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  box-shadow: 0 calc(var(--tc) * 2) calc(var(--tc) * 12) rgba(0, 0, 0, 0.1);
+}
+
+.tc__emi-ghost--mar {
+  left: calc(var(--tc) * 86);
+  top: calc(var(--tc) * 276.84);
+  width: calc(var(--tc) * 109.6);
+  height: calc(var(--tc) * 62.72);
+  padding: calc(var(--tc) * 7.68) calc(var(--tc) * 10.24);
+  gap: calc(var(--tc) * 7.68);
+  border-radius: calc(var(--tc) * 7.68);
+  opacity: 0.6;
+  filter: blur(0.75px);
+  box-shadow: 0 calc(var(--tc) * 4) calc(var(--tc) * 4) rgba(0, 0, 0, 0.1);
+}
+
+.tc__emi-ghost-row {
+  font-size: calc(var(--tc) * 9.6);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.tc__emi-ghost--mar .tc__emi-ghost-row {
+  font-size: calc(var(--tc) * 7.68);
+}
+
+.tc__emi-ghost-row i {
+  font-style: normal;
+  color: rgba(0, 0, 0, 0.3);
+  margin-left: calc(var(--tc) * 6.4);
+}
+
+.tc__emi-ghost-amt {
+  font-size: calc(var(--tc) * 19.2);
+  line-height: calc(var(--tc) * 22.4);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.tc__emi-ghost--mar .tc__emi-ghost-amt {
+  font-size: calc(var(--tc) * 15.36);
+  line-height: calc(var(--tc) * 17.92);
+}
+
+/* the interest, absorbed at the flent mark (268:3379) */
+.tc__emi-interest {
+  position: absolute;
+  left: calc(var(--tc) * 386.5);
+  top: calc(var(--tc) * 162);
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-style: normal;
+  font-size: calc(var(--tc) * 10);
+  letter-spacing: -0.03em;
+  color: #34c759;
+  white-space: nowrap;
+}
+
+/* the flent ghost-square riding the wire (268:3384) */
+.tc__emi-flent {
+  position: absolute;
+  left: calc(var(--tc) * 325);
+  top: calc(var(--tc) * 165);
+  width: calc(var(--tc) * 53.76);
+  height: calc(var(--tc) * 53.76);
+  border-radius: calc(var(--tc) * 14.08);
+  background: rgba(178, 96, 37, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tc__emi-flent img {
+  width: calc(var(--tc) * 26.2);
+  height: calc(var(--tc) * 26.2);
+  display: block;
+  border-radius: calc(var(--tc) * 6);
+  filter: drop-shadow(0 calc(var(--tc) * 2) calc(var(--tc) * 6) rgba(0, 0, 0, 0.25));
+}
+
+/* gromor, settled directly (268:3380) */
+.tc__emi-gromor {
+  position: absolute;
+  left: calc(var(--tc) * 471);
+  top: calc(var(--tc) * 150);
+  width: calc(var(--tc) * 132);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--tc) * 12);
+}
+
+.tc__tile--solid {
+  background: #fff;
+  filter: drop-shadow(0 calc(var(--tc) * 3.2) calc(var(--tc) * 13.6) rgba(0, 0, 0, 0.15));
+}
+
+.tc__emi-gromor .tc__party-name {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* ════ card 3 · the CIBIL dial (glass) ════ */
+.tc__dial {
+  position: absolute;
+  left: calc(50% + var(--tc) * 0.22);
+  top: calc(var(--tc) * 120);
+  transform: translateX(-50%);
+  width: calc(var(--tc) * 157.44);
+  height: calc(var(--tc) * 157.44);
+}
+
+/* the exported Figma layers — track ring full-size, the arc layer at its
+   designed offset (its viewBox carries the stroke bleed) */
+.tc__dial-trackimg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tc__dial-arcimg {
+  position: absolute;
+  inset: 0;
+}
+
+/* the arc layer, reconstructed from the export: a round-capped arc mask
+   (the design's geometry — 286° sweep, gap at the bottom) over a conic
+   gradient with the file's exact stops (the export's own render is a
+   foreignObject behind an empty mask — blank in every browser) */
+.tc__dial-paint {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: conic-gradient(
+    from 217deg,
+    #ff938e 0deg,
+    #ff938e 26deg,
+    #feda4d 150deg,
+    #8ef47a 268deg,
+    #8ef47a 360deg
+  );
+  /* inlined as a data URI — an external mask file at a stable URL gets
+     cached by Safari across design iterations and serves stale geometry */
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20157.44%20157.44%22%3E%3Cpath%20d%3D%22M%2035.20%20136.48%20A%2072.32%2072.32%200%201%201%20122.24%20136.48%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%2211.8%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E") center / 100% 100% no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20157.44%20157.44%22%3E%3Cpath%20d%3D%22M%2035.20%20136.48%20A%2072.32%2072.32%200%201%201%20122.24%20136.48%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%2211.8%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E") center / 100% 100% no-repeat;
+}
+
+.tc__dial-score {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--tc) * 40);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.8);
+  opacity: 0.8;
+}
+
+.tc__dial-plus {
+  position: absolute;
+  left: calc(var(--tc) * 320);
+  top: calc(var(--tc) * 126);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--tc) * 21.76);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.4);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+/* the dial card's copy leads from the top; the dial settles beneath */
+.tc__copy--low {
+  top: calc(var(--tc) * 39);
+}
+
+/* ════ card 4 · no blind commitment (bronze) — the slip pocket ════ */
+/* the notice timeline across the card's top (268:3397/3489…3492) */
+.tc__notice {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: calc(var(--tc) * 100);
+  pointer-events: none;
+}
+
+/* the hairline runs from the card's very edge (268:3397 — x0, w409) */
+.tc__notice-line {
+  position: absolute;
+  left: 0;
+  top: calc(var(--tc) * 44.5);
+  width: calc(var(--tc) * 409);
+}
+
+.tc__notice-line i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -0.5px;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  display: block;
+}
+
+.tc__notice-dot {
+  position: absolute;
+  display: block;
+}
+
+.tc__notice-dot--small {
+  left: calc(var(--tc) * 101);
+  top: calc(var(--tc) * 36.5);
+  width: calc(var(--tc) * 16);
+  height: calc(var(--tc) * 16);
+  border-radius: 50%;
+  background: rgba(85, 57, 38, 0.4);
+}
+
+/* the leaving dot — bronze, with its warm halo drawn live */
+.tc__notice-dot--big {
+  left: calc(var(--tc) * 239);
+  top: calc(var(--tc) * 29.5);
+  width: calc(var(--tc) * 30);
+  height: calc(var(--tc) * 30);
+  border-radius: 50%;
+  background: #b26025;
+  box-shadow: 0 0 calc(var(--tc) * 26) rgba(178, 96, 37, 0.55);
+}
+
+.tc__notice-label {
+  position: absolute;
+  top: calc(var(--tc) * 66.5);
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--tc) * 10);
+  line-height: calc(var(--tc) * 14);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.tc__notice-label--a {
+  left: calc(var(--tc) * 108.5);
+}
+
+.tc__notice-label--b {
+  left: calc(var(--tc) * 253.5);
+}
+
+.tc__copy--slip {
+  left: calc(var(--tc) * 44);
+  top: calc(var(--tc) * 191.5);
+  width: calc(var(--tc) * 346);
+}
+
+/* the slip itself — tucked into the card's top-right pocket, upper part
+   clipped by the card (268:3399: rotated box at (378,−50.5); unrotated
+   content 262.4×285.6 centred in it → (399.7, −30.9)) */
+.tc__slip-wrap {
+  position: absolute;
+  left: calc(var(--tc) * 399.7);
+  top: calc(var(--tc) * -30.9);
+  width: calc(var(--tc) * 262.4);
+  height: calc(var(--tc) * 285.6);
+}
+
+.tc__slip {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  /* the RESTING pose lives in CSS — if the entrance tween never fires
+     (scroll-up entry, deep-anchor loads), the slip still sits properly
+     tilted in its pocket instead of floating flat */
+  transform: rotate(9.47deg);
+}
+
+.tc__slip-paper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* slip typography rides the same card unit (design px × 1) */
+.tc__slip-body {
+  position: absolute;
+  inset: 0;
+  padding: calc(var(--tc) * 32.6) calc(var(--tc) * 26.9) 0;
+  font-family: var(--sans);
+}
+
+.tc__slip-head {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--tc) * 8.96);
+}
+
+.tc__slip-head span {
+  font-weight: 600;
+  font-size: calc(var(--tc) * 8.96);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.tc__slip-head em {
+  font-style: normal;
+  font-weight: 500;
+  font-size: calc(var(--tc) * 7.68);
+  padding: calc(var(--tc) * 2.56) calc(var(--tc) * 5.12);
+  border-radius: calc(var(--tc) * 19.2);
+  background: rgba(178, 96, 37, 0.1);
+  color: #b26025;
+  white-space: nowrap;
+}
+
+.tc__slip-rule {
+  margin: calc(var(--tc) * 8) 0;
+  border-top: 1px dashed rgba(0, 0, 0, 0.15);
+}
+
+.tc__slip-row {
+  display: flex;
+  align-items: center;
+  padding: calc(var(--tc) * 3.2) 0;
+}
+
+.tc__slip-k {
+  width: calc(var(--tc) * 111.7);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--tc) * 2.56);
+  font-weight: 600;
+  font-size: calc(var(--tc) * 6.4);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.tc__slip-row.is-dim .tc__slip-k {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.tc__slip-info {
+  width: calc(var(--tc) * 8.84);
+  height: calc(var(--tc) * 8.84);
+  stroke: rgba(0, 0, 0, 0.35);
+  fill: rgba(0, 0, 0, 0.35);
+}
+
+.tc__slip-v {
+  font-weight: 500;
+  font-size: calc(var(--tc) * 9.22);
+  color: rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+}
+
+.tc__slip-v strong {
+  font-weight: 700;
+}
+
+.tc__slip-v s {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.tc__slip-free {
+  font-style: normal;
+  color: rgba(0, 130, 71, 0.7);
+}
+
+.tc__slip-fee {
+  color: #b26025;
+}
+
+.tc__slip-fee i {
+  font-style: normal;
+  font-size: calc(var(--tc) * 7.68);
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.tc__slip-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: calc(var(--tc) * 9);
+}
+
+.tc__slip-total span {
+  font-weight: 600;
+  font-size: calc(var(--tc) * 8.96);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.tc__slip-total strong {
+  font-weight: 500;
+  font-size: calc(var(--tc) * 20.48);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+/* ---- small screens: cards stack, each scales whole ------------------- */
+@media (max-width: 860px) {
+  .tr__inner {
+    width: 88vw;
+    margin: 0 auto;
+  }
+
+  .tr__rows,
+  .tr__row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: auto;
+  }
+
+  /* each card re-derives its design unit from its own width, so the
+     whole miniature scales — positions, type, art, all together */
+  .tc {
+    --tc: calc(88vw / var(--cw));
+    width: 88vw;
+  }
+
+  /* the two narrow cards get proportionally bigger type this way; the
+     wide pair floors its primary copy for legibility */
+  .tc--emi .tc__copy,
+  .tc--slip .tc__copy {
+    font-size: max(calc(var(--tc) * 20), 12px);
+    line-height: 1.4;
+  }
+
+  /* the floored copy runs taller than the miniature slot — hang it from
+     the card's bottom edge instead so it never clips */
+  .tc__copy--slip {
+    top: auto;
+    bottom: calc(var(--tc) * 14);
+  }
+}

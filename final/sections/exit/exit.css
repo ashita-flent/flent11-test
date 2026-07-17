@@ -1,0 +1,1124 @@
+/* ============================================================
+   Section · Exit — redesigned calculator (Figma 241:1451 +
+   expanded card 18143581): month bar with a draggable exit
+   marker, the MONEY SAVED pin above it, flanking paid/pending
+   stat cards, and the bill as an expandable deductions card.
+   Same 1512×982 contain-fit metrics (--u); same curtain-sheet
+   shell riding over the journey's held frame.
+   ============================================================ */
+
+.exit {
+  --u: min(calc(100vw / 1512), calc(100vh / 982));
+  --ue: min(calc(100vw / 1512), calc(100vh / 982));
+  --ex-accent: #b26025;
+
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 620px;
+  background: linear-gradient(to bottom, #ffffff 0%, #eedcd0 100%);
+  overflow: hidden;
+
+  /* curtain transition: the journey's final frame stays pinned for one
+     extra viewport of runway while this section rides up OVER it */
+  margin-top: -100vh;
+  z-index: 10;
+  box-shadow: 0 calc(var(--u) * -24) calc(var(--u) * 80) rgba(15, 8, 3, 0.35);
+  /* the shadow must only cast UP over the journey; the bottom clips 1px
+     inside the box so no sub-pixel sliver draws over the trust peach */
+  clip-path: inset(-9999px 0 1px 0);
+}
+
+/* contain-fit 1512×982 design frame */
+.ex__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--u) * 1512);
+  height: calc(var(--u) * 982);
+}
+
+/* ---- the two faces: story in front, calculator behind the CTA --------- */
+.ex__story,
+.ex__math {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(calc(var(--u) * 12));
+  transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s;
+}
+
+.ex__story.is-on,
+.ex__math.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+/* ---- the exit story (Figma 358:2915) ----------------------------------- */
+.ex__shead {
+  position: absolute;
+  left: calc(var(--u) * 94);
+  top: calc(var(--u) * 100);
+  width: calc(var(--u) * 1163);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 24);
+}
+
+/* the timeline (Vector 12 — 1px black 20%, running off both edges) */
+.ex__tl-line {
+  position: absolute;
+  left: calc(var(--u) * -75);
+  width: calc(var(--u) * 1698);
+  top: calc(var(--u) * 589);
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* tick stems (Vector 13 — 2px black 40%, h 69 crossing the line) with
+   their captions 14u under (358:3052…) */
+.ex__tl-when {
+  position: absolute;
+  top: calc(var(--u) * 554);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 14);
+}
+
+.ex__tl-stem {
+  width: 2px;
+  height: calc(var(--u) * 69);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.ex__tl-cap {
+  /* wide enough that AFTER MOVE-OUT holds one line (358:3063 w 203)
+     while THE DAY YOU GIVE NOTICE still breaks to two */
+  max-width: calc(var(--u) * 210);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 20);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* you-are-here (Group 2) — terracotta core + 20% halo on the line */
+.ex__tl-mark {
+  position: absolute;
+  top: calc(var(--u) * 589);
+  width: calc(var(--u) * 16);
+  height: calc(var(--u) * 16);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--ex-accent);
+}
+
+.ex__tl-mark::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--u) * -7);
+  border-radius: 50%;
+  background: rgba(178, 96, 37, 0.2);
+}
+
+/* each moment's dashed drop to the line (Vectors 14–17 — 1px, 4/4) */
+.ex__tl-drop {
+  position: absolute;
+  width: 1px;
+  margin-left: -0.5px;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2) 0,
+    rgba(0, 0, 0, 0.2) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* a moment: dark pill + its two-line note (358:3020…) */
+.ex__tls {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--u) * 17);
+  width: calc(var(--u) * 276);
+  font-family: var(--sans);
+}
+
+/* the caption echoed inside the step — phone layout only */
+.ex__tls-when {
+  display: none;
+}
+
+.ex__tls-pill {
+  padding: calc(var(--u) * 10) calc(var(--u) * 20);
+  border-radius: 30px;
+  background: #3a3a3a;
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.ex__tls-copy {
+  font-weight: 400;
+  font-size: calc(var(--u) * 16);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* ---- pledges + the CTA into the calculator (358:3024 / 358:3031) ------ */
+.ex__pledges {
+  position: absolute;
+  left: calc(var(--u) * 94);
+  top: calc(var(--u) * 791);
+  display: flex;
+  gap: calc(var(--u) * 20);
+}
+
+.ex__pledge {
+  display: flex;
+  align-items: center;
+  width: calc(var(--u) * 219);
+  height: calc(var(--u) * 116);
+  padding: calc(var(--u) * 10) calc(var(--u) * 20);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.ex__mathcta {
+  position: absolute;
+  left: calc(var(--u) * 1003);
+  top: calc(var(--u) * 791);
+  width: calc(var(--u) * 440);
+  height: calc(var(--u) * 116);
+  padding: calc(var(--u) * 10) calc(var(--u) * 20);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: calc(var(--u) * 10);
+  border: 0;
+  border-radius: 12px;
+  background: #552f15;
+  font-family: var(--sans);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ex__mathcta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 calc(var(--u) * 10) calc(var(--u) * 28) rgba(85, 47, 21, 0.35);
+}
+
+.ex__mathcta-t {
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ex__mathcta-s {
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ex__mathcta-arrow {
+  position: absolute;
+  right: calc(var(--u) * 20);
+  top: calc(var(--u) * 20);
+  width: calc(var(--u) * 24);
+  height: calc(var(--u) * 24);
+}
+
+/* ---- the way back out of the math ------------------------------------- */
+.ex__back {
+  position: absolute;
+  left: calc(var(--u) * 94);
+  top: calc(var(--u) * 56);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px 4px 0;
+  background: none;
+  border: 0;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  color: var(--ex-accent);
+  cursor: pointer;
+}
+
+.ex__back svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.25s ease;
+}
+
+.ex__back:hover svg {
+  transform: translateX(-2px);
+}
+
+/* ---- header (241:1453) ------------------------------------------------ */
+.ex__head {
+  position: absolute;
+  left: calc(var(--u) * 94);
+  top: calc(var(--u) * 100);
+  width: calc(var(--u) * 1076);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 24);
+}
+
+.ex__title {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 56);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.ex__sub {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 20);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.ex__sub em {
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* ---- flanking stat cards (269:112 / 269:118) -------------------------- */
+.ex__stat {
+  position: absolute;
+  top: calc(var(--u) * 275);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 8);
+  padding: calc(var(--u) * 20);
+  border-radius: 12px;
+  font-family: var(--sans);
+}
+
+.ex__stat--paid {
+  left: calc(var(--u) * 93);
+  background: rgba(178, 96, 37, 0.1);
+}
+
+.ex__stat--pend {
+  right: calc(var(--u) * 100);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.ex__stat-k {
+  font-weight: 600;
+  font-size: calc(var(--u) * 16);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.ex__stat-v {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 7);
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+}
+
+.ex__stat-v i {
+  font-style: normal;
+  font-weight: 600;
+  font-size: calc(var(--u) * 16);
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.ex__stat-v s {
+  font-weight: 400;
+  font-size: calc(var(--u) * 14);
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.ex__stat-zero {
+  font-style: normal;
+  color: #008247;
+}
+
+/* the loan-closed badge hangs off the pending card's shoulder (269:125) */
+.ex__loan {
+  position: absolute;
+  right: calc(var(--u) * 92);
+  top: calc(var(--u) * 260);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 30px;
+  background: rgba(76, 175, 80, 0.2);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.ex__loan svg {
+  width: calc(var(--u) * 16);
+  height: calc(var(--u) * 16);
+}
+
+/* the rail — mirrors the bar's horizontal span per breakpoint; every
+   marker-tracking element positions in % of it */
+.ex__rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--u) * 93);
+  width: calc(var(--u) * 1319);
+  pointer-events: none;
+}
+
+.ex__rail .ex__card,
+.ex__rail .ex__card * {
+  pointer-events: auto;
+}
+
+/* ---- the MONEY SAVED pin (241:1484/1485) ------------------------------ */
+.ex__pin-cap {
+  position: absolute;
+  top: calc(var(--u) * 266);
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 19.6);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ex__pin {
+  position: absolute;
+  top: calc(var(--u) * 310);
+  transform: translateX(-50%);
+  padding: calc(var(--u) * 12) calc(var(--u) * 20);
+  border-radius: 42px;
+  background: #522d12;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 24);
+  letter-spacing: -0.02em;
+  color: #fff;
+  white-space: nowrap;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+/* runs from the pin's underside down to the hanging dot (Vector 14 —
+   2px, #522D12) */
+.ex__stem {
+  position: absolute;
+  top: calc(var(--u) * 358);
+  height: calc(var(--u) * 94);
+  width: 2px;
+  margin-left: -1px;
+  background: #522d12;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- the month bar (254:2678) ----------------------------------------- */
+.ex__bar {
+  position: absolute;
+  left: calc(var(--u) * 93);
+  top: calc(var(--u) * 383);
+  width: calc(var(--u) * 1319);
+  height: calc(var(--u) * 48); /* generous vertical hit band */
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+
+.ex__bar:active,
+.ex__bar.is-dragging,
+.ex__bar.is-dragging .ex__dot {
+  cursor: grabbing;
+}
+
+/* the two segments split at the exit marker, 8px of air between */
+.ex__bar-fill,
+.ex__bar-rest {
+  position: absolute;
+  top: calc(var(--u) * 12);
+  height: calc(var(--u) * 24);
+  border-radius: 4px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ex__bar-fill {
+  left: 0;
+  background: rgba(178, 96, 37, 0.2);
+}
+
+.ex__bar-rest {
+  right: 0;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* the hairline through the bar's waist (Vector 2 — black 10%) + the
+   journey line riding it to the marker (Vector 3 — 2px, round caps,
+   #DC772E easing to #4C2910 as it arrives) + per-month tick marks */
+.ex__bar-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--u) * 23.5);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
+.ex__bar-grad {
+  position: absolute;
+  left: 0;
+  top: calc(var(--u) * 23);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #dc772e, #4c2910);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.ex__tickmark {
+  position: absolute;
+  top: calc(var(--u) * 16);
+  height: calc(var(--u) * 16);
+  width: 1px;
+  margin-left: -0.5px;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+/* the month you'd give notice — warmed (241:1477) */
+.ex__tickmark.is-notice {
+  background: #b26025;
+}
+
+/* the exit marker — a plumb bob hanging under the bar on the stem
+   (Ellipse 9, solid #522D12; centre 53u below the track's waist) */
+.ex__dot {
+  position: absolute;
+  top: calc(var(--u) * 77);
+  width: calc(var(--u) * 16);
+  height: calc(var(--u) * 16);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #522d12;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: grab;
+  touch-action: none;
+}
+
+/* its halo (Ellipse 10 — the track's terracotta at 20%); blooms as the
+   hover / drag / keyboard-focus feedback */
+.ex__dot::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--u) * -8);
+  border-radius: 50%;
+  background: rgba(178, 96, 37, 0.2);
+  transition: transform 0.25s ease, background-color 0.25s ease;
+  z-index: -1;
+}
+
+@media (hover: hover) {
+  .ex__dot:hover::before {
+    transform: scale(1.35);
+    background: rgba(178, 96, 37, 0.3);
+  }
+}
+
+.ex__bar:focus-visible .ex__dot::before {
+  transform: scale(1.35);
+  background: rgba(178, 96, 37, 0.3);
+}
+
+.ex__bar.is-dragging .ex__dot::before {
+  transform: scale(1.5);
+  background: rgba(178, 96, 37, 0.32);
+}
+
+/* ---- tick labels ------------------------------------------------------- */
+.ex__tick {
+  position: absolute;
+  top: calc(var(--u) * 421);
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 12);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  transition: color 0.3s ease;
+  pointer-events: none;
+}
+
+.ex__tick.is-ahead {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+.ex__notice {
+  position: absolute;
+  top: calc(var(--u) * 444);
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 12);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.ex__month {
+  position: absolute;
+  top: calc(var(--u) * 476);
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 20);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- the deductions card (241:1518) ------------------------------------ */
+.ex__card {
+  position: absolute;
+  top: calc(var(--u) * 522);
+  width: calc(var(--u) * 415);
+  padding: calc(var(--u) * 24) calc(var(--u) * 28);
+  border-radius: 20px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.5)
+  );
+  font-family: var(--sans);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ex__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: calc(var(--u) * 20);
+}
+
+.ex__card-title {
+  font-weight: 600;
+  font-size: calc(var(--u) * 16);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.ex__card-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 0 4px 8px;
+  background: none;
+  border: 0;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  color: var(--ex-accent);
+  cursor: pointer;
+}
+
+.ex__card-toggle svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ex__card.is-open .ex__card-toggle svg {
+  transform: rotate(180deg);
+}
+
+.ex__chip {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 50px;
+  background: rgba(0, 130, 71, 0.1);
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  color: rgba(0, 130, 71, 0.9);
+  white-space: nowrap;
+}
+
+/* the two bodies swap with the FAQ's 0fr→1fr glide */
+.ex__card-a,
+.ex__card-b {
+  display: grid;
+  transition: grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ex__card-a {
+  grid-template-rows: 1fr;
+}
+
+.ex__card.is-open .ex__card-a {
+  grid-template-rows: 0fr;
+}
+
+.ex__card-b {
+  grid-template-rows: 0fr;
+}
+
+.ex__card.is-open .ex__card-b {
+  grid-template-rows: 1fr;
+}
+
+.ex__card-a-clip,
+.ex__card-b-clip {
+  overflow: hidden;
+}
+
+/* collapsed — the headline deduction */
+.ex__waiver {
+  margin-top: calc(var(--u) * 12);
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+}
+
+.ex__waiver s {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.4);
+  margin-left: 4px;
+}
+
+.ex__waiver-sub {
+  margin-top: calc(var(--u) * 8);
+  font-size: calc(var(--u) * 14);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.ex__waiver-sub strong {
+  font-weight: 600;
+}
+
+/* expanded — the full math */
+.ex__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: calc(var(--u) * 5) 0;
+}
+
+.ex__row-k {
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.ex__row-v {
+  font-weight: 500;
+  font-size: calc(var(--u) * 15);
+  letter-spacing: -0.01em;
+  color: rgba(0, 0, 0, 0.85);
+  white-space: nowrap;
+}
+
+.ex__row-v i {
+  font-style: normal;
+  font-weight: 400;
+  font-size: calc(var(--u) * 12.5);
+  color: rgba(0, 0, 0, 0.35);
+  margin-left: 3px;
+}
+
+.ex__row-v i s {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.ex__row-v--ded {
+  color: var(--ex-accent);
+}
+
+.ex__rule {
+  margin: calc(var(--u) * 8) 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.ex__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: calc(var(--u) * 8);
+}
+
+.ex__total span {
+  font-weight: 600;
+  font-size: calc(var(--u) * 13);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ex__total strong {
+  font-weight: 500;
+  font-size: calc(var(--u) * 26);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Mobile (≤640px) — width-fit 430 artboard; the sheet runs taller than
+   one screen and scrolls. Stats sit side by side, the bar spans the
+   column, and the card goes full width beneath the marker.
+   ════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .exit {
+    --ue: calc(100vw / 430);
+    --u: var(--ue);
+    height: calc(var(--ue) * 780);
+    min-height: 100vh;
+  }
+
+  .ex__frame {
+    width: calc(var(--ue) * 430);
+    height: calc(var(--ue) * 780);
+  }
+
+  .ex__head {
+    left: calc(var(--ue) * 24);
+    top: calc(var(--ue) * 36);
+    width: calc(var(--ue) * 382);
+    gap: calc(var(--ue) * 10);
+  }
+
+  .ex__title {
+    font-size: calc(var(--ue) * 30);
+  }
+
+  .ex__sub {
+    font-size: calc(var(--ue) * 15);
+  }
+
+  /* stats side by side */
+  .ex__stat {
+    top: calc(var(--ue) * 168);
+    padding: 12px 14px;
+    gap: 5px;
+    border-radius: 10px;
+  }
+
+  .ex__stat--paid {
+    left: calc(var(--ue) * 24);
+  }
+
+  .ex__stat--pend {
+    right: calc(var(--ue) * 24);
+  }
+
+  .ex__stat-k {
+    font-size: 11px;
+  }
+
+  .ex__stat-v {
+    font-size: 14px;
+    gap: 5px;
+  }
+
+  .ex__stat-v i,
+  .ex__stat-v s {
+    font-size: 10px;
+  }
+
+  .ex__loan {
+    right: calc(var(--ue) * 20);
+    top: calc(var(--ue) * 156);
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .ex__loan svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  /* the pin */
+  .ex__pin-cap {
+    top: calc(var(--ue) * 268);
+    font-size: 10px;
+  }
+
+  .ex__pin {
+    top: calc(var(--ue) * 288);
+    padding: 9px 14px;
+    font-size: 15px;
+    border-radius: 30px;
+  }
+
+  .ex__stem {
+    top: calc(var(--ue) * 328);
+    /* down through the bar (top 352ue) to the hanging dot's top edge
+       (44px − 8px into the bar's own px space) */
+    height: calc(var(--ue) * 24 + 36px);
+  }
+
+  /* the bar */
+  .ex__rail {
+    left: calc(var(--ue) * 24);
+    width: calc(var(--ue) * 382);
+  }
+
+  .ex__bar {
+    left: calc(var(--ue) * 24);
+    top: calc(var(--ue) * 352);
+    width: calc(var(--ue) * 382);
+    height: 48px;
+  }
+
+  .ex__bar-fill,
+  .ex__bar-rest {
+    top: 14px;
+    height: 20px;
+  }
+
+  .ex__bar-line {
+    top: 23.5px;
+  }
+
+  .ex__bar-grad {
+    top: 23px;
+  }
+
+  .ex__tickmark {
+    top: 16px;
+    height: 16px;
+  }
+
+  .ex__dot {
+    top: 44px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .ex__dot::before {
+    inset: -7px;
+  }
+
+  /* only the endpoints keep their labels on the phone column */
+  .ex__tick {
+    display: none;
+  }
+
+  .ex__notice {
+    top: calc(var(--ue) * 412);
+    font-size: 8.5px;
+  }
+
+  .ex__month {
+    top: calc(var(--ue) * 432);
+    font-size: 12px;
+  }
+
+  /* the card — full column width */
+  .ex__card {
+    left: 0 !important;
+    top: calc(var(--ue) * 478);
+    width: 100%;
+    padding: 18px 20px;
+    border-radius: 16px;
+  }
+
+  .ex__card-title {
+    font-size: 12px;
+  }
+
+  .ex__card-toggle {
+    font-size: 12px;
+  }
+
+  .ex__chip {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .ex__waiver {
+    font-size: 15px;
+    margin-top: 10px;
+  }
+
+  .ex__waiver-sub {
+    font-size: 11px;
+  }
+
+  .ex__row-k {
+    font-size: 11px;
+  }
+
+  .ex__row-v {
+    font-size: 12px;
+  }
+
+  .ex__row-v i {
+    font-size: 9.5px;
+  }
+
+  .ex__total strong {
+    font-size: 19px;
+  }
+
+  .ex__total span {
+    font-size: 10px;
+  }
+
+  /* ── the story reflows to a stacked column; the horizontal timeline
+     furniture steps aside and each moment carries its caption as an
+     overline instead ── */
+  .ex__story {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: calc(var(--ue) * 36) calc(var(--ue) * 24) 0;
+  }
+
+  .ex__tl-line,
+  .ex__tl-when,
+  .ex__tl-mark,
+  .ex__tl-drop {
+    display: none;
+  }
+
+  .ex__shead {
+    position: static;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .ex__tls {
+    position: static;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .ex__tls-when {
+    display: block;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  .ex__tls-pill {
+    padding: 8px 14px;
+    font-size: 14px;
+    white-space: normal;
+  }
+
+  .ex__tls-copy {
+    font-size: 12px;
+  }
+
+  .ex__pledges {
+    position: static;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .ex__pledge {
+    flex: 1;
+    width: auto;
+    height: auto;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  .ex__mathcta {
+    position: relative; /* keeps the arrow anchored while in flow */
+    left: auto;
+    top: auto;
+    width: 100%;
+    height: auto;
+    padding: 14px 16px;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .ex__mathcta-t {
+    font-size: 15px;
+  }
+
+  .ex__mathcta-s {
+    font-size: 11px;
+  }
+
+  .ex__mathcta-arrow {
+    width: 18px;
+    height: 18px;
+    right: 12px;
+    top: 12px;
+  }
+
+  .ex__back {
+    left: calc(var(--ue) * 24);
+    top: calc(var(--ue) * 10);
+    font-size: 12px;
+  }
+}

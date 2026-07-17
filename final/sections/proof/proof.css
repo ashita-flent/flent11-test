@@ -1,0 +1,154 @@
+/* ============================================================
+   Section · Proof — "Flent 11 is new. Living with Flent is
+   not." Editorial stat blocks under dark top rules, then a
+   three-column wall of tweet placeholders (dashed frames with
+   the classic X) waiting on the real screenshots.
+   ============================================================ */
+
+.pr {
+  --u: min(calc(100vw / 1512), calc(100vh / 982));
+
+  width: 100%;
+  background: var(--bg);
+  padding: clamp(84px, 13vh, 160px) 0 clamp(96px, 14vh, 170px);
+}
+
+/* same content column as the exit frame — 1320u centred */
+.pr__inner {
+  width: calc(var(--u) * 1320);
+  margin: 0 auto;
+}
+
+/* ---- heading -------------------------------------------------------- */
+.pr__head {
+  margin-bottom: clamp(48px, 7vw, 84px);
+}
+
+.pr__eyebrow {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 18px;
+}
+
+.pr__title {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(2rem, 4.6vw, 3.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+
+.pr__sub {
+  margin-top: 20px;
+  max-width: 54ch;
+  font-family: var(--sans);
+  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ---- stats ----------------------------------------------------------- */
+.pr__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(24px, 4vw, 48px);
+  margin-bottom: clamp(56px, 8vw, 96px);
+}
+
+/* each stat opens with a strong editorial rule — the Ramp move */
+.pr__stat {
+  border-top: 1.5px solid var(--ink);
+  padding-top: 20px;
+}
+
+.pr__stat-value {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 3.2vw, 2.7rem);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pr__stat-label {
+  margin-top: 8px;
+  font-family: var(--sans);
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+/* ---- tweet wall ------------------------------------------------------- */
+.pr__wall {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.pr__col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* the middle column hangs lower — the wall reads as a loose collage */
+.pr__col:nth-child(2) {
+  margin-top: 56px;
+}
+
+/* placeholder frame: dashed hairline + the drafting X, label centred */
+.pr__tweet {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(26, 23, 20, 0.22);
+  border-radius: 12px;
+  background-image: linear-gradient(
+      to top right,
+      transparent calc(50% - 0.5px),
+      var(--box-line) calc(50% - 0.5px),
+      var(--box-line) calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    ),
+    linear-gradient(
+      to bottom right,
+      transparent calc(50% - 0.5px),
+      var(--box-line) calc(50% - 0.5px),
+      var(--box-line) calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    );
+}
+
+.pr__tweet span {
+  padding: 4px 10px;
+  background: var(--bg);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(26, 23, 20, 0.35);
+}
+
+/* ---- small screens ---------------------------------------------------- */
+@media (max-width: 860px) {
+  .pr__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pr__wall {
+    grid-template-columns: 1fr;
+  }
+
+  .pr__col:nth-child(2) {
+    margin-top: 0;
+  }
+}

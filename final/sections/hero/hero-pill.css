@@ -1,0 +1,158 @@
+/* ============================================================
+   Hero · the "11 opens" intro → settled frame4 (Figma 294:769)
+   All metrics ride --u (1 Figma px of the 1512×982 frame).
+   ============================================================ */
+
+.hp {
+  --u: min(calc(100vw / 1512), calc(100vh / 982));
+
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 560px;
+  /* the brand cream (329:2547 sheet #F1E2D8 — same family as the exit
+     peach and the footer wash) */
+  background: #f1e2d8;
+  overflow: hidden;
+}
+
+/* the centred design frame — bars, clip window and copy all live here */
+.hp__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--u) * 1512);
+  height: calc(var(--u) * 982);
+}
+
+/* brand bars (positioned/sized by GSAP; under the photo window so the
+   expanding capsule swallows them exactly as in the storyboard) */
+.hp__bar {
+  position: absolute;
+  z-index: 1;
+  display: block;
+}
+
+/* the capsule window onto the room */
+.hp__clip {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  will-change: clip-path;
+}
+
+/* the photo never moves — Figma 294:770: (−26,−61) 1859×1045 */
+.hp__img {
+  position: absolute;
+  left: calc(var(--u) * -26);
+  top: calc(var(--u) * -61);
+  width: calc(var(--u) * 1859);
+  height: calc(var(--u) * 1045);
+  object-fit: cover;
+  display: block;
+}
+
+/* wordmark (294:798) */
+.hp__brand {
+  position: absolute;
+  z-index: 3;
+  left: calc(var(--u) * 99);
+  top: calc(var(--u) * 45);
+  width: calc(var(--u) * 87.66);
+  height: calc(var(--u) * 25.8);
+}
+
+/* headline (294:792) — 64u regular, "worth it" medium italic */
+.hp__title {
+  position: absolute;
+  z-index: 3;
+  left: calc(var(--u) * 99);
+  top: calc(var(--u) * 717);
+  margin: 0;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 64);
+  line-height: calc(var(--u) * 81);
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+.hp__title em {
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* the CTA pill (294:795) — black, 24u/14u pad, r40 */
+.hp__cta {
+  position: absolute;
+  z-index: 3;
+  left: calc(var(--u) * 1170);
+  top: calc(var(--u) * 821);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+  padding: calc(var(--u) * 14) calc(var(--u) * 24);
+  border: 0;
+  border-radius: calc(var(--u) * 40);
+  background: #000;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 24);
+  letter-spacing: -0.02em;
+  color: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.hp__cta span {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.hp__cta:hover span {
+  transform: translateX(3px);
+}
+
+/* ---- phone (≤640) — same story, portrait proportions ---------------- */
+@media (max-width: 640px) {
+  .hp__frame {
+    left: 0;
+    top: 0;
+    transform: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hp__img {
+    /* cover the settled capsule (6vw..94vw × 12vh..53vh) with room to
+       spare through every beat */
+    left: -6vw;
+    top: 0;
+    width: 112vw;
+    height: 64vh;
+  }
+
+  .hp__brand {
+    left: 6vw;
+    top: 22px;
+    width: 76px;
+    height: 22.4px;
+  }
+
+  .hp__title {
+    left: 6vw;
+    top: calc(50vh + 32px);
+    font-size: 34px;
+    line-height: 43px;
+    letter-spacing: -0.035em;
+  }
+
+  .hp__cta {
+    left: 6vw;
+    top: calc(50vh + 32px + 86px + 28px);
+    padding: 12px 20px;
+    border-radius: 28px;
+    font-size: 17px;
+  }
+}
