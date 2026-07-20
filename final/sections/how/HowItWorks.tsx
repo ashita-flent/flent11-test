@@ -5,6 +5,17 @@ import "./how.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* phones resize the viewport every time the browser chrome slides in or
+   out — without this, every such resize re-measures the pinned journey
+   MID-READ and the indicator/beat tracking jumps a step. ScrollTrigger
+   ignores those mobile chrome resizes entirely (rotations still refresh). */
+ScrollTrigger.config({ ignoreMobileResize: true });
+/* phone browsers resize the viewport as their address bar collapses —
+   without this every such resize re-measures the pinned journey mid-
+   scroll and the stage visibly jumps (global config; set once here,
+   the section that owns the page's big pin) */
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 /* ────────────────────────────────────────────────────────────────────────
    How it works — Figma Page 2 ("Flent-11", node 13:3).
    One shared background image (the sunlit-wall room) that the scroll
@@ -49,15 +60,19 @@ type Focus = { x: number; y: number; scale: number; opacity: number };
      door layer (cover in the 1.784 box):  y% = (dy + 88 + 11k − (w/1.75 − h)/2)/1132
      olive layer (own-ratio, top-left):    y% = (dy + 88 − max(0,(w/1.978 − h)/2))/1132 */
 
-/* Figma 329:2687 (journey start): room 2180×1226 @ (−373,−122) */
-const INTRO_FOCUS: Focus = { x: -13.77, y: -2.83, scale: 1.0797, opacity: 1 };
+/* Figma 329:2687 (journey start, 2026-07-18): room 2285×1286 @ (−478,−152) */
+const INTRO_FOCUS: Focus = { x: -18.97, y: -5.43, scale: 1.13175, opacity: 1 };
 
 type Step = {
   id: string;
   when: string;
+  /** the mobile frames run shorter captions (iPhone 17 - 4…6) */
+  whenM: string;
   title: string;
   body: string;
   focus: Focus;
+  /** phone frames crop the room differently — an override dolly pose */
+  focusM?: Focus;
   /** Each variant renders its exact Figma frame layout. */
   variant: "financed" | "movein" | "monthly" | "complete";
   /** Journey-indicator colour scheme, matched to the settled backdrop:
@@ -73,8 +88,9 @@ const STEPS: Step[] = [
   {
     id: "movein",
     when: "FIRST MONTH",
-    title: "You move in. Rent-free.",
-    body: "", // rendered bespoke below (carries the inline rent field)
+    whenM: "FIRST MONTH",
+    title: "", // bespoke: base-rent chip + two-line headline (33:368)
+    body: "",
     focus: { x: -111.39, y: 7.51, scale: 2.2689, opacity: 1 }, // Figma 33:368 — 4581×2314 @ (−2344,−3), olive layer
     variant: "movein",
     tone: "ink", // the wall reads light at the indicator band
@@ -82,6 +98,7 @@ const STEPS: Step[] = [
   {
     id: "financed",
     when: "2ND - 11TH MONTH",
+    whenM: "FIRST MONTH",
     title: "", // bespoke: headline + Gromor → flent handoff diagram
     body: "",
     // Figma 322:2083 — 2062×1042 @ (−546,−3), the bottom-anchored room
@@ -92,6 +109,7 @@ const STEPS: Step[] = [
   {
     id: "monthly",
     when: "2ND - 11TH MONTH",
+    whenM: "2-11 MONTHS",
     title: "", // bespoke: headline + tenant → Gromor EMI diagram
     body: "",
     // Figma 322:2152 — identical placement: the camera holds still
@@ -103,6 +121,7 @@ const STEPS: Step[] = [
   {
     id: "complete",
     when: "END OF 11TH MONTH",
+    whenM: "END OF MONTH 11",
     title: "You complete 11 months. You pay for 10.",
     body: "That’s the Flent 11 exchange. You commit to the full stay. We make the terms work harder for you.",
     // Figma 39:309 (2026-07-16 pass) — the camera dives into the room's
@@ -111,6 +130,10 @@ const STEPS: Step[] = [
     // 39:310 fill, 1024×429), dissolving in over the olive layer as the
     // window rides the same zoom off the top-left.
     focus: { x: -114.91, y: -51.24, scale: 1.9569, opacity: 1 },
+    // iPhone 17 - 6: the phone crop dives deeper into the room's dark
+    // right side — the umber evening wall owns the frame (the mobile
+    // scrim in the CSS carries the rest of the design's darkness)
+    focusM: { x: -160, y: -48, scale: 2.5, opacity: 1 },
     variant: "complete",
     tone: "white",
   },
@@ -136,7 +159,7 @@ const EMI_MONTHS = [
 const WHEN_START = "START";
 
 /* Journey-indicator dot centres, px in the 1512 frame (Figma 22:283). */
-const DOT_X = [222, 570.67, 919.33, 1268];
+const DOT_X = [230, 578.67, 927.33, 1276];
 
 /* which dot lights for each journey step. dot 0 = START (intro); the two
    financing beats SHARE dot 2 (both Figma frames mark "2ND – 11TH MONTH").
@@ -380,47 +403,6 @@ export function PaneWindow({ rent }: { rent: number }) {
   );
 }
 
-/** House-Rent payment card (Figma 174:580 / 174:849) — avatar with the
-    green paid-check, label + plan line, amount (act B adds the struck
-    full price inline). */
-function PayCard({
-  sub,
-  amount,
-  struck,
-}: {
-  sub: string;
-  amount: string;
-  struck?: string;
-}) {
-  return (
-    <div className="how__paycard">
-      <div className="how__paycard-left">
-        <span className="how__paycard-avatar">
-          <img src="/how-avatar.png" alt="" />
-          <svg className="how__paycard-check" viewBox="0 0 20 20" fill="none" aria-hidden>
-            <rect width="20" height="20" rx="10" fill="#34C759" />
-            <path
-              d="M15 7L8.8125 13L6 10.2727"
-              stroke="#fff"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
-        <span className="how__paycard-text">
-          <span className="how__paycard-title">House Rent</span>
-          <span className="how__paycard-sub">{sub}</span>
-        </span>
-      </div>
-      <span className="how__paycard-amt">
-        ₹ {amount}
-        {struck && <s>₹ {struck}</s>}
-      </span>
-    </div>
-  );
-}
-
 /** The flow wire (174:587/174:758) — white gradient line + arrowhead,
     parametric length so both flows share one drawing. */
 /* 252:2420/2436 — the EMI beat's connector: hairline + open chevron,
@@ -533,13 +515,20 @@ export default function HowItWorks({
   const scrimDRef = useRef<HTMLDivElement>(null);
   const stepRefs = useRef<HTMLDivElement[]>([]);
   const [active, setActive] = useState(-1); // -1 = intro, 0..n = steps
+  // the indicator's own (earlier) clock — see the tracker's onUpdate
+  const [dotStep, setDotStep] = useState(-1);
   // phone layout? DOT_X spans the 1512 design frame — on the 640-unit
   // mobile frame those coords run past the right edge, so the indicator
   // gets viewport-fitted dot positions instead (12 / 38 / 64 / 90 vw)
   const [mobileInd] = useState(
     () => window.matchMedia("(max-width: 640px)").matches
   );
-  const dotXs = mobileInd ? [77, 243, 410, 576] : DOT_X;
+  // the pane hover-reveal needs a real pointer — on touch, taps would
+  // latch :hover and strand the reveal over a pane
+  const [canHover] = useState(
+    () => window.matchMedia("(hover: hover)").matches
+  );
+  const dotXs = mobileInd ? [76.42, 238.81, 401.19, 563.58] : DOT_X;
   // the pinned timeline's ScrollTrigger — the break slide's "see how it
   // works" link converts a beat position into a scroll target through it
   const mainSTRef = useRef<ScrollTrigger | null>(null);
@@ -645,20 +634,87 @@ export default function HowItWorks({
       const zoom = {
         scale: s1,
         xPercent: ((0.5 * vw - (W * s1) / 6 - X) / W) * 100,
-        yPercent: ((0.53 * vh - 0.045 * H * s1 - Y) / H) * 100,
+        // the glass rides a touch higher (0.53 → 0.50) so move-in's copy
+        // and the month-one cell share the frame evenly
+        yPercent: ((0.5 * vh - 0.045 * H * s1 - Y) / H) * 100,
       };
-      // completion — the dive into the bottom-right corner: the frosted
-      // exit pane reads as a ~46vw square low in the frame, the rest of
-      // the window bleeding off the top-left
-      const s2 = (0.46 * vw) / (W / 3);
+      // completion (iPhone 17 - 6, window 411:678) — the dive renders
+      // the window at the design's literal 569.9 frame-px width and
+      // parks its bottom-right corner at (309.7, 372.1): exactly the
+      // design's four-cell crop, the copy owning the wash below
+      const mx = vw / 402;
+      const my = vh / 874;
+      const s2 = (569.9 * mx) / W;
       const corner = {
         scale: s2,
-        xPercent: ((0.94 * vw - W * s2 - X) / W) * 100,
-        yPercent: ((0.9 * vh - H * s2 - Y) / H) * 100,
+        xPercent: ((309.7 * mx - W * s2 - X) / W) * 100,
+        yPercent: ((372.1 * my - H * s2 - Y) / H) * 100,
       };
-      return { zoom, corner };
+      // the onward chevrons centre on the parked EXIT PANE (411:785 —
+      // dead-centre of the corner cell), derived from the same pose so
+      // they stay centred at any viewport: the rendered pane is a third
+      // of the dived window's width, a quarter of its height
+      const chev = {
+        x: 309.7 * mx - (W * s2) / 6,
+        y: 372.1 * my - (H * s2) / 8,
+        s: 41.2 * mx,
+      };
+      /* ── the financing beats' whole column, solved as ONE stack:
+         copy → (42) → diagram row → window → (18) → indicator line at
+         812. The design's gaps (iPhone 17 - 4/5: sub→row 42, deck→glass
+         23) hold at every size; the WINDOW absorbs any squeeze by
+         shrinking below its designed 222 width — spacing and legibility
+         never give. Copy feet are read via offsets (transform-immune,
+         so the steps' hidden y-shift can't skew them). ── */
+      const foot = (sel: string) => {
+        const el = section.querySelector<HTMLElement>(sel);
+        return el ? el.offsetTop + el.offsetHeight : 0;
+      };
+      const indTop = 812 * my;
+      const f3top = Math.max(foot(".how__copy--fin3") + 42, 200 * my);
+      const f3subtop = f3top + 344 * mx * 0.239 + 18;
+      const montop = Math.max(foot(".how__copy--mon") + 42, 244 * my);
+      // the shared rest pose sits below the TALLER beat's stack
+      // (fin3 sub ≈ 40 tall + 24 gap; the mon deck runs ≈ 98 + 23 gap)
+      const restTopMin = Math.max(f3subtop + 64, montop + 121, 404 * my);
+      const s3full = (222 * mx) / W;
+      const avail = indTop - 18 - restTopMin;
+      const s3 = Math.min(s3full, Math.max((150 * mx) / W, avail / H));
+      const restTop = Math.min(restTopMin, indTop - 18 - H * s3);
+      // a shrunk window re-centres inside the designed slot
+      const restLeft = 83 * mx + (W * (s3full - s3)) / 2;
+      const rest = {
+        scale: s3,
+        xPercent: ((restLeft - X) / W) * 100,
+        yPercent: ((restTop - Y) / H) * 100,
+      };
+      return { zoom, corner, rest, restTop, f3top, f3subtop, montop, chev };
     };
     const MP = mobileLayout ? mobilePoses() : null;
+    // CSS reads the solved stack: the flow rows sit exactly where the
+    // solver put them, so nothing can overlap by construction
+    if (MP) {
+      const stack = (m: { restTop: number; f3top: number; f3subtop: number; montop: number }) => {
+        section.style.setProperty("--mrest", `${Math.round(m.restTop)}px`);
+        section.style.setProperty("--f3top", `${Math.round(m.f3top)}px`);
+        section.style.setProperty("--f3subtop", `${Math.round(m.f3subtop)}px`);
+        section.style.setProperty("--montop", `${Math.round(m.montop)}px`);
+      };
+      stack(MP);
+      // webfont swap reflows the headlines — restack once settled (the
+      // window pose is baked into the timeline; the designed gaps absorb
+      // the small drift)
+      document.fonts?.ready.then(() => stack(mobilePoses())).catch(() => {});
+      // park the onward chevrons dead-centre on the dived exit pane
+      gsap.set(section.querySelectorAll(".how__scroll-on"), {
+        left: MP.chev.x,
+        top: MP.chev.y,
+        xPercent: -50,
+        yPercent: -50,
+        width: MP.chev.s,
+        height: MP.chev.s,
+      });
+    }
     const POSE_ZOOM = MP ? MP.zoom : WIN.zoom;
     const POSE_CORNER = MP ? MP.corner : WIN.corner;
 
@@ -699,11 +755,11 @@ export default function HowItWorks({
         yPercent: POSE_INTRO.yPercent,
         autoAlpha: 1,
       });
-      gsap.set(rig, { "--frost": mobileLayout ? "7px" : "5.635px" });
+      gsap.set(rig, { "--frost": mobileLayout ? "3.83px" : "5.635px" });
       // the intro veil's backdrop blur can't reach the rig in Chromium
       // (the panes' own backdrop-filter output is never re-blurred), so
       // the rig wears the veil's haze itself until the dissolve
-      gsap.set(rig, { filter: "blur(4.5px)" });
+      gsap.set(rig, { filter: "blur(2px)" });
       // the veil sits over the window frame's overlay stroke too — the
       // stage-level frame rig can't slide under it, so it wears a touch of
       // the veil's attenuation until the dive lifts it
@@ -726,18 +782,20 @@ export default function HowItWorks({
         autoAlpha: 0,
         filter: "blur(12px)",
       });
-      // month 1 is lit with its ₹0 from the very first frame (329:2714)
-      gsap.set(q(".how__m1"), { autoAlpha: 1, y: 0 });
-      gsap.set(q(".how__catch"), { autoAlpha: 0, y: 8 });
+      // the intro shows a REAL window — plain glass, no monthly markings
+      // (329:2709, 2026-07-19 pass); the month furniture arrives with the
+      // move-in dive (scrubbed reveal below). The m1 card's white ground
+      // and glow ride the is-plain class instead (CSS transitions).
+      gsap.set(q(".how__m1, .how__plabel"), { autoAlpha: 0 });
+      gsap.set(q(".how__m1"), { y: 0 });
+      gsap.set(q(".how__pane--m1 .how__m1-flent"), { autoAlpha: 0 });
       // the financing diagrams assemble on arrival; the panes' rent
       // amounts + no-cost badges light only on the monthly beat
       gsap.set(q(".how__fin3 > *, .how__fin3-sub, .how__mon > *"), { autoAlpha: 0 });
       gsap.set(q(".how__pamt, .how__pdisc"), { autoAlpha: 0 });
       gsap.set(q(".how__scroll-on"), { autoAlpha: 0 });
-      // payment-flow pieces (the upfront summary's card → flent draw)
-      gsap.set(q(".how__paycard"), { autoAlpha: 0, y: 14 });
+      // the financing wires draw in on their beats
       gsap.set(q(".how__tflow-wire"), { clipPath: "inset(0 100% 0 0)" });
-      gsap.set(q(".how__flenticon"), { autoAlpha: 0 });
 
       const anchors: number[] = [];
 
@@ -785,13 +843,15 @@ export default function HowItWorks({
         anchors.push(anchor);
 
         // dolly the shared background to this step's Figma placement
+        // (phones take the step's own crop where one is drawn)
+        const focus = (mobileLayout && step.focusM) || step.focus;
         tl.to(
           bg,
           {
-            xPercent: step.focus.x,
-            yPercent: step.focus.y,
-            scale: step.focus.scale,
-            opacity: step.focus.opacity,
+            xPercent: focus.x,
+            yPercent: focus.y,
+            scale: focus.scale,
+            opacity: focus.opacity,
             duration: 1,
           },
           anchor - 0.5
@@ -803,7 +863,15 @@ export default function HowItWorks({
         // content out before the next beat (the exit curtain follows the last)
         tl.to(
           steps[i],
-          { autoAlpha: 0, y: -26, duration: 0.4, ease: "power2.in" },
+          {
+            autoAlpha: 0,
+            y: -26,
+            // phones clear faster: the shared window's next dolly passes
+            // through the diagram band, and a live deck under a moving
+            // glass reads as a collision
+            duration: mobileLayout ? 0.26 : 0.4,
+            ease: "power2.in",
+          },
           anchor + 0.55
         );
       });
@@ -811,6 +879,11 @@ export default function HowItWorks({
       // a1 move-in · a2 financed · a3 monthly (camera holds from a2) ·
       // a4 completion
       const [a1, a2, , a4] = anchors;
+
+      // the window dives in BARE — the month sequence, the frost and the
+      // ₹0 are dealt on ARRIVAL by the move-in micro (not scrubbed), per
+      // the 33:368 storyboard: start-frame glass → months write on →
+      // pane one frosts → the first month's gift appears.
 
       /* ── window rig: on stage from the intro (small, far right), it rides
          the SAME camera move as the room into the month-1 dive — one
@@ -828,16 +901,27 @@ export default function HowItWorks({
         },
         a1 - 0.5 // rides the intro→move-in background dolly
       );
-      tl.to(rig, { "--frost": "16.445px", duration: 1 }, a1 - 0.5);
+      // pane blur at the dive: 16.445 on desktop (329:2634), 8.47 on the
+      // phone frame (406:407 — the greens must stay readable at 402w)
+      tl.to(
+        rig,
+        { "--frost": mobileLayout ? "8.47px" : "16.445px", duration: 1 },
+        a1 - 0.5
+      );
       // the room hands from the door-lit morning to the olive afternoon
       // INSIDE the dive — geometry continuous, texture dissolving mid-air
       tl.to(q(".how__bg-b"), { opacity: 1, duration: 1 }, a1 - 0.5);
+      const POSE_REST = MP
+        ? MP.rest
+        : { scale: 1, xPercent: 0, yPercent: 0 };
       tl.to(
         rigs,
-        { scale: 1, xPercent: 0, yPercent: 0, duration: 1 },
+        { ...POSE_REST, duration: 1 },
         a2 - 0.5 // rides the same beat as the background dolly
       );
-      tl.to(rig, { "--frost": "7px", duration: 1 }, a2 - 0.5);
+      // the phone's small panes mush at the desktop frost — the design
+      // (iPhone 17 - 5) keeps the resting greens readable
+      tl.to(rig, { "--frost": mobileLayout ? "4px" : "7px", duration: 1 }, a2 - 0.5);
 
       /* ── completion (39:309, 2026-07-16): the camera dives into the
          room's bottom-right — the window rides the SAME zoom off the
@@ -857,8 +941,14 @@ export default function HowItWorks({
       // inside the dive (39:310's own fill)
       tl.to(q(".how__bg-c"), { opacity: 1, duration: 1 }, a4 - 0.5);
       // pane frost holds the design's literal 16.445 at the corner dive
-      // (329:2634… — the leafy structure stays readable through it)
-      tl.to(rig, { "--frost": "16.445px", duration: 1 }, a4 - 0.5);
+      // (329:2634… — the leafy structure stays readable through it).
+      // Phone: iPhone 17 - 6's panes carry radius 15.645 ⇒ 7.82px CSS —
+      // the leaves keep their bokeh structure instead of smearing flat
+      tl.to(
+        rig,
+        { "--frost": mobileLayout ? "7.82px" : "16.445px", duration: 1 },
+        a4 - 0.5
+      );
 
       // dark gradient scrims: move-in's top wash (34:442), the financing
       // loop's blur-graded wash (252:2354 — blur masked to fade with the
@@ -888,10 +978,19 @@ export default function HowItWorks({
         end: `+=${TOTAL_BEATS * 100}%`,
         onUpdate: (self) => {
           const t = self.progress * total;
+          // TWO clocks: the INDICATOR flips early (a−0.45, the moment
+          // the previous copy starts leaving) so the dots lead the
+          // story; the MICRO trigger flips late (a−0.1, the step nearly
+          // settled) so arrival animations — and the mon beat's landed
+          // payments — are never reset while their step is still on
+          // screen
+          let dotIdx = -1;
           let idx = -1;
           anchors.forEach((a, i) => {
+            if (t >= a - 0.45) dotIdx = i;
             if (t >= a - 0.1) idx = i;
           });
+          setDotStep(dotIdx);
           setActive(idx);
         },
       });
@@ -918,17 +1017,66 @@ export default function HowItWorks({
       gsap.set(q(".how__pflash"), { opacity: 0 });
     }
 
-    if (active === 0) {
-      // move-in — the ₹0 has been lit since the intro (the dive just
-      // magnifies it); only the catch line teases the financing turn
-      m.set(q(".how__catch"), { autoAlpha: 0, y: 8 })
-        .to(q(".how__catch"), { autoAlpha: 1, y: 0, duration: 0.5 }, 1.2);
+    /* the window's story pieces — plabels, the m1 frost (held plain by
+       .is-m1wait while the labels write on) and the ₹0 card. Settled in
+       one stroke for any beat past move-in; cleared back to bare glass
+       for the intro. */
+    const storyRigs = () =>
+      section.querySelectorAll(".how__winrig, .how__glowrig");
+    const settleWindowStory = (labelsOn: boolean) => {
+      storyRigs().forEach((r) => r.classList.remove("is-m1wait"));
+      m.set(q(".how__plabel"), { autoAlpha: labelsOn ? 1 : 0 }, 0)
+        .set(q(".how__m1"), { autoAlpha: 1, y: 0 }, 0)
+        .set(q(".how__pane--m1 .how__m1-flent"), { autoAlpha: 0.45 }, 0);
+    };
+
+    if (active < 0) {
+      // intro — the start frame's window is bare glass
+      storyRigs().forEach((r) => r.classList.remove("is-m1wait"));
+      m.set(q(".how__plabel, .how__m1"), { autoAlpha: 0 }, 0).set(
+        q(".how__pane--m1 .how__m1-flent"),
+        { autoAlpha: 0 },
+        0
+      );
+    } else if (active === 0) {
+      // move-in (33:368 storyboard) — the dive lands on bare glass, the
+      // month sequence writes itself on, THEN pane one frosts over and
+      // the first month's ₹0 settles onto it
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        settleWindowStory(true);
+      } else {
+        // phones hide the month labels (display:none) — staggering them
+        // would only stall the frost + ₹0 behind ~2s of invisible writing
+        const labelsAct = !window.matchMedia("(max-width: 640px)").matches;
+        storyRigs().forEach((r) => r.classList.add("is-m1wait"));
+        m.set(q(".how__plabel"), { autoAlpha: 0 }, 0)
+          .set(q(".how__m1"), { autoAlpha: 0, y: 6 }, 0)
+          .set(q(".how__pane--m1 .how__m1-flent"), { autoAlpha: 0 }, 0);
+        // 1 · the months write themselves onto the glass, in sequence
+        if (labelsAct)
+          m.to(
+            q(".how__plabel"),
+            { autoAlpha: 1, duration: 0.35, stagger: 0.09 },
+            0.45
+          );
+        // 2 · pane one frosts over (the pane's own transition carries it)
+        m.add(() => {
+          storyRigs().forEach((r) => r.classList.remove("is-m1wait"));
+        }, labelsAct ? "+=0.2" : 0.3)
+          // 3 · the first month's gift appears on the frost
+          .to(
+            q(".how__pane--m1 .how__m1-flent"),
+            { autoAlpha: 0.45, duration: 0.45 },
+            "+=0.4"
+          )
+          .to(q(".how__m1"), { autoAlpha: 1, y: 0, duration: 0.5 }, "<0.08");
+      }
     } else if (active === 1) {
       // financed upfront (322:2083) — Gromor lands, the wire carries the
       // ten months' figure across, flent receives it with a glow; the
       // trade line signs it off
-      m.set(q(".how__m1"), { autoAlpha: 1, y: 0 }) // in case move-in was skipped
-        .set(q(".how__fin3 > *, .how__fin3-sub"), { autoAlpha: 0 })
+      settleWindowStory(true); // in case move-in was skipped
+      m.set(q(".how__fin3 > *, .how__fin3-sub"), { autoAlpha: 0 })
         .set(q(".how__fin3-gromor, .how__fin3-flent"), { y: 12 })
         .set(q(".how__fin3 .how__tflow-wire"), { clipPath: "inset(0 100% 0 0)" })
         .to(q(".how__fin3-gromor"), { autoAlpha: 1, y: 0, duration: 0.45 }, 0.55)
@@ -977,7 +1125,7 @@ export default function HowItWorks({
 
       /* reset immediately (not via the timeline) so the flight paths can
          be measured from the settled front-slot pose */
-      gsap.set(q(".how__m1"), { autoAlpha: 1, y: 0 });
+      settleWindowStory(true); // in case move-in was skipped
       gsap.set(q(".how__mon > *"), { autoAlpha: 0 });
       gsap.set(q(".how__mon-tenant, .how__mon-gromor"), { y: 12 });
       gsap.set(q(".how__mon .how__tflow-wire"), { clipPath: "inset(0 100% 0 0)" });
@@ -1036,6 +1184,9 @@ export default function HowItWorks({
         // the window never clips a hard card edge. As it fades, the target
         // pane FLASHES (payment made) and settles showing the ₹ it now holds.
         const STEP = 1.0; // seconds between cycles — barely overlapping
+        // phones stack the deck ABOVE the glass — the flight runs on the
+        // vertical axis there, not the desktop's sideways drift
+        const vertFlight = window.matchMedia("(max-width: 640px)").matches;
         cards.forEach((card, k) => {
           const T = 2.6 + k * STEP;
           const paneMonth = k + 2; // month 1 is the free one
@@ -1050,13 +1201,27 @@ export default function HowItWorks({
           const paneCx = pr.left + pr.width / 2;
           const paneCy = pr.top + pr.height / 2;
           // the frame would clip a card that crossed into the window, so it
-          // stops SHORT of the glass and dissolves in the open room. Cap the
-          // travel just left of the window's near edge, keeping the same
-          // heading toward the pane (dy scaled to the shortened dx).
-          const winLeft = pr.left - ((paneMonth - 1) % 3) * pr.width;
-          const capX = Math.min(paneCx, winLeft - pr.width * 0.35);
-          const dx = capX - slotCx;
-          const dy = (paneCy - slotCy) * (dx / (paneCx - slotCx));
+          // stops SHORT of the glass and dissolves in the open room, capped
+          // at the window's NEAR edge along the layout's travel axis while
+          // keeping the heading toward the pane. Desktop flows sideways
+          // into the window at its right; the phone's deck sits above the
+          // glass, so the card dives DOWN and melts above the top edge.
+          let dx: number;
+          let dy: number;
+          if (vertFlight) {
+            const winTop = pr.top - Math.floor((paneMonth - 1) / 3) * pr.height;
+            const capY = Math.min(paneCy, winTop - pr.height * 0.3);
+            dy = capY - slotCy;
+            dx =
+              paneCy === slotCy
+                ? 0
+                : (paneCx - slotCx) * (dy / (paneCy - slotCy));
+          } else {
+            const winLeft = pr.left - ((paneMonth - 1) % 3) * pr.width;
+            const capX = Math.min(paneCx, winLeft - pr.width * 0.35);
+            dx = capX - slotCx;
+            dy = (paneCy - slotCy) * (dx / (paneCx - slotCx));
+          }
 
           // the drift + dissolve: eases toward the pane while softening,
           // then melts FAST — blur builds and opacity drops quickly so the
@@ -1068,7 +1233,9 @@ export default function HowItWorks({
               x: dx,
               y: dy,
               scale: 0.6,
-              filter: "blur(20px)",
+              // the phone's dive is short — the desktop's 20px melt
+              // blooms the little card into an unreadable white smear
+              filter: `blur(${vertFlight ? 10 : 20}px)`,
               zIndex: 2,
               duration: 0.85,
               ease: "sine.out",
@@ -1102,8 +1269,12 @@ export default function HowItWorks({
               gsap.fromTo(gsum, { scale: 1.08 }, { scale: 1, duration: 0.35, ease: "power2.out" });
             }, T + 0.66);
 
-          // the deck settles forward a quiet step behind it — FULL cards,
-          // the ones behind simply lighter and blurrier (no half-cut mask)
+          // the deck settles forward the INSTANT this card starts its
+          // flight — so the next card pulls into focus immediately behind
+          // it, not after it has dissolved. Snappy (0.5s) so the new front
+          // card is fully sharp well before its own departure at T+STEP,
+          // giving it a clean beat in focus (and never fighting that
+          // departure tween, which used to overlap the slow advance).
           for (let j = k + 1; j <= Math.min(k + 4, cards.length - 1); j++) {
             const d = DEPTHS[Math.min(j - k - 1, 3)];
             const next = cards[j];
@@ -1114,10 +1285,10 @@ export default function HowItWorks({
                 scale: d.s,
                 autoAlpha: d.a,
                 filter: `blur(${d.b}px)`,
-                duration: 0.95,
+                duration: 0.5,
                 ease: "sine.inOut",
               },
-              T + 0.4
+              T + 0.05
             );
           }
         });
@@ -1132,10 +1303,14 @@ export default function HowItWorks({
           );
       }
     } else if (active === 3) {
-      // completion — the grid rests; the way onward glows in
-      m.set(q(".how__m1"), { autoAlpha: 1, y: 0 })
-        .set(q(".how__scroll-on"), { autoAlpha: 0 })
-        .to(q(".how__scroll-on"), { autoAlpha: 1, duration: 0.5 }, 0.9);
+      // completion — the grid rests wordless (labels off); the way
+      // onward glows in
+      settleWindowStory(false);
+      m.set(q(".how__scroll-on"), { autoAlpha: 0 }).to(
+        q(".how__scroll-on"),
+        { autoAlpha: 1, duration: 0.5 },
+        0.9
+      );
     }
 
     return () => {
@@ -1147,11 +1322,17 @@ export default function HowItWorks({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
+  // financed shares the FIRST MONTH dot on phones (iPhone 17 - 4).
+  // Everything the INDICATOR shows rides the early dotStep clock; the
+  // stage's own states (finalCls, micro) stay on the settled `active`.
+  const dotMap = mobileInd ? [1, 1, 2, 3] : DOT_FOR_STEP;
   const dotIdx =
-    active < 0 ? 0 : DOT_FOR_STEP[Math.min(active, DOT_FOR_STEP.length - 1)];
+    dotStep < 0 ? 0 : dotMap[Math.min(dotStep, dotMap.length - 1)];
   const activeX = dotXs[dotIdx];
   const finalCls = active === 3 ? " is-final" : "";
+  const plainCls = active < 0 ? " is-plain" : "";
   const stepIdx = Math.min(Math.max(active, 0), STEPS.length - 1);
+  const dotStepIdx = Math.min(Math.max(dotStep, 0), STEPS.length - 1);
 
   return (
     <section className="how" ref={sectionRef}>
@@ -1181,7 +1362,7 @@ export default function HowItWorks({
         <div className="how__scrim how__scrim--d" ref={scrimDRef} aria-hidden />
 
         {/* ₹0 pane glow — behind the glass, spilling onto the wall (35:447) */}
-        <div className={`how__glowrig${finalCls}`} ref={glowRigRef} aria-hidden>
+        <div className={`how__glowrig${finalCls}${plainCls}`} ref={glowRigRef} aria-hidden>
           <div className="how__m1-glow" />
         </div>
 
@@ -1197,63 +1378,52 @@ export default function HowItWorks({
               }}
             >
               {step.variant === "movein" ? (
-                /* ── Figma Frame 4 (33:368) — white copy, vertically centred,
-                   the rent editable inline; the catch-teaser sits low ── */
-                <>
-                  <div className="how__copy how__copy--movein">
-                    <h3 className="how__title">{step.title}</h3>
-                    <p className="how__body">
-                      Assume your rent is{" "}
-                      <label
-                        className="how__rentfield how__rentfield--inline"
-                        htmlFor="how-rent"
-                      >
-                        <span className="how__rentfield-rupee" aria-hidden>
-                          ₹
-                        </span>
-                        <span className="how__rentfield-sizer">
-                          <span aria-hidden>{rentText || "45,000"}</span>
-                          <input
-                            id="how-rent"
-                            className="how__rentfield-input"
-                            type="text"
-                            inputMode="numeric"
-                            autoComplete="off"
-                            spellCheck={false}
-                            placeholder="45,000"
-                            size={1}
-                            value={rentText}
-                            onChange={onRentInput}
-                            onBlur={commitRent}
-                            onKeyDown={onRentKey}
-                            aria-label="Monthly rent in rupees"
-                          />
-                        </span>
-                        <svg
-                          className="how__rentfield-pencil"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden
-                        >
-                          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                        </svg>
-                      </label>
-                      . But for the first month – you pay nothing!
-                    </p>
-                  </div>
-                  <p className="how__catch">Wondering what the catch is?</p>
-                </>
+                /* ── Figma Frame 4 (33:368, 2026-07-19 pass) — white copy,
+                   vertically centred at 50%−90: the base-rent chip (still
+                   the editable fill-in-the-blank), the two-line headline,
+                   the deposit note ── */
+                <div className="how__copy how__copy--movein">
+                  <label className="how__rentchip" htmlFor="how-rent">
+                    Your base rent&nbsp;-&nbsp;
+                    <span className="how__rentfield-rupee" aria-hidden>
+                      ₹
+                    </span>
+                    <span className="how__rentfield-sizer">
+                      <span aria-hidden>{rentText || "45,000"}</span>
+                      <input
+                        id="how-rent"
+                        className="how__rentfield-input"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        spellCheck={false}
+                        placeholder="45,000"
+                        size={1}
+                        value={rentText}
+                        onChange={onRentInput}
+                        onBlur={commitRent}
+                        onKeyDown={onRentKey}
+                        aria-label="Monthly rent in rupees"
+                      />
+                    </span>
+                  </label>
+                  <h3 className="how__title">
+                    You move-in.
+                    <br />
+                    <strong>Your first month is on us.</strong>
+                  </h3>
+                  <p className="how__body">
+                    For the first month - you pay nothing! You only pay the
+                    standard 3-month deposit to complete your booking.
+                  </p>
+                </div>
               ) : step.variant === "financed" ? (
                 /* ── Figma 322:2083 — financed upfront: Gromor hands the
                    ten months' rent to flent in one piece ── */
                 <>
                   <div className="how__copy how__copy--fin3">
                     <h3 className="how__title how__title--fin3">
-                      Your remaining 10 months’
+                      Your remaining 10 months’{" "}
                       <br />
                       rent is financed <strong>upfront</strong>.
                     </h3>
@@ -1306,7 +1476,7 @@ export default function HowItWorks({
                 <>
                   <div className="how__copy how__copy--mon">
                     <h3 className="how__title how__title--mon">
-                      You pay monthly no-cost EMI
+                      You pay monthly no-cost EMI{" "}
                       <br />
                       <strong>just like your regular rent cycle.</strong>
                     </h3>
@@ -1317,7 +1487,7 @@ export default function HowItWorks({
                   </div>
                   <div className="how__mon" aria-hidden>
                     <span className="how__mon-wire">
-                      <ArrowWire w={432} dash="2 2" />
+                      <ArrowWire w={467} dash="2 2" />
                     </span>
                     <div className="how__mon-tenant">
                       <img src="/how-tenant.png" alt="" />
@@ -1374,8 +1544,10 @@ export default function HowItWorks({
                       </span>
                     </div>
                     <div className="how__mon-gromor">
-                      <span className="how__mon-gcrop">
-                        <img src="/trust-gromor-logo.png" alt="" />
+                      <span className="how__mon-gtile">
+                        <span className="how__mon-gcrop">
+                          <img src="/trust-gromor-logo.png" alt="" />
+                        </span>
                       </span>
                       <span className="how__mon-gname">Gromor</span>
                       <span className="how__mon-gsum">₹ {inr(rent * 2)}</span>
@@ -1419,7 +1591,7 @@ export default function HowItWorks({
           {/* pane window glass — hover armed on step 3 only; glassy white
               (no EMI) once the greenery is full bleed */}
           <div
-            className={`how__winrig${active === 2 ? " is-hoverable" : ""}${finalCls}`}
+            className={`how__winrig${active === 2 && canHover ? " is-hoverable" : ""}${finalCls}${plainCls}`}
             ref={rigRef}
           >
             <PaneWindow rent={rent} />
@@ -1448,14 +1620,13 @@ export default function HowItWorks({
           <div className="how__intro" ref={introRef}>
             <div className="how__intro-copy">
               <p className="how__intro-kicker">
-                Flent 11 does not remove the 11-month commitment.
+                Flent 11 does not remove the 11-month commitment.{" "}
                 <br />
-                <strong>It changes what that commitment gets you.</strong>
+                It changes what that commitment gets you.
               </p>
               <p className="how__intro-state">
                 <em>Your first month is free.</em>
-                <br />
-                Your rent starts from <strong>month two</strong>.
+                Your rent starts from month two.
               </p>
             </div>
             <button
@@ -1483,20 +1654,30 @@ export default function HowItWorks({
           {/* journey indicator — Figma 22:286; colours flip ink/white with
               each step's settled backdrop so the caption, track and dots
               stay legible */}
+          <img
+            className={`how__mbrand${active >= 0 && STEPS[stepIdx].tone === "white" ? " is-white" : ""}`}
+            src="/hero-flent11.svg"
+            alt=""
+            aria-hidden
+          />
           <div
-            className={`how__indicator${active < STEPS.length ? " is-live" : ""}${active >= 0 && STEPS[stepIdx].tone === "white" ? " is-white" : ""}`}
+            className={`how__indicator${dotStep < STEPS.length ? " is-live" : ""}${dotStep >= 0 && STEPS[dotStepIdx].tone === "white" ? " is-white" : ""}`}
           >
             <span
               className="how__when"
-              style={
-                // edge dots would clip a centred caption on a phone — the
-                // label anchors to the margin there instead of tracking
-                mobileInd
-                  ? { left: "6vw", transform: "none" }
-                  : { left: `calc(var(--u) * ${activeX})` }
-              }
+              style={{
+                // on phones the centre clamps inside the margins so the
+                // edge dots' captions never wrap against the screen edge
+                left: mobileInd
+                  ? `clamp(56px, calc(var(--u) * ${activeX}), calc(100vw - 56px))`
+                  : `calc(var(--u) * ${activeX})`,
+              }}
             >
-              {active < 0 ? WHEN_START : STEPS[stepIdx].when}
+              {dotStep < 0
+                ? WHEN_START
+                : mobileInd
+                  ? STEPS[dotStepIdx].whenM
+                  : STEPS[dotStepIdx].when}
             </span>
             <div className="how__track" />
             {/* width reaches back to the viewport's left edge (50vw − 50%
@@ -1508,13 +1689,13 @@ export default function HowItWorks({
             {dotXs.map((x, i) => {
               // dot 0 has no step (the intro); the rest label from their
               // first step's caption ("Go to FIRST MONTH", etc.)
-              const step = DOT_FOR_STEP.indexOf(i);
+              const step = dotMap.indexOf(i);
               const label = step < 0 ? WHEN_START : STEPS[step].when;
               return (
                 <button
                   key={i}
                   type="button"
-                  className={`how__dot${i === dotIdx && active < STEPS.length ? " is-active" : ""}`}
+                  className={`how__dot${i === dotIdx && dotStep < STEPS.length ? " is-active" : ""}`}
                   style={{ left: `calc(var(--u) * ${x})` }}
                   onClick={() => goToDot(i)}
                   aria-label={`Go to ${label}`}

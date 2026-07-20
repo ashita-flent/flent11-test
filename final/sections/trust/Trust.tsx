@@ -241,6 +241,7 @@ export default function Trust() {
       <div className="tr__inner">
         <h2 className="tr__head">
           Read everything,{" "}
+          <br className="tr__head-br" />
           <em className="tr__head-em">before you sign anything.</em>
         </h2>
 

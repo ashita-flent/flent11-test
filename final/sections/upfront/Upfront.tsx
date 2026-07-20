@@ -28,14 +28,15 @@ gsap.registerPlugin(ScrollTrigger);
    this section reuses how.css wholesale under the same `how` root class.
    ──────────────────────────────────────────────────────────────────────── */
 
-/* the strip seam in viewport terms: frame-centre + 344u (frame-x 1100).
-   On phones the wall parks fully offscreen — the break reads as a plain
-   paper slide. */
+/* the strip seam sits at exactly ⅔ of the viewport — the same edge as
+   the lock-in table's Flent 11 photo column right above (a true viewport
+   third), so the two image bands stack flush at every width. On phones
+   the wall parks fully offscreen — the break reads as a plain paper
+   slide. */
 const peekPx = () =>
   window.matchMedia("(max-width: 640px)").matches
-    ? window.innerWidth
-    : window.innerWidth / 2 +
-      344 * Math.min(window.innerWidth / 1512, window.innerHeight / 982);
+    ? 0 // iPhone 17 - 10: the wall sits behind the blur sheet, unshifted
+    : (window.innerWidth * 2) / 3;
 
 export default function Upfront({ rent }: { rent: number }) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -100,7 +101,7 @@ export default function Upfront({ rent }: { rent: number }) {
         autoAlpha: 0,
       });
       // journey-beat furniture the shared window carries — never lit here
-      gsap.set(q(".how__pamt, .how__pdisc, .how__catch, .how__scroll-on"), {
+      gsap.set(q(".how__pamt, .how__pdisc, .how__scroll-on"), {
         autoAlpha: 0,
       });
 
@@ -124,13 +125,25 @@ export default function Upfront({ rent }: { rent: number }) {
 
       // gentle parking: the slide is a full-viewport composition — when
       // the scroll rests nearby, settle it fully in view (same grammar as
-      // the exit sheet's snap break)
+      // the exit sheet's snap break). The flush pose is computed LIVE,
+      // not assumed at progress 0.5: the section is 100vh but the phone's
+      // innerHeight drifts as browser chrome hides, and a hardcoded
+      // midpoint parks short — a sliver of the previous section's table
+      // left showing above. Full viewport fill or nothing.
       ScrollTrigger.create({
         trigger: section,
         start: "top bottom",
         end: "bottom top",
         snap: {
-          snapTo: (v: number) => (Math.abs(v - 0.5) < 0.22 ? 0.5 : v),
+          snapTo: (v: number, self?: ScrollTrigger) => {
+            if (!self) return v;
+            const total = (self.end as number) - (self.start as number);
+            const flushY =
+              section.getBoundingClientRect().top + window.scrollY;
+            const flush = (flushY - (self.start as number)) / total;
+            const band = (0.45 * window.innerHeight) / total;
+            return Math.abs(v - flush) < band ? flush : v;
+          },
           inertia: false,
           duration: { min: 0.2, max: 0.5 },
           delay: 0.08,
@@ -166,11 +179,11 @@ export default function Upfront({ rent }: { rent: number }) {
 
     if (open) {
       const u = Math.min(window.innerWidth / 1512, window.innerHeight / 982);
-      // Frame 7 rests the window at x 904 (home is 935); on phones the
-      // window instead drops 12vh so the tenant card clears its top edge
+      // Frame 7 rests the window at x 904 (home is 935); the phone home
+      // is already tucked under the tenant card (see how.css .upf rules)
       const winShift = mobileL ? 0 : -31 * u;
       const labels = q(".how__plabel");
-      tl.set(rigs, { y: mobileL ? window.innerHeight * 0.12 : 0 })
+      tl.set(rigs, { y: 0 })
         .set(q(".how__m1"), { autoAlpha: 1, y: 0 })
         .set(q(".how__pane--m1 .how__plit, .how__plit--m2, .how__m2-glow"), {
           autoAlpha: 1,
@@ -193,7 +206,13 @@ export default function Upfront({ rent }: { rent: number }) {
         // no crossfade. The strip's link steps aside first.
         .to(q(".how__break-see"), { autoAlpha: 0, duration: 0.15 * D }, 0)
         .to(q(".how__break-down"), { autoAlpha: 0, duration: 0.15 * D }, 0)
-        .to(uA, { x: -peek, duration: 0.8 * D, ease: "power3.inOut" }, 0)
+        .to(
+          uA,
+          mobileL
+            ? { autoAlpha: 0, duration: 0.35 * D }
+            : { x: -peek, duration: 0.8 * D, ease: "power3.inOut" },
+          0
+        )
         .to(
           q(".how__break-panel, .how__break-see"),
           { x: 0, duration: 0.8 * D, ease: "power3.inOut" },
@@ -283,12 +302,15 @@ export default function Upfront({ rent }: { rent: number }) {
   }, [open]);
 
   return (
-    <section className="how upf" ref={sectionRef}>
+    <section className={`how upf${open ? " is-open" : ""}`} ref={sectionRef}>
       <div className="how__stage">
         {/* lamp-lit evening wall (Figma 65:522) — parked shifted so its
             left edge peeks in the strip; the open slides it to 0 */}
         <div className="how__warmbg" ref={warmBgRef} aria-hidden>
-          <img src="/how-warm-bg.png" alt="" />
+          <picture>
+            <source media="(max-width: 640px)" srcSet="/upfront-cozy.png" />
+            <img src="/how-warm-bg.png" alt="" />
+          </picture>
         </div>
         {/* the act's wash + blur — one continuous treated surface across
             the strip and the opened page */}
@@ -311,7 +333,10 @@ export default function Upfront({ rent }: { rent: number }) {
                 Prefer to skip the financing entirely?
               </p>
               <p className="how__uhead-line">
-                Pay upfront <strong>and get 2 months off</strong>
+                Pay upfront{" "}
+                <strong>
+                  and get <span className="how__uhead-off">2 months off</span>
+                </strong>
               </p>
             </div>
             <div
@@ -334,20 +359,8 @@ export default function Upfront({ rent }: { rent: number }) {
               type="button"
               className="how__break-down"
               onClick={goOnward}
-              aria-label="Continue on"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <path d="M7 6l5 5 5-5" />
-                <path d="M7 13l5 5 5-5" />
-              </svg>
+              Not for you? Keep scrolling
             </button>
           </div>
 

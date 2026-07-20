@@ -38,7 +38,8 @@
 .tr__head {
   font-family: var(--sans);
   font-weight: 400;
-  font-size: clamp(1.9rem, calc(var(--t) * 56), 3.5rem);
+  /* floor matches the sibling section titles (2rem on phones) */
+  font-size: clamp(2rem, calc(var(--t) * 48), 3rem);
   line-height: normal;
   letter-spacing: -0.04em;
   color: rgba(0, 0, 0, 0.8);
@@ -48,6 +49,11 @@
 .tr__head-em {
   font-style: italic;
   color: rgba(0, 0, 0, 0.4);
+}
+
+/* the phone frame breaks the headline after the comma (418:710) */
+.tr__head-br {
+  display: none;
 }
 
 /* ---- the card rows ----------------------------------------------------- */
@@ -732,38 +738,169 @@
 
 /* ---- small screens: cards stack, each scales whole ------------------- */
 @media (max-width: 860px) {
+  /* ── the designed phone stack (iPhone 17 - 9, 402×874): headline at
+     (40,60) 28px, four 316-wide cards at (40,150) gap 12. Card internals
+     are EXACTLY the desktop coordinates at 0.512 scale, so --tc simply
+     re-derives and everything rides along; only the re-set pieces
+     (copy widths, card-1 row, slip pocket, timeline span, +6 points)
+     carry overrides. ── */
+  .tr {
+    --tmx: calc(100vw / 402);
+  }
+
+  /* near-full-bleed cards (362u, centred): the design mock's 316-wide
+     stack reads small on glass — everything inside rides --tc, so the
+     ×1.145 enlargement scales each miniature whole. The stack is
+     welcome to run past one viewport; the page scrolls. */
   .tr__inner {
-    width: 88vw;
+    width: calc(var(--tmx) * 362);
     margin: 0 auto;
+  }
+
+  .tr__head-br {
+    display: inline;
+  }
+
+  .tr__head {
+    width: calc(var(--tmx) * 342);
+    font-size: calc(var(--tmx) * 28);
+    margin-bottom: calc(var(--tmx) * 20);
   }
 
   .tr__rows,
   .tr__row {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: calc(var(--tmx) * 14);
     height: auto;
   }
 
-  /* each card re-derives its design unit from its own width, so the
-     whole miniature scales — positions, type, art, all together */
   .tc {
-    --tc: calc(88vw / var(--cw));
-    width: 88vw;
+    --tc: calc(var(--tmx) * 0.5865);
+    width: calc(var(--tmx) * 362);
+    height: calc(var(--tc) * 312.5);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: calc(var(--tc) * 8.192 / 0.512);
   }
 
-  /* the two narrow cards get proportionally bigger type this way; the
-     wide pair floors its primary copy for legibility */
-  .tc--emi .tc__copy,
-  .tc--slip .tc__copy {
-    font-size: max(calc(var(--tc) * 20), 12px);
+  /* copy columns narrow to the phone card (418:718/728/854) */
+  .tc--hand .tc__copy {
+    width: calc(var(--tc) * 312.5);
+  }
+
+  .tc--emi .tc__copy {
+    width: calc(var(--tc) * 502);
+  }
+
+  .tc--cibil .tc__copy {
+    width: calc(var(--tc) * 501);
+  }
+
+  /* card 1 — the handoff row centres as one piece (418:863) */
+  .tc__tile--gromor {
+    left: calc(var(--tc) * 178.3);
+    top: calc(var(--tc) * 152);
+  }
+
+  .tc__chev {
+    left: calc(var(--tc) * 311.3);
+    top: calc(var(--tc) * 186.7);
+  }
+
+  .tc__tile--flent {
+    left: calc(var(--tc) * 383.3);
+    top: calc(var(--tc) * 152);
+  }
+
+  .tc__party-name--a {
+    left: calc(var(--tc) * 218.3);
+  }
+
+  .tc__party-name--b {
+    left: calc(var(--tc) * 423.3);
+  }
+
+  .tc__party-name--a,
+  .tc__party-name--b {
+    top: calc(var(--tc) * 240);
+  }
+
+  /* card 3 — the thread spans nearly the full card (418:757) and the
+     slip pokes further past the top edge (418:759) */
+  .tc__notice-line {
+    width: calc(var(--tc) * 573);
+  }
+
+  .tc__slip-wrap {
+    top: calc(var(--tc) * -62.8);
+  }
+
+  /* card 4 — "+ 6 points" rides beside the dial, Light (418:855) */
+  .tc__dial-plus {
+    left: calc(var(--tc) * 375.6);
+    top: calc(var(--tc) * 117);
+    font-weight: 300;
+  }
+
+  /* ── readability pass: the 0.58 miniature ran the reading text down
+     to 6–11px on glass. Every piece someone actually READS gets a
+     floor (positions hold, the type grows), and the dense cards take
+     extra height so every card keeps a real foot margin — the EMI
+     deck's last ghost (foot at 339.56) and the slip copy were landing
+     flush on their card edges. ── */
+  .tc--emi {
+    height: calc(var(--tc) * 375);
+  }
+
+  .tc--slip {
+    height: calc(var(--tc) * 470);
+  }
+
+  .tc--cibil {
+    height: calc(var(--tc) * 335);
+  }
+
+  .tc__copy {
+    font-size: max(calc(var(--tc) * 20), 14px);
     line-height: 1.4;
   }
 
-  /* the floored copy runs taller than the miniature slot — hang it from
-     the card's bottom edge instead so it never clips */
-  .tc__copy--slip {
-    top: auto;
-    bottom: calc(var(--tc) * 14);
+  .tc__party-name {
+    font-size: max(calc(var(--tc) * 16), 11px);
+  }
+
+  .tc__emi-chip-label,
+  .tc__emi-chip-sub {
+    font-size: max(calc(var(--tc) * 12), 9.5px);
+  }
+
+  .tc__emi-chip-amt {
+    font-size: max(calc(var(--tc) * 24), 15px);
+  }
+
+  .tc__emi-interest {
+    font-size: max(calc(var(--tc) * 10), 9px);
+  }
+
+  .tc__notice-label {
+    font-size: max(calc(var(--tc) * 10), 9.5px);
+  }
+
+  .tc__dial-score {
+    font-size: max(calc(var(--tc) * 40), 24px);
+  }
+
+  .tc__dial-plus {
+    font-size: max(calc(var(--tc) * 21.76), 13px);
+  }
+
+  /* the slip is a fixed paper (rows can't reflow it) — the WHOLE
+     document scales up from its pocket corner instead, fine print,
+     rules and scallops together; the total-refund line becomes the
+     readable takeaway. (Its grown left edge still clears the LEAVING
+     caption by a hair — checked at 390.) */
+  .tc__slip-wrap {
+    transform: scale(1.3);
+    transform-origin: 100% 0;
   }
 }

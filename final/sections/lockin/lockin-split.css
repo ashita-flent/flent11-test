@@ -7,44 +7,69 @@
    ============================================================ */
 
 .ls {
+  /* same contain-fit unit as Proof / Exit so the copy column lines up */
+  --u: min(calc(100vw / 1512), calc(100vh / 982));
   width: 100%;
   background: var(--bg);
-  padding: clamp(72px, 12vh, 150px) 0 clamp(48px, 7vh, 90px);
+  /* no bottom padding: the full-bleed stage hands straight off to the
+     upfront section (its own full-viewport composition) — a trailing pad
+     here only reads as a dead white band between the two */
+  padding: clamp(72px, 12vh, 150px) 0 0;
 }
 
-/* ---- heading (above the stage) ------------------------------------- */
+/* desktop: the whole section composes as ONE viewport frame — head on
+   top, the stage filling the remainder (≈64vh instead of a fixed 80vh),
+   so when the snap parks the section's bottom edge on the viewport's,
+   the title, table and image band all sit inside the frame together */
+@media (min-width: 761px) {
+  .ls {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-height: 720px;
+  }
+
+  .ls__head-block {
+    flex: none;
+  }
+
+  .ls__stage {
+    flex: 1;
+    height: auto;
+    min-height: 420px;
+  }
+}
+
+/* ---- heading (above the stage) — the shared 1320u centred column the
+   Proof / Exit sections use, so the copy margins match across the page --- */
 .ls__head-block {
-  max-width: 1160px;
+  width: calc(var(--u) * 1320);
   margin: 0 auto clamp(36px, 5vw, 60px);
-  padding: 0 6vw;
 }
 
-.ls__eyebrow {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 18px;
-}
-
+/* single line, 54u Medium (Figma 383:284) */
 .ls__title {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(2rem, 4.6vw, 3.4rem);
+  font-size: clamp(1.9rem, 3.17vw, 3rem);
   line-height: 1.02;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
   color: var(--ink);
 }
 
+/* two lines, the second carrying the weight (383:285) */
 .ls__sub {
-  margin-top: 20px;
-  max-width: 34ch;
+  margin-top: clamp(20px, 2.1vw, 32px);
+  max-width: 52ch;
   font-family: var(--sans);
-  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  font-size: clamp(1rem, 1.26vw, 1.19rem);
   line-height: 1.5;
-  color: var(--ink-soft);
+  letter-spacing: -0.017em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.ls__sub strong {
+  font-weight: 600;
 }
 
 /* ---- stage ----------------------------------------------------------- */
@@ -53,13 +78,20 @@
   position: relative;
   height: 80vh;
   min-height: 560px;
-  margin: 0 2vw;
-  border-radius: 22px;
+  margin: 0;
+  border-radius: 0;
   overflow: hidden;
   cursor: none;
   user-select: none;
   background: var(--bg);
-  border: 1px solid var(--box-line);
+}
+
+/* the material frame — everything that belongs inside the card (the
+   three worlds + both text copies). Desktop: a neutral pass-through.
+   Phones: it takes the rounded clip so the handle can ride OUTSIDE it. */
+.ls__mat {
+  position: relative;
+  height: 100%;
 }
 
 /* ---- sketch world ----------------------------------------------------- */
@@ -86,21 +118,23 @@
 }
 
 /* pencil-sketch effect: grayscale base + inverted blurred copy on
-   colour-dodge = line drawing */
+   colour-dodge = line drawing. The lines ride at partial opacity so the
+   strokes read as soft graphite, not hard ink (Figma strip ≈ Y 224). */
 .ls__sketch-base {
-  filter: grayscale(1) contrast(1.02) brightness(1.05);
+  filter: grayscale(1) contrast(1) brightness(1.06);
 }
 
 .ls__sketch-lines {
   filter: grayscale(1) invert(1) blur(2.6px);
   mix-blend-mode: color-dodge;
+  opacity: 0.4;
 }
 
 /* warm paper wash to pull the sketch into the page's ground */
 .ls__paper {
   position: absolute;
   inset: 0;
-  background: rgba(250, 248, 244, 0.55);
+  background: rgba(250, 248, 244, 0.68);
 }
 
 /* ---- watercolour slice — Regular Flent band only ----------------------
@@ -118,14 +152,17 @@
   pointer-events: none;
 }
 
+/* a lighter wash with a touch more definition — the pencil outline
+   beneath (the sketch layer runs under this zone) reads through it for
+   the natural watercolour-over-drawing look (Figma strip ≈ Y 203) */
 .ls__wc-color {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.42;
-  filter: saturate(1.5) blur(9px);
+  opacity: 0.3;
+  filter: saturate(1.35) blur(6px);
 }
 
 /* ---- photo world (clipped) -------------------------------------------- */
@@ -150,14 +187,15 @@
   object-fit: cover;
 }
 
-/* gentle darkening so light type reads on the photo */
+/* darkening so light type reads on the photo — matched to the Figma
+   tinted render (its photo sits at ≈66% of the raw luma ⇒ avg α .34) */
 .ls__photo-tint {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(26, 23, 20, 0.18),
-    rgba(26, 23, 20, 0.32)
+    rgba(26, 23, 20, 0.28),
+    rgba(26, 23, 20, 0.4)
   );
 }
 
@@ -168,41 +206,66 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 clamp(20px, 3vw, 52px);
+  padding: 0;
 }
 
 .ls__grid {
   width: 100%;
 }
 
-/* wide column bands — each visual style (sketch · watercolour · photo)
-   gets a broad slice of the stage */
+/* three equal columns, one per material zone (Figma 383:288 — no label
+   column; every cell is a self-describing statement) */
 .ls__row {
   display: grid;
-  grid-template-columns: 0.72fr 0.95fr 1.25fr 1.1fr;
+  grid-template-columns: repeat(3, 1fr);
   transition: background 0.25s ease;
   border-radius: 10px;
 }
 
 .ls__cell {
   position: relative;
-  padding: 17px 22px;
+  padding: 17px clamp(32px, 4vw, 64px);
   font-family: var(--sans);
-  font-size: clamp(0.9rem, 1.1vw, 1.04rem);
+  font-size: clamp(0.88rem, 1.06vw, 1rem);
   line-height: 1.35;
   display: flex;
   align-items: center;
-}
-
-.ls__rowlabel {
-  font-weight: 600;
 }
 
 .ls__row--head .ls__cell {
   padding-top: 6px;
   padding-bottom: 14px;
   font-weight: 600;
-  font-size: clamp(0.82rem, 1vw, 0.95rem);
+  font-size: clamp(0.82rem, 0.99vw, 0.94rem);
+}
+
+/* the Flent 11 statements carry the weight (383:305…) */
+.ls__cell.is-feat {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* ---- the savings row — the table's takeaway, kept lit ------------------ */
+/* a standing green-washed band (the marks' tint) with weightier figures */
+.ls__row--save .ls__cell {
+  font-weight: 600;
+  border-bottom: 0;
+}
+
+.ls__table--sketch .ls__row--save {
+  background: rgba(159, 220, 174, 0.22);
+}
+
+.ls__table--sketch .ls__row--save.is-hot {
+  background: rgba(159, 220, 174, 0.32);
+}
+
+.ls__table--photo .ls__row--save {
+  background: rgba(90, 140, 104, 0.35);
+}
+
+.ls__table--photo .ls__row--save.is-hot {
+  background: rgba(90, 140, 104, 0.45);
 }
 
 /* sketch copy — ink text, hairline rules */
@@ -219,13 +282,9 @@
   border-bottom: 1.5px solid rgba(26, 23, 20, 0.6);
 }
 
-.ls__table--sketch .ls__corner {
-  border-bottom-color: transparent;
-}
-
 .ls__table--sketch .is-feat.ls__head {
-  color: var(--red);
-  font-size: clamp(0.95rem, 1.15vw, 1.1rem);
+  color: var(--ink);
+  font-size: clamp(0.95rem, 1.12vw, 1.06rem);
 }
 
 .ls__table--sketch .ls__row.is-hot {
@@ -236,11 +295,13 @@
    the .ls__wc slice behind the table; the class marks the column zone for
    measurement) */
 
-/* photo copy — light text with a whisper of shadow */
+/* photo copy — light text lifted by a firmer shadow */
 .ls__table--photo .ls__cell {
-  color: rgba(250, 248, 244, 0.96);
+  color: #fff;
   border-bottom: 1px solid rgba(250, 248, 244, 0.24);
-  text-shadow: 0 1px 12px rgba(26, 23, 20, 0.35);
+  text-shadow:
+    0 1px 3px rgba(26, 23, 20, 0.45),
+    0 1px 16px rgba(26, 23, 20, 0.5);
 }
 
 .ls__table--photo .ls__head {
@@ -251,20 +312,9 @@
   border-bottom: 1.5px solid rgba(250, 248, 244, 0.85);
 }
 
-.ls__table--photo .ls__corner {
-  border-bottom-color: transparent;
-}
-
 .ls__table--photo .is-feat.ls__head {
   color: #fff;
-  font-size: clamp(0.95rem, 1.15vw, 1.1rem);
-}
-
-/* frosted glass behind the featured column on the photo side */
-.ls__table--photo .is-feat {
-  background: rgba(250, 248, 244, 0.13);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  font-size: clamp(0.95rem, 1.12vw, 1.06rem);
 }
 
 .ls__table--photo .ls__row.is-hot {
@@ -369,10 +419,37 @@
    rising through Flent 11 at the bottom. Same materials, rotated 90°.
    ════════════════════════════════════════════════════════════════════ */
 
+/* no full-bleed on the phone: the SECTION carries the inset (16px
+   left, a 56px handle rail right) — it must NOT live as margins on
+   the stage itself, because ScrollTrigger locks a pinned element to
+   its margin-box width and the card would pin full-bleed again. */
+@media (max-width: 760px) {
+  .ls {
+    padding-left: 16px;
+    padding-right: 56px;
+    /* room under the card (the hint lives here) so the table never
+       kisses the next section's dark slide while scrolling */
+    padding-bottom: 56px;
+  }
+
+  .ls__head-block {
+    width: auto;
+  }
+}
+
 .ls__stage--v {
   height: auto;
   min-height: 0;
   cursor: default;
+  /* overflow must stay visible for the handle riding outside */
+  overflow: visible;
+}
+
+.ls__stage--v .ls__mat {
+  height: auto;
+  border: 1px solid rgba(26, 23, 20, 0.12);
+  border-radius: 18px;
+  overflow: hidden;
 }
 
 /* the materials clip on Y instead of X */
@@ -398,11 +475,13 @@
 }
 
 /* ---- the stacked bands -------------------------------------------------- */
+/* tightened metrics: the pinned card should fit a phone screen whole,
+   so the sweep plays out with all three bands in view */
 .ls__vbands {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 8px 0 18px;
+  padding: 6px 0 12px;
 }
 
 /* the photo-side copy overlays the base copy pixel-for-pixel */
@@ -413,7 +492,7 @@
 }
 
 .ls__vband {
-  padding: 18px 6vw 22px;
+  padding: 14px 18px 16px;
 }
 
 .ls__vband + .ls__vband {
@@ -427,29 +506,23 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-soft);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .ls__vband.is-feat .ls__vband-name {
   color: var(--red);
 }
 
+/* self-describing statements — one per line, no label column */
 .ls__vrow {
-  display: grid;
-  grid-template-columns: 42% 1fr;
-  gap: 12px;
-  padding: 8px 0;
+  padding: 7px 0;
   font-family: var(--sans);
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   line-height: 1.4;
 }
 
 .ls__vrow + .ls__vrow {
   border-top: 1px solid rgba(26, 23, 20, 0.07);
-}
-
-.ls__vrow-label {
-  color: var(--ink-soft);
 }
 
 .ls__vrow-value {
@@ -466,10 +539,6 @@
   color: #ffd9c9;
 }
 
-.ls__vbands--photo .ls__vrow-label {
-  color: rgba(255, 255, 255, 0.72);
-}
-
 .ls__vbands--photo .ls__vrow-value {
   color: #fff;
   text-shadow: 0 1px 10px rgba(26, 23, 20, 0.35);
@@ -484,38 +553,60 @@
 }
 
 /* ---- vertical line + draggable puck ------------------------------------- */
+/* the line runs on past the frame edge, out across the rail, so it
+   visibly connects to the handle riding outside */
 .ls__stage--v .ls__line {
   top: var(--splitv, 0%);
   bottom: auto;
   left: 0;
-  right: 0;
+  right: -56px;
   width: auto;
   height: 1.5px;
 }
 
-/* the puck is a real handle here: always visible, riding the line's right
-   end, draggable with a thumb (its own touch-action; the stage scrolls) */
+/* the puck is the handle's face — always visible, riding the line
+   OUTSIDE the frame on the right-hand rail. Pointer events stay off
+   on the puck itself: its fixed hit zone is the grip strip below, so
+   the target never moves even though the face does. */
 .ls__stage--v .ls__puck {
   top: var(--splitv, 0%);
   left: auto;
-  right: 10px;
-  width: 46px;
-  height: 46px;
-  margin-top: -23px;
+  right: -50px; /* fully outside the frame, 6px in from the screen edge */
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
   flex-direction: column;
-  gap: 1px;
-  font-size: 0.62rem;
+  gap: 0;
+  font-size: 0.58rem;
   opacity: 1;
-  pointer-events: auto;
+  pointer-events: none;
+}
+
+/* the grip — the handle's touch target: an invisible disc riding
+   WITH the puck on the rail (slightly larger than its face). ONLY
+   this disc owns the touch (touch-action none), so a thumb landing
+   anywhere else — the card, the rail above/below the handle, the
+   page — scrolls normally; only grabbing the handle itself scrubs
+   the line. */
+.ls__stage--v .ls__grip {
+  position: absolute;
+  top: var(--splitv, 0%);
+  right: -56px;
+  width: 56px;
+  height: 68px;
+  margin-top: -34px;
   touch-action: none;
   cursor: grab;
 }
 
-.ls__stage--v .ls__puck:active {
+.ls__stage--v .ls__grip:active {
   cursor: grabbing;
 }
 
+/* the hint sits on the page ground BELOW the card — never over the
+   savings row (the table's takeaway) */
 .ls__stage--v .ls__hint {
-  bottom: 10px;
-  background: rgba(250, 248, 244, 0.85);
+  bottom: -38px;
+  background: none;
+  white-space: nowrap;
 }

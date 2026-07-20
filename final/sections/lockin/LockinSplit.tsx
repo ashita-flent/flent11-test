@@ -12,26 +12,44 @@ const COLS = ["Typical Bangalore rental", "Regular Flent lock-in", "Flent 11"];
 const FEAT = COLS.length - 1; // Flent 11 — lives on the photo side
 const WC = 1; // Regular Flent — watercolour fill on the sketch side
 
-const ROWS: { label: string; cells: ReactNode[] }[] = [
-  { label: "Security deposit", cells: ["Usually 6+ months", "3 months", "3 months"] },
+/* Self-describing statements (Figma 383:288 — no label column; each cell
+   carries its whole claim). The closing savings row is ours, computed
+   from the rows above at the site's standard ₹45,000 rent:
+     baseline year = 11 × 45,000                      = ₹4,95,000
+     Regular lock-in saves ₹2,000 × 11               = ₹22,000  (~4%)
+     Flent 11 pays 10 months at 43,000 = ₹4,30,000 ⇒ saves ₹65,000 (~13%) */
+const ROWS: { cells: ReactNode[] }[] = [
   {
-    label: "Lock-in benefit",
     cells: [
-      "Usually none",
-      "₹2,000/month lower rent",
+      "6+ months rent as deposit",
+      "3 months rent as deposit",
+      "3 months rent as deposit",
+    ],
+  },
+  {
+    cells: [
+      "No lock-in benefit",
+      "₹2,000/month off upon 11 month lock-in",
       <>
-        ₹2,000/month lower rent +{" "}
-        <mark className="ls__mark">first month free</mark>
+        ₹2,000/month off + <mark className="ls__mark">first month free</mark>
       </>,
     ],
   },
-  { label: "First rent payment", cells: ["Month one", "Month one", "Month two"] },
+  { cells: ["Pay from month one", "Month one", "Month two"] },
   {
-    label: "Early exit",
     cells: [
-      "Deposit forfeited",
-      "Deposit forfeited",
+      "Leave early, lose full deposit",
+      "Leave early, lose full deposit",
       "Lock-in breakage fee capped at 21 days of rent",
+    ],
+  },
+  {
+    cells: [
+      "No savings",
+      "₹22,000 saved over the year (~4%)",
+      <>
+        ₹65,000 saved over the year <mark className="ls__mark">~13%</mark>
+      </>,
     ],
   },
 ];
@@ -54,7 +72,6 @@ function CompareTable({
     <div className={`ls__table ls__table--${mode}`} aria-hidden={mode === "photo"}>
       <div className="ls__grid">
         <div className="ls__row ls__row--head">
-          <span className="ls__cell ls__corner" />
           {COLS.map((c, i) => (
             <span
               key={c}
@@ -69,12 +86,11 @@ function CompareTable({
 
         {ROWS.map((row, ri) => (
           <div
-            className={`ls__row${ri === hot ? " is-hot" : ""}`}
-            key={row.label}
+            className={`ls__row${ri === ROWS.length - 1 ? " ls__row--save" : ""}${ri === hot ? " is-hot" : ""}`}
+            key={ri}
             onMouseEnter={() => setHot(ri)}
             onMouseLeave={() => setHot(-1)}
           >
-            <span className="ls__cell ls__rowlabel">{row.label}</span>
             {row.cells.map((val, ci) => (
               <span
                 key={ci}
@@ -108,9 +124,8 @@ function CompareBands({ mode }: { mode: "sketch" | "photo" }) {
       {COLS.map((c, i) => (
         <div className={`ls__vband${i === FEAT ? " is-feat" : ""}`} key={c}>
           <h3 className="ls__vband-name">{c}</h3>
-          {ROWS.map((row) => (
-            <div className="ls__vrow" key={row.label}>
-              <span className="ls__vrow-label">{row.label}</span>
+          {ROWS.map((row, ri) => (
+            <div className="ls__vrow" key={ri}>
               <span className="ls__vrow-value">{row.cells[i]}</span>
             </div>
           ))}
@@ -124,6 +139,7 @@ export default function LockinSplit() {
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const puckRef = useRef<HTMLDivElement>(null);
+  const gripRef = useRef<HTMLDivElement>(null);
   const [hot, setHot] = useState(-1);
   // one layout per breakpoint — vertical bands + vertical split on phones
   const [vertical, setVertical] = useState(
@@ -142,7 +158,10 @@ export default function LockinSplit() {
     const puck = puckRef.current!;
 
     const proxy = { v: 0 }; // the reveal edge, % along the split axis
-    let rest = 0; // home: everything clean white
+    /* home = 100: the resting stage is the full TRIPTYCH (Figma 383:286 —
+       sketch, watercolour and photo each lit in their third); hovering
+       pulls the edge back to compare, and release drains home again */
+    let rest = 100;
 
     const axis = vertical ? "--splitv" : "--split";
     const apply = () => stage.style.setProperty(axis, `${proxy.v}%`);
@@ -158,14 +177,12 @@ export default function LockinSplit() {
         if (bands.length < 3) return;
         const z = (el: HTMLElement) =>
           ((el.getBoundingClientRect().top - s.top) / s.height) * 100;
-        const z1 = z(bands[0]);
-        stage.style.setProperty("--z1v", `${z1}%`);
+        stage.style.setProperty("--z1v", `${z(bands[0])}%`);
         stage.style.setProperty("--z2v", `${z(bands[1])}%`);
         stage.style.setProperty(
           "--z3v",
           `${gsap.utils.clamp(20, 85, z(bands[2]))}%`
         );
-        rest = z1;
         return;
       }
       const firstHead = stage.querySelector<HTMLElement>(
@@ -187,12 +204,28 @@ export default function LockinSplit() {
       );
       stage.style.setProperty("--z2", `${z2}%`);
       stage.style.setProperty("--z3", `${z3}%`);
-      rest = z1;
     };
+
+    /* the zones must stay locked to the table's thirds — re-measure as
+       late layout settles (webfonts swap, the material images decode, and
+       one settle tick), not just on resize. A drifted measurement leaves
+       the material seams misaligned with the columns. */
+    document.fonts?.ready.then(() => measure()).catch(() => {});
+    stage.querySelectorAll<HTMLImageElement>("img").forEach((im) => {
+      if (!im.complete)
+        im.addEventListener("load", () => measure(), { once: true });
+    });
+    const settleT = window.setTimeout(measure, 400);
 
     const ctx = gsap.context(() => {
       measure();
-      proxy.v = rest;
+      const reduce = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      /* everything starts dark and the entrance lights the triptych —
+         the cursor sweep on desktop, the pinned scroll sweep on phones.
+         Reduced motion rests fully lit from the start instead. */
+      proxy.v = reduce ? rest : 0;
       apply();
 
       gsap.from(".ls__head-block > *", {
@@ -204,26 +237,55 @@ export default function LockinSplit() {
         scrollTrigger: { trigger: rootRef.current, start: "top 75%" },
       });
 
-      // entrance tease — one full sweep (revealing all three materials)
-      // and back home to white. Killed the moment the user takes over.
-      let lineIntro: gsap.core.Timeline | null = gsap
-        .timeline({
-          scrollTrigger: { trigger: stage, start: "top 62%" },
-          onComplete: () => (lineIntro = null),
-        })
-        .to(proxy, {
-          v: 100,
-          duration: 1.6,
-          ease: "power2.inOut",
-          onUpdate: apply,
-        })
-        .to(proxy, {
-          v: () => rest,
-          duration: 1.3,
-          ease: "power3.inOut",
-          onUpdate: apply,
-          delay: 0.25,
+      // the snap BREAK — a MAGNET around the parked pose (the section's
+      // bottom edge flush on the viewport's bottom; the section is a
+      // 100vh frame, so parked = the whole composition). The zone runs
+      // PAST the flush point, so a rest anywhere in the band — arriving,
+      // hovering to play with the table, or drifting a little beyond —
+      // pulls back to flush from either direction. Only a barely-entered
+      // peek or a committed push well past the fold scrolls free.
+      // Desktop only — the vertical column free-scrolls.
+      if (!vertical) {
+        const root = rootRef.current!;
+        ScrollTrigger.create({
+          trigger: root,
+          start: "top bottom",
+          end: "bottom 55%", // the band extends 45vh past the flush pose
+          snap: {
+            snapTo: (v: number, self?: ScrollTrigger) => {
+              if (!self) return v;
+              const total = (self.end as number) - (self.start as number);
+              const vh = window.innerHeight;
+              const flush = root.offsetHeight / total; // bottom on the fold
+              const enter = (0.33 * vh) / total; // <33vh visible: still free
+              const release = flush + (0.3 * vh) / total; // >30vh past: moving on
+              return v < enter || v > release ? v : flush;
+            },
+            inertia: false,
+            duration: { min: 0.3, max: 0.65 },
+            delay: 0.1,
+            ease: "power2.inOut",
+          },
         });
+      }
+
+      // entrance — one sweep lights the triptych and STAYS (home is the
+      // fully-revealed stage). Killed the moment the user takes over.
+      // Desktop only: in vertical mode the scroll itself is the reveal,
+      // and a self-moving line under a moving page read as two scrolls.
+      let lineIntro: gsap.core.Timeline | null = null;
+      if (!vertical && !reduce)
+        lineIntro = gsap
+          .timeline({
+            scrollTrigger: { trigger: stage, start: "top 62%" },
+            onComplete: () => (lineIntro = null),
+          })
+          .to(proxy, {
+            v: 100,
+            duration: 1.6,
+            ease: "power2.inOut",
+            onUpdate: apply,
+          });
 
       const vTo = gsap.quickTo(proxy, "v", {
         duration: 0.55,
@@ -240,73 +302,105 @@ export default function LockinSplit() {
       };
 
       if (vertical) {
-        /* ── vertical wiring: the line rides Y. Touch drags the puck (the
-           stage itself keeps native scroll); a tap parks the line where
-           you tapped; fine pointers can just hover. ── */
+        /* ── vertical wiring: the STICKY compare. The stage pins once
+           it's centred in the viewport, and roughly one screen of
+           scroll sweeps the reveal edge down the bands — the table
+           holds still while its materials arrive, so the page scroll
+           and the split never read as two competing scrolls.
+
+           Deliberate control lives on the handle riding the rail
+           OUTSIDE the frame's right edge — the grip disc: dragging it
+           scrubs the line. ONLY that disc owns the touch, so a thumb
+           anywhere else (card, rail, page) scrolls as normal. Last
+           input wins: the next scroll simply re-takes the line
+           (smoothed by the quickTo). ── */
+        let gripping = false;
+        let hintDone = false;
+        const dropHint = () => {
+          if (hintDone) return;
+          hintDone = true;
+          stage.classList.add("is-hovering");
+        };
+
+        // the handle waves as the table lands — "this slides"
+        let bob: gsap.core.Tween | null = null;
+        const stopBob = () => {
+          if (!bob) return;
+          bob.kill();
+          bob = null;
+          gsap.to(puck, { y: 0, duration: 0.3, overwrite: "auto" });
+        };
+
+        if (!reduce) {
+          ScrollTrigger.create({
+            trigger: stage,
+            // park the card centred (or 12px from the top when it's
+            // taller than the screen) and hold it for the sweep
+            start: () =>
+              `top ${Math.max(
+                12,
+                (window.innerHeight - stage.offsetHeight) / 2
+              )}px`,
+            end: () => "+=" + Math.round(window.innerHeight * 0.6),
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onEnter: () => {
+              if (!bob)
+                bob = gsap.to(puck, {
+                  y: 9,
+                  duration: 0.55,
+                  ease: "sine.inOut",
+                  repeat: 11,
+                  yoyo: true,
+                  onComplete: () => (bob = null),
+                });
+            },
+            onUpdate: (self) => {
+              if (gripping) return; // the finger owns the line right now
+              vTo(self.progress * 100); // the quickTo trail keeps it liquid
+              // the hint has done its job once the sweep is nearly home
+              if (self.progress > 0.9) dropHint();
+            },
+          });
+        }
+
+        const grip = gripRef.current!;
         const pctFromY = (clientY: number) => {
           const r = stage.getBoundingClientRect();
           return gsap.utils.clamp(0, 100, ((clientY - r.top) / r.height) * 100);
         };
-
-        let dragging = false;
-        const onPuckDown = (e: PointerEvent) => {
+        const onGripDown = (e: PointerEvent) => {
           e.preventDefault();
-          takeOver();
-          dragging = true;
-          stage.classList.add("is-hovering");
+          gripping = true;
+          stopBob();
+          dropHint();
           try {
-            puck.setPointerCapture(e.pointerId);
+            grip.setPointerCapture(e.pointerId);
           } catch {
-            /* capture is an optimisation — dragging works without it */
+            /* capture is an optimisation — the drag works without it */
           }
-        };
-        const onPuckMove = (e: PointerEvent) => {
-          if (dragging) vTo(pctFromY(e.clientY));
-        };
-        const onPuckUp = () => {
-          dragging = false;
-          stage.classList.remove("is-hovering");
-        };
-        puck.addEventListener("pointerdown", onPuckDown);
-        puck.addEventListener("pointermove", onPuckMove);
-        puck.addEventListener("pointerup", onPuckUp);
-        puck.addEventListener("pointercancel", onPuckUp);
-
-        // a tap anywhere on the stage sends the line there
-        const onTap = (e: PointerEvent) => {
-          if (e.target === puck || puck.contains(e.target as Node)) return;
-          takeOver();
           vTo(pctFromY(e.clientY));
         };
-        stage.addEventListener("pointerup", onTap);
-
-        // fine pointers (small desktop windows) still get the hover sweep
-        const hoverFine = window.matchMedia("(hover: hover)").matches;
-        const onMove = (e: MouseEvent) => {
-          takeOver();
-          vTo(pctFromY(e.clientY));
+        const onGripMove = (e: PointerEvent) => {
+          if (gripping) vTo(pctFromY(e.clientY));
         };
-        const onLeave = () => vTo(rest);
-        if (hoverFine) {
-          stage.addEventListener("mousemove", onMove);
-          stage.addEventListener("mouseleave", onLeave);
-        }
-
-        const onResize = () => {
-          measure();
-          vTo(rest);
+        const onGripUp = () => {
+          gripping = false;
         };
+        grip.addEventListener("pointerdown", onGripDown);
+        grip.addEventListener("pointermove", onGripMove);
+        grip.addEventListener("pointerup", onGripUp);
+        grip.addEventListener("pointercancel", onGripUp);
+
+        const onResize = () => measure();
         window.addEventListener("resize", onResize);
         return () => {
-          puck.removeEventListener("pointerdown", onPuckDown);
-          puck.removeEventListener("pointermove", onPuckMove);
-          puck.removeEventListener("pointerup", onPuckUp);
-          puck.removeEventListener("pointercancel", onPuckUp);
-          stage.removeEventListener("pointerup", onTap);
-          if (hoverFine) {
-            stage.removeEventListener("mousemove", onMove);
-            stage.removeEventListener("mouseleave", onLeave);
-          }
+          bob?.kill();
+          grip.removeEventListener("pointerdown", onGripDown);
+          grip.removeEventListener("pointermove", onGripMove);
+          grip.removeEventListener("pointerup", onGripUp);
+          grip.removeEventListener("pointercancel", onGripUp);
           window.removeEventListener("resize", onResize);
         };
       }
@@ -345,21 +439,22 @@ export default function LockinSplit() {
       };
     }, rootRef);
 
-    return () => ctx.revert();
+    return () => {
+      window.clearTimeout(settleT);
+      ctx.revert();
+    };
   }, [vertical]);
 
   return (
     <section className="ls" ref={rootRef}>
       <div className="ls__head-block">
-        <p className="ls__eyebrow">What changes</p>
         <h2 className="ls__title">
-          Yes, it&rsquo;s a lock-in.
-          <br />
-          Here&rsquo;s what changed.
+          Yes, it&rsquo;s a lock-in. Here&rsquo;s what changed.
         </h2>
         <p className="ls__sub">
-          Flent&nbsp;11 does not remove the 11-month commitment. It changes
-          what that commitment gets you.
+          Flent&nbsp;11 does not remove the 11-month commitment.
+          <br />
+          <strong>It changes what that commitment gets you.</strong>
         </p>
       </div>
 
@@ -367,37 +462,43 @@ export default function LockinSplit() {
         className={`ls__stage${vertical ? " ls__stage--v" : ""}`}
         ref={stageRef}
       >
-        {/* sketch world — the life you'd have without Flent 11 */}
-        <div className="ls__sketch" aria-hidden>
-          <img className="ls__sketch-base" src={IMG} alt="" />
-          <img className="ls__sketch-lines" src={IMG} alt="" />
-          <div className="ls__paper" />
-        </div>
+        {/* the material frame — everything that belongs INSIDE the card.
+            On phones it takes the rounded clip so the handle can live
+            outside it; on desktop it's a pass-through. */}
+        <div className="ls__mat">
+          {/* sketch world — the life you'd have without Flent 11 */}
+          <div className="ls__sketch" aria-hidden>
+            <img className="ls__sketch-base" src={IMG} alt="" />
+            <img className="ls__sketch-lines" src={IMG} alt="" />
+            <div className="ls__paper" />
+          </div>
 
-        {/* watercolour slice — alive only inside the Regular Flent zone */}
-        <div className="ls__wc" aria-hidden>
-          <img className="ls__wc-color" src={IMG} alt="" />
-        </div>
+          {/* watercolour slice — alive only inside the Regular Flent zone */}
+          <div className="ls__wc" aria-hidden>
+            <img className="ls__wc-color" src={IMG} alt="" />
+          </div>
 
-        {/* dark-text copy over the sketch + watercolour */}
-        {vertical ? (
-          <CompareBands mode="sketch" />
-        ) : (
-          <CompareTable mode="sketch" hot={hot} setHot={setHot} />
-        )}
-
-        {/* photo world — Flent 11, clipped at the split line */}
-        <div className="ls__photo-clip" aria-hidden={false}>
-          <img className="ls__photo" src={IMG} alt="A furnished Flent home" />
-          <div className="ls__photo-tint" />
+          {/* dark-text copy over the sketch + watercolour */}
           {vertical ? (
-            <CompareBands mode="photo" />
+            <CompareBands mode="sketch" />
           ) : (
-            <CompareTable mode="photo" hot={hot} setHot={setHot} />
+            <CompareTable mode="sketch" hot={hot} setHot={setHot} />
           )}
+
+          {/* photo world — Flent 11, clipped at the split line */}
+          <div className="ls__photo-clip" aria-hidden={false}>
+            <img className="ls__photo" src={IMG} alt="A furnished Flent home" />
+            <div className="ls__photo-tint" />
+            {vertical ? (
+              <CompareBands mode="photo" />
+            ) : (
+              <CompareTable mode="photo" hot={hot} setHot={setHot} />
+            )}
+          </div>
         </div>
 
-        {/* split line + puck (cursor-ridden on desktop, draggable on touch) */}
+        {/* split line + puck (rides the cursor on desktop; on phones it
+            marks the scroll-driven line) */}
         <div className="ls__line" aria-hidden />
         <div className="ls__puck" ref={puckRef} aria-hidden>
           {vertical ? (
@@ -412,8 +513,13 @@ export default function LockinSplit() {
             </>
           )}
         </div>
+        {/* the grip — the phone's handle: an invisible disc riding with
+            the puck; the only surface that owns the touch */}
+        {vertical && <div className="ls__grip" ref={gripRef} aria-hidden />}
 
-        <p className="ls__hint">{vertical ? "drag to compare" : "hover to compare"}</p>
+        <p className="ls__hint">
+          {vertical ? "scroll — or slide the handle" : "hover to compare"}
+        </p>
       </div>
     </section>
   );

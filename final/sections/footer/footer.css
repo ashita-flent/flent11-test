@@ -1,64 +1,75 @@
 /* ============================================================
-   Footer · the puzzle close (Figma 316:2059)
-   Width-fit frame: --uf = 1 Figma px of the 1512 design width,
-   so the photo always bleeds edge to edge; section height is the
-   frame's own 982uf. Eases in from the register's cream above.
+   Footer · the capsule close + the puzzle (Figma 400:823)
+   Contain-fit frame: --uf = 1 Figma px, capped by BOTH axes so
+   the 1512-wide frame never outgrows a wide-but-short viewport.
+   The photo band still bleeds edge to edge; frame CONTENT (the
+   hole grid, the slots copy) centres via --fx, the frame's left
+   edge in viewport terms. Two beats stack: the closing capsule
+   over the warm gradient, then the 818u puzzle band.
    ============================================================ */
 
 .ft {
-  --uf: calc(100vw / 1512);
+  --uf: min(calc(100vw / 1512), calc(100vh / 982));
+  --fx: calc(50vw - var(--uf) * 756);
 
   position: relative;
   width: 100%;
-  height: calc(var(--uf) * 982);
-  /* the frame's warm cream (316:2059 / sheet #F1E2D8), eased in from the
-     register's cooler ground above */
-  background: linear-gradient(to bottom, var(--bg), #f1e2d8 calc(var(--uf) * 150));
+  /* the page's cream easing into the sheet peach — the scroll keeps
+     its gradient through the close (400:823 ground #F1E2D8) */
+  background: linear-gradient(
+    to bottom,
+    var(--bg),
+    #f1e2d8 calc(var(--uf) * 420)
+  );
   overflow: hidden;
 }
 
-/* ---- the closing words (316:2077 / 316:2078 / 316:2080) ------------- */
-.ft__head {
-  position: absolute;
-  left: calc(var(--uf) * 90);
-  top: calc(var(--uf) * 173);
+/* ---- the closing capsule (400:894 / 400:840) ------------------------- */
+/* the pill returns for the close: a near-white capsule floating on the
+   peach, copy centred inside */
+.ft__close {
+  position: relative;
+  /* the hero's settled capsule metrics (PILL_SETTLE — 1385.6×456.4u,
+     the wide low letterbox) so the close rhymes with the opening */
+  width: min(calc(var(--uf) * 1386), 96vw);
+  min-height: calc(var(--uf) * 456);
+  margin: calc(var(--uf) * 110) auto calc(var(--uf) * 100);
+  padding: calc(var(--uf) * 48) calc(var(--uf) * 60);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--uf) * 44);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  z-index: 2;
+}
+
+/* 48u Regular, two lines: ink, then the ink→bronze wash (400:841) */
+.ft__close-title {
   margin: 0;
   font-family: var(--sans);
   font-weight: 400;
-  font-size: calc(var(--uf) * 56);
-  line-height: calc(var(--uf) * 71);
-  letter-spacing: -0.04em;
-  color: rgba(0, 0, 0, 0.8);
-  z-index: 2;
-}
-
-.ft__row {
-  position: absolute;
-  left: calc(var(--uf) * 90);
-  top: calc(var(--uf) * 362);
-  right: calc(var(--uf) * 90);
-  z-index: 2;
-}
-
-/* the pill parks mid-frame on desktop (316:2080 @ x733) */
-.ft__row .ft__cta {
-  position: absolute;
-  left: calc(var(--uf) * 643);
-  top: 0;
-}
-
-.ft__line {
-  margin: 0;
-  font-family: var(--sans);
-  font-weight: 500;
-  font-style: italic;
-  font-size: calc(var(--uf) * 56);
-  line-height: calc(var(--uf) * 71);
+  font-size: calc(var(--uf) * 48);
+  line-height: 1.17;
   letter-spacing: -0.04em;
   color: rgba(0, 0, 0, 0.8);
 }
 
-/* the same pill as the hero's (316:2080 = 244×58, r40) */
+.ft__close-grad {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.8),
+    rgba(178, 96, 37, 0.8)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* the black pill (400:845 — px24 py14, r40, 20u Medium) */
 .ft__cta {
   display: flex;
   align-items: center;
@@ -69,7 +80,7 @@
   background: #000;
   font-family: var(--sans);
   font-weight: 500;
-  font-size: calc(var(--uf) * 24);
+  font-size: calc(var(--uf) * 20);
   letter-spacing: -0.02em;
   color: #fff;
   white-space: nowrap;
@@ -85,13 +96,16 @@
   transform: translateX(3px);
 }
 
+/* ---- the slots band -------------------------------------------------- */
+.ft__band {
+  position: relative;
+  height: calc(var(--uf) * 818);
+}
+
 /* ---- the puzzle ------------------------------------------------------ */
 .ft__region {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(var(--uf) * 818);
+  inset: 0;
   overflow: hidden;
 }
 
@@ -111,8 +125,11 @@
   position: absolute;
   inset: 0;
   background: #f1e2d8;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  /* the concealed room stays properly BLURRED (Figma bg-blur 10) — only
+     the squares carry the sharp image; the show-through under the wash
+     must never compete with the copy */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   mask-image: linear-gradient(to bottom, #000, rgba(0, 0, 0, 0.428));
   -webkit-mask-image: linear-gradient(to bottom, #000, rgba(0, 0, 0, 0.428));
 }
@@ -128,9 +145,12 @@
   transition: opacity 0.6s ease 0.08s;
 }
 
+/* the slice must mirror the backdrop photo's cover box EXACTLY — that
+   box is the full-bleed band (100vw × 818uf), not the 1512uf frame, so
+   the sharp reveal stays pixel-aligned at any viewport ratio */
 .ft__tile img {
   position: absolute;
-  width: calc(var(--uf) * 1512);
+  width: 100vw;
   height: calc(var(--uf) * 818);
   max-width: none;
   object-fit: cover;
@@ -153,46 +173,128 @@
   }
 }
 
-/* ---- phone (≤640) — words above, the puzzle band below -------------- */
+/* ---- the slots copy — the band's clear left third (400:852) ---------- */
+.ft__slots {
+  position: absolute;
+  left: calc(var(--fx) + var(--uf) * 91);
+  top: calc(var(--uf) * 300);
+  width: calc(var(--uf) * 524);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--uf) * 34);
+  z-index: 2;
+}
+
+.ft__slots-line {
+  margin: 0;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--uf) * 36);
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.ft__slots-ask {
+  margin: 0;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--uf) * 24);
+  line-height: 1.35;
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.ft__slots-ask strong {
+  font-weight: 600;
+}
+
+/* the outline pill (400:849) */
+.ft__talk {
+  padding: calc(var(--uf) * 14) calc(var(--uf) * 24);
+  border: 1px solid #000;
+  border-radius: calc(var(--uf) * 40);
+  background: none;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--uf) * 20);
+  letter-spacing: -0.02em;
+  color: #000;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.ft__talk:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* ---- phone (≤640) — capsule, then copy, then the puzzle band --------- */
 @media (max-width: 640px) {
   .ft {
-    height: auto;
-    padding-top: 64px;
+    /* the frame unit doubles to width-fit-half: the puzzle band and its
+       cells read at phone scale (the grid runs wider than the screen,
+       its right-weighted cluster filling the frame) — every uf consumer
+       (band height, tile size/positions, slice boxes) scales together */
+    --uf: calc(100vw / 756);
+    background: linear-gradient(to bottom, var(--bg), #f1e2d8 240px);
   }
 
-  .ft__head {
-    position: static;
-    padding: 0 6vw;
-    font-size: 26px;
+  .ft__close {
+    width: auto;
+    margin: 64px 6vw 48px;
+    padding: 36px 26px;
+    gap: 22px;
+    border-radius: 36px;
+  }
+
+  .ft__close-title {
+    font-size: 25px;
     line-height: 34px;
   }
 
-  .ft__row {
-    position: static;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 20px 6vw 28px;
-    gap: 18px;
-  }
-
-  .ft__row .ft__cta {
-    position: static;
-  }
-
-  .ft__line {
-    font-size: 21px;
-    line-height: 28px;
-  }
-
   .ft__cta {
-    padding: 11px 18px;
+    padding: 12px 20px;
+    border-radius: 26px;
+    font-size: 15px;
+    gap: 6px;
+  }
+
+  /* copy above, the puzzle band below — the phone column has no clear
+     left third to share */
+  .ft__band {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ft__slots {
+    position: static;
+    order: -1;
+    width: auto;
+    padding: 0 6vw 34px;
+    gap: 20px;
+  }
+
+  .ft__slots-line {
+    font-size: 22px;
+  }
+
+  .ft__slots-ask {
+    font-size: 16px;
+  }
+
+  .ft__talk {
+    padding: 11px 20px;
     border-radius: 26px;
     font-size: 15px;
   }
 
   .ft__region {
     position: relative;
+    /* the tile slices mirror the photo's 818uf cover box — the band must
+       keep that height or the sharp reveals drift off the backdrop */
     height: calc(var(--uf) * 818);
   }
 }

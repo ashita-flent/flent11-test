@@ -28,7 +28,8 @@
 .fq__title {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: clamp(1.9rem, 4vw, 3.1rem);
+  /* floor matches the sibling section titles (2rem on phones) */
+  font-size: clamp(2rem, 4vw, 3.1rem);
   line-height: 1.1;
   letter-spacing: -0.035em;
   color: var(--ink);
@@ -142,5 +143,39 @@
   .fq__a-body,
   .fq__toggle-v {
     transition: none;
+  }
+}
+
+/* ---- tablet/phone (≤860, same switch as proof/trust) ------------------- */
+@media (max-width: 860px) {
+  /* the 402-frame's 23px side margins — the same content column as the
+     proof section above (the contain-fit 1320u drifts to ~25px and the
+     sections' edges stop lining up) */
+  .fq__inner {
+    width: calc(100vw - 46px);
+  }
+
+  /* the reading column IS the content column here — the desktop's
+     narrowed 950u list left a strip with ~72px side margins on phones */
+  .fq__list {
+    width: 100%;
+  }
+
+  /* head→content gap 40, the proof frame's mobile rhythm */
+  .fq__title {
+    margin-bottom: 40px;
+  }
+}
+
+/* ---- phone (≤640) ------------------------------------------------------ */
+@media (max-width: 640px) {
+  /* the desktop line break centres an orphaned "ask" at this width —
+     let the title wrap on its own, evenly */
+  .fq__title br {
+    display: none;
+  }
+
+  .fq__title {
+    text-wrap: balance;
   }
 }

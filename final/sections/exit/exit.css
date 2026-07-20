@@ -1,8 +1,11 @@
 /* ============================================================
-   Section · Exit — redesigned calculator (Figma 241:1451 +
-   expanded card 18143581): month bar with a draggable exit
-   marker, the MONEY SAVED pin above it, flanking paid/pending
-   stat cards, and the bill as an expandable deductions card.
+   Section · Exit — two faces on one thread.
+   Face 1 · the story (Figma 383:420): four dark step pills
+   dropping dashed stems to the grey line at y 629; the
+   "See the full math" pill rests ON the line.
+   Face 2 · the calculator (Figma 316:1755): the month bar's
+   waist rides the SAME line. The faces swipe left/right around
+   the stationary thread — it is the section's spine.
    Same 1512×982 contain-fit metrics (--u); same curtain-sheet
    shell riding over the journey's held frame.
    ============================================================ */
@@ -39,25 +42,52 @@
   height: calc(var(--u) * 982);
 }
 
-/* ---- the two faces: story in front, calculator behind the CTA --------- */
+/* ---- the thread (Vector 12 — 1px black 20%, running off both viewport
+   edges at frame-y 629). One line, both faces: the story's timeline and
+   the calculator's track waist sit on it, so it NEVER moves while the
+   views swipe around it. ---- */
+.ex__thread {
+  position: absolute;
+  top: calc(var(--u) * 629);
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  z-index: 0;
+}
+
+/* ---- the two faces — a clean carriage slide around the thread: the
+   story rides fully out LEFT as the calculator rides in from the RIGHT
+   (one band, same motion, no fade), so the stationary line underneath
+   visibly hands off from the story's timeline to the track's waist. ---- */
 .ex__story,
 .ex__math {
   position: absolute;
   inset: 0;
-  opacity: 0;
+  z-index: 1;
   visibility: hidden;
-  transform: translateY(calc(var(--u) * 12));
-  transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s;
+  will-change: transform;
+  transition:
+    transform 0.7s cubic-bezier(0.76, 0, 0.24, 1),
+    visibility 0.7s;
+}
+
+/* parked fully past the viewport edges (frame ≤ viewport, so −50vw−50%
+   clears the left edge exactly; +50vw+50% waits past the right) */
+.ex__story {
+  transform: translateX(calc(-50vw - 50%));
+}
+
+.ex__math {
+  transform: translateX(calc(50vw + 50%));
 }
 
 .ex__story.is-on,
 .ex__math.is-on {
-  opacity: 1;
   visibility: visible;
   transform: none;
 }
 
-/* ---- the exit story (Figma 358:2915) ----------------------------------- */
+/* ---- face 1 · the exit story (Figma 383:420) --------------------------- */
 .ex__shead {
   position: absolute;
   left: calc(var(--u) * 94);
@@ -68,20 +98,42 @@
   gap: calc(var(--u) * 24);
 }
 
-/* the timeline (Vector 12 — 1px black 20%, running off both edges) */
-.ex__tl-line {
-  position: absolute;
-  left: calc(var(--u) * -75);
-  width: calc(var(--u) * 1698);
-  top: calc(var(--u) * 589);
-  border-top: 1px solid rgba(0, 0, 0, 0.2);
+.ex__title {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 48);
+  letter-spacing: -0.04em;
+  color: rgba(0, 0, 0, 0.8);
 }
 
-/* tick stems (Vector 13 — 2px black 40%, h 69 crossing the line) with
-   their captions 14u under (358:3052…) */
+.ex__sub {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 20);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* each moment's dashed drop to the thread (Vectors 14–17 — 1px, 4/4) */
+.ex__tl-drop {
+  position: absolute;
+  width: 1px;
+  margin-left: -0.5px;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2) 0,
+    rgba(0, 0, 0, 0.2) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* tick stems (Vector 13 — 2px black 40%, h 69 crossing the thread at
+   629) with their captions 14u under (383:561…) */
 .ex__tl-when {
   position: absolute;
-  top: calc(var(--u) * 554);
+  top: calc(var(--u) * 594);
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -96,71 +148,39 @@
 }
 
 .ex__tl-cap {
-  /* wide enough that AFTER MOVE-OUT holds one line (358:3063 w 203)
-     while THE DAY YOU GIVE NOTICE still breaks to two */
+  /* wide enough that AFTER MOVE-OUT holds one line while THE DAY YOU
+     GIVE NOTICE breaks to two (383:563 w 127) */
   max-width: calc(var(--u) * 210);
   font-family: var(--sans);
   font-weight: 600;
-  font-size: calc(var(--u) * 20);
-  line-height: 1.5;
+  font-size: calc(var(--u) * 16);
+  line-height: normal;
   letter-spacing: 0.04em;
   text-align: center;
   color: rgba(0, 0, 0, 0.6);
 }
 
-/* you-are-here (Group 2) — terracotta core + 20% halo on the line */
-.ex__tl-mark {
-  position: absolute;
-  top: calc(var(--u) * 589);
-  width: calc(var(--u) * 16);
-  height: calc(var(--u) * 16);
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: var(--ex-accent);
-}
-
-.ex__tl-mark::before {
-  content: "";
-  position: absolute;
-  inset: calc(var(--u) * -7);
-  border-radius: 50%;
-  background: rgba(178, 96, 37, 0.2);
-}
-
-/* each moment's dashed drop to the line (Vectors 14–17 — 1px, 4/4) */
-.ex__tl-drop {
-  position: absolute;
-  width: 1px;
-  margin-left: -0.5px;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.2) 0,
-    rgba(0, 0, 0, 0.2) 4px,
-    transparent 4px,
-    transparent 8px
-  );
-}
-
-/* a moment: dark pill + its two-line note (358:3020…) */
+/* a moment: icon chip on a dark pill, note below (393:855…) */
 .ex__tls {
   position: absolute;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: calc(var(--u) * 17);
-  width: calc(var(--u) * 276);
+  gap: calc(var(--u) * 20);
   font-family: var(--sans);
 }
 
-/* the caption echoed inside the step — phone layout only */
-.ex__tls-when {
-  display: none;
-}
-
+/* the dark pill (383:526 — #1E1E1E easing to #3A3A3A rightward) with
+   its white icon chip resting on the left end */
 .ex__tls-pill {
-  padding: calc(var(--u) * 10) calc(var(--u) * 20);
-  border-radius: 30px;
-  background: #3a3a3a;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: calc(var(--u) * 50);
+  padding: 0 calc(var(--u) * 20) 0 calc(var(--u) * 60);
+  border-radius: calc(var(--u) * 30);
+  background: linear-gradient(-90deg, #3a3a3a 0%, #1e1e1e 100%);
   font-weight: 500;
   font-size: calc(var(--u) * 20);
   line-height: 1.5;
@@ -169,7 +189,25 @@
   white-space: nowrap;
 }
 
+.ex__tls-chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  width: calc(var(--u) * 50);
+  height: calc(var(--u) * 50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #3a3a3a;
+  border-radius: 50%;
+  background: #fff;
+  filter: drop-shadow(4px 2px 12px rgba(0, 0, 0, 0.2));
+}
+
+/* the note hangs 20u under the pill, aligned with the label (x + 60) */
 .ex__tls-copy {
+  margin-left: calc(var(--u) * 60);
   font-weight: 400;
   font-size: calc(var(--u) * 16);
   line-height: 1.5;
@@ -177,150 +215,258 @@
   color: rgba(0, 0, 0, 0.8);
 }
 
-/* ---- pledges + the CTA into the calculator (358:3024 / 358:3031) ------ */
+.ex__tls-copy strong {
+  font-weight: 600;
+}
+
+/* ---- pledges (391:819…) + the CTA resting on the thread (383:540) ----- */
 .ex__pledges {
   position: absolute;
   left: calc(var(--u) * 94);
-  top: calc(var(--u) * 791);
+  top: calc(var(--u) * 779);
+  width: calc(var(--u) * 1353);
   display: flex;
   gap: calc(var(--u) * 20);
 }
 
 .ex__pledge {
+  flex: 1;
   display: flex;
   align-items: center;
-  width: calc(var(--u) * 219);
-  height: calc(var(--u) * 116);
-  padding: calc(var(--u) * 10) calc(var(--u) * 20);
-  border-radius: 12px;
+  gap: calc(var(--u) * 16);
+  padding: calc(var(--u) * 16);
+  border-radius: calc(var(--u) * 24);
   background: rgba(255, 255, 255, 0.7);
   font-family: var(--sans);
   font-weight: 500;
   font-size: calc(var(--u) * 20);
-  line-height: 1.5;
+  line-height: 1.2;
   letter-spacing: -0.02em;
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(0, 0, 0, 0.9);
 }
 
+/* the shield's tile — bronze-washed glass (391:820) */
+.ex__pledge-tile {
+  flex: none;
+  box-sizing: border-box;
+  width: calc(var(--u) * 60);
+  height: calc(var(--u) * 60);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: calc(var(--u) * 16);
+  background: linear-gradient(
+    to bottom,
+    rgba(178, 96, 37, 0.05),
+    rgba(178, 96, 37, 0.2)
+  );
+}
+
+.ex__pledge-tile img {
+  width: calc(var(--u) * 26);
+  height: calc(var(--u) * 25.6);
+}
+
+/* "See the full math" — the terracotta pill ON the thread (centre 629);
+   its hover deepens the clay and sends the arrow onward */
 .ex__mathcta {
   position: absolute;
-  left: calc(var(--u) * 1003);
-  top: calc(var(--u) * 791);
-  width: calc(var(--u) * 440);
-  height: calc(var(--u) * 116);
-  padding: calc(var(--u) * 10) calc(var(--u) * 20);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
+  left: calc(var(--u) * 1259);
+  top: calc(var(--u) * 607);
+  display: inline-flex;
+  align-items: center;
   gap: calc(var(--u) * 10);
+  height: calc(var(--u) * 44);
+  padding: 0 calc(var(--u) * 20);
   border: 0;
-  border-radius: 12px;
-  background: #552f15;
+  border-radius: calc(var(--u) * 52);
+  background: var(--ex-accent);
   font-family: var(--sans);
-  text-align: left;
+  font-weight: 500;
+  font-size: calc(var(--u) * 16);
+  letter-spacing: -0.02em;
+  color: #fff;
+  white-space: nowrap;
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.ex__mathcta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 calc(var(--u) * 10) calc(var(--u) * 28) rgba(85, 47, 21, 0.35);
-}
-
-.ex__mathcta-t {
-  font-weight: 500;
-  font-size: calc(var(--u) * 20);
-  line-height: 1.5;
-  letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.ex__mathcta-s {
-  font-weight: 500;
-  font-size: calc(var(--u) * 14);
-  letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.6);
+  z-index: 2;
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .ex__mathcta-arrow {
-  position: absolute;
-  right: calc(var(--u) * 20);
-  top: calc(var(--u) * 20);
-  width: calc(var(--u) * 24);
-  height: calc(var(--u) * 24);
+  width: calc(var(--u) * 14);
+  height: calc(var(--u) * 11.3);
+  transition: transform 0.25s ease;
 }
 
-/* ---- the way back out of the math ------------------------------------- */
+.ex__mathcta:hover {
+  background: #9a501c;
+  transform: translateY(-1px);
+  box-shadow: 0 calc(var(--u) * 8) calc(var(--u) * 22) rgba(178, 96, 37, 0.4);
+}
+
+.ex__mathcta:hover .ex__mathcta-arrow {
+  transform: translateX(calc(var(--u) * 3));
+}
+
+.ex__mathcta:active {
+  transform: translateY(0);
+  box-shadow: 0 calc(var(--u) * 4) calc(var(--u) * 12) rgba(178, 96, 37, 0.35);
+}
+
+.ex__mathcta:focus-visible {
+  outline: 2px solid var(--ex-accent);
+  outline-offset: 3px;
+}
+
+/* ---- face 2 · the calculator (Figma 316:1755) -------------------------- */
+
+/* the way back — arrow-left + Back in clay (316:1860) */
 .ex__back {
   position: absolute;
-  left: calc(var(--u) * 94);
-  top: calc(var(--u) * 56);
+  left: calc(var(--u) * 93);
+  top: calc(var(--u) * 86);
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 8px 4px 0;
+  gap: calc(var(--u) * 5.3);
+  padding: 0;
   background: none;
   border: 0;
   font-family: var(--sans);
   font-weight: 500;
-  font-size: calc(var(--u) * 14);
+  font-size: calc(var(--u) * 18.5);
+  line-height: 1.43;
   color: var(--ex-accent);
   cursor: pointer;
 }
 
-.ex__back svg {
-  width: 11px;
-  height: 11px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+/* the arrow asset is white-stroked — a mask lets it wear the clay */
+.ex__back-arrow {
+  width: calc(var(--u) * 15);
+  height: calc(var(--u) * 12);
+  background: currentColor;
+  mask: url(/exit-ic-arrow.svg) center / contain no-repeat;
+  -webkit-mask: url(/exit-ic-arrow.svg) center / contain no-repeat;
+  transform: scaleX(-1);
   transition: transform 0.25s ease;
 }
 
-.ex__back:hover svg {
-  transform: translateX(-2px);
+.ex__back:hover .ex__back-arrow {
+  transform: scaleX(-1) translateX(calc(var(--u) * 3));
 }
 
-/* ---- header (241:1453) ------------------------------------------------ */
+/* ---- header row (394:523) — title left, the rent block right ---------- */
 .ex__head {
   position: absolute;
   left: calc(var(--u) * 94);
-  top: calc(var(--u) * 100);
-  width: calc(var(--u) * 1076);
+  top: calc(var(--u) * 135);
+  width: calc(var(--u) * 1318);
   display: flex;
-  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
   gap: calc(var(--u) * 24);
 }
 
-.ex__title {
+.ex__mtitle {
   font-family: var(--sans);
   font-weight: 400;
-  font-size: calc(var(--u) * 56);
+  font-size: calc(var(--u) * 40);
+  line-height: normal;
   letter-spacing: -0.04em;
   color: rgba(0, 0, 0, 0.8);
 }
 
-.ex__sub {
+.ex__rent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: calc(var(--u) * 8);
   font-family: var(--sans);
-  font-weight: 400;
-  font-size: calc(var(--u) * 20);
-  line-height: 1.5;
+}
+
+.ex__rent-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 24);
+}
+
+.ex__rent-k {
+  width: calc(var(--u) * 157);
+  flex: none;
+  font-weight: 600;
+  font-size: calc(var(--u) * 16);
   letter-spacing: -0.02em;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
 }
 
-.ex__sub em {
+.ex__rent-k i {
+  font-style: normal;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* the editable rent (383:785) — white field, quiet ₹ */
+.ex__rent-field {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 4);
+  width: calc(var(--u) * 178);
+  padding: calc(var(--u) * 6) calc(var(--u) * 12);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: calc(var(--u) * 8);
+  background: #fff;
+  cursor: text;
+}
+
+.ex__rent-field span {
   font-weight: 500;
-  font-style: italic;
+  font-size: calc(var(--u) * 16);
+  color: rgba(0, 0, 0, 0.4);
 }
 
-/* ---- flanking stat cards (269:112 / 269:118) -------------------------- */
+.ex__rent-field input {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 16);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.ex__rent-field:focus-within {
+  border-color: rgba(178, 96, 37, 0.55);
+}
+
+.ex__rent-v {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+  width: calc(var(--u) * 178);
+  font-weight: 500;
+  font-size: calc(var(--u) * 16);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+}
+
+.ex__rent-v s {
+  font-size: calc(var(--u) * 14);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* ---- flanking stat chips (316:1789 / 316:1795) ------------------------- */
 .ex__stat {
   position: absolute;
-  top: calc(var(--u) * 275);
+  top: calc(var(--u) * 497);
   display: flex;
   flex-direction: column;
   gap: calc(var(--u) * 8);
@@ -376,31 +522,9 @@
   color: #008247;
 }
 
-/* the loan-closed badge hangs off the pending card's shoulder (269:125) */
-.ex__loan {
-  position: absolute;
-  right: calc(var(--u) * 92);
-  top: calc(var(--u) * 260);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 30px;
-  background: rgba(76, 175, 80, 0.2);
-  backdrop-filter: blur(7px);
-  -webkit-backdrop-filter: blur(7px);
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: calc(var(--u) * 14);
-  letter-spacing: -0.02em;
-  color: rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
-  z-index: 2;
-}
-
-.ex__loan svg {
-  width: calc(var(--u) * 16);
-  height: calc(var(--u) * 16);
+/* the phone's vertical slider lives only under 640px */
+.ex__vslider {
+  display: none;
 }
 
 /* the rail — mirrors the bar's horizontal span per breakpoint; every
@@ -419,55 +543,56 @@
   pointer-events: auto;
 }
 
-/* ---- the MONEY SAVED pin (241:1484/1485) ------------------------------ */
-.ex__pin-cap {
-  position: absolute;
-  top: calc(var(--u) * 266);
-  transform: translateX(-50%);
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: calc(var(--u) * 19.6);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
-  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
+/* ---- the total-refund pill riding the marker (316:1850) ---------------- */
 .ex__pin {
   position: absolute;
-  top: calc(var(--u) * 310);
+  top: calc(var(--u) * 530);
   transform: translateX(-50%);
-  padding: calc(var(--u) * 12) calc(var(--u) * 20);
-  border-radius: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--u) * 14);
+  box-sizing: border-box;
+  height: calc(var(--u) * 54);
+  padding: 0 calc(var(--u) * 20);
+  border-radius: calc(var(--u) * 42);
   background: #522d12;
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: calc(var(--u) * 24);
-  letter-spacing: -0.02em;
-  color: #fff;
   white-space: nowrap;
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2;
 }
 
-/* runs from the pin's underside down to the hanging dot (Vector 14 —
-   2px, #522D12) */
+.ex__pin span {
+  font-weight: 600;
+  font-size: calc(var(--u) * 16);
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ex__pin strong {
+  font-weight: 600;
+  font-size: calc(var(--u) * 24);
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+/* runs from the pill's underside down to the hanging bob (Vector 14 —
+   2px, #522D12, y 584→674) */
 .ex__stem {
   position: absolute;
-  top: calc(var(--u) * 358);
-  height: calc(var(--u) * 94);
+  top: calc(var(--u) * 584);
+  height: calc(var(--u) * 90);
   width: 2px;
   margin-left: -1px;
   background: #522d12;
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ---- the month bar (254:2678) ----------------------------------------- */
+/* ---- the month bar (316:1847) — waist on the thread at 629 ------------- */
 .ex__bar {
   position: absolute;
   left: calc(var(--u) * 93);
-  top: calc(var(--u) * 383);
+  top: calc(var(--u) * 605);
   width: calc(var(--u) * 1319);
   height: calc(var(--u) * 48); /* generous vertical hit band */
   cursor: grab;
@@ -502,9 +627,9 @@
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* the hairline through the bar's waist (Vector 2 — black 10%) + the
-   journey line riding it to the marker (Vector 3 — 2px, round caps,
-   #DC772E easing to #4C2910 as it arrives) + per-month tick marks */
+/* the rail's own hairline through the waist (Vector 2 — black 10%,
+   layered on the thread) + the journey line riding it to the marker
+   (Vector 3 — 2px, round caps, #DC772E easing to #4C2910) */
 .ex__bar-line {
   position: absolute;
   left: 0;
@@ -584,10 +709,10 @@
   background: rgba(178, 96, 37, 0.32);
 }
 
-/* ---- tick labels ------------------------------------------------------- */
+/* ---- tick labels (316:1761…) ------------------------------------------- */
 .ex__tick {
   position: absolute;
-  top: calc(var(--u) * 421);
+  top: calc(var(--u) * 643);
   transform: translateX(-50%);
   font-family: var(--sans);
   font-weight: 600;
@@ -606,7 +731,7 @@
 
 .ex__notice {
   position: absolute;
-  top: calc(var(--u) * 444);
+  top: calc(var(--u) * 666);
   transform: translateX(-50%);
   font-family: var(--sans);
   font-weight: 600;
@@ -619,9 +744,25 @@
   pointer-events: none;
 }
 
+/* the loan's close, one month past the exit (383:805) */
+.ex__loanclosed {
+  position: absolute;
+  top: calc(var(--u) * 663);
+  transform: translateX(-50%);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(var(--u) * 12);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #008247;
+  white-space: nowrap;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
 .ex__month {
   position: absolute;
-  top: calc(var(--u) * 476);
+  top: calc(var(--u) * 701);
   transform: translateX(-50%);
   font-family: var(--sans);
   font-weight: 600;
@@ -633,492 +774,748 @@
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ---- the deductions card (241:1518) ------------------------------------ */
+/* ---- the deductions card (316:1802) — always open ---------------------- */
 .ex__card {
   position: absolute;
-  top: calc(var(--u) * 522);
-  width: calc(var(--u) * 415);
+  top: calc(var(--u) * 281);
+  box-sizing: border-box;
+  width: calc(var(--u) * 434);
   padding: calc(var(--u) * 24) calc(var(--u) * 28);
-  border-radius: 20px;
+  border-radius: calc(var(--u) * 20);
   background: linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.9),
-    rgba(255, 255, 255, 0.5)
+    rgba(255, 255, 255, 0.7),
+    #ffffff
   );
   font-family: var(--sans);
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.ex__card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: calc(var(--u) * 20);
-}
-
 .ex__card-title {
+  display: block;
+  margin-bottom: calc(var(--u) * 24);
   font-weight: 600;
   font-size: calc(var(--u) * 16);
+  line-height: 1.25;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: rgba(0, 0, 0, 0.7);
 }
 
-.ex__card-toggle {
-  display: inline-flex;
+.ex__card-rows {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 16);
+}
+
+.ex__row {
+  display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 0 4px 8px;
-  background: none;
-  border: 0;
-  font-family: var(--sans);
+  gap: calc(var(--u) * 12);
+}
+
+.ex__row-k {
+  flex: none;
+  width: calc(var(--u) * 120);
+  font-weight: 600;
+  font-size: calc(var(--u) * 16);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.ex__row-v {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 8);
   font-weight: 500;
-  font-size: calc(var(--u) * 14);
-  color: var(--ex-accent);
-  cursor: pointer;
-}
-
-.ex__card-toggle svg {
-  width: 11px;
-  height: 11px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.ex__card.is-open .ex__card-toggle svg {
-  transform: rotate(180deg);
-}
-
-.ex__chip {
-  display: inline-flex;
-  width: fit-content;
-  padding: 6px 12px;
-  border-radius: 50px;
-  background: rgba(0, 130, 71, 0.1);
-  font-weight: 500;
-  font-size: calc(var(--u) * 14);
-  color: rgba(0, 130, 71, 0.9);
-  white-space: nowrap;
-}
-
-/* the two bodies swap with the FAQ's 0fr→1fr glide */
-.ex__card-a,
-.ex__card-b {
-  display: grid;
-  transition: grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.ex__card-a {
-  grid-template-rows: 1fr;
-}
-
-.ex__card.is-open .ex__card-a {
-  grid-template-rows: 0fr;
-}
-
-.ex__card-b {
-  grid-template-rows: 0fr;
-}
-
-.ex__card.is-open .ex__card-b {
-  grid-template-rows: 1fr;
-}
-
-.ex__card-a-clip,
-.ex__card-b-clip {
-  overflow: hidden;
-}
-
-/* collapsed — the headline deduction */
-.ex__waiver {
-  margin-top: calc(var(--u) * 12);
-  font-weight: 500;
-  font-size: calc(var(--u) * 20);
+  font-size: calc(var(--u) * 16);
   letter-spacing: -0.02em;
   color: rgba(0, 0, 0, 0.9);
   white-space: nowrap;
 }
 
-.ex__waiver s {
-  font-weight: 500;
-  color: rgba(0, 0, 0, 0.4);
-  margin-left: 4px;
-}
-
-.ex__waiver-sub {
-  margin-top: calc(var(--u) * 8);
-  font-size: calc(var(--u) * 14);
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.ex__waiver-sub strong {
-  font-weight: 600;
-}
-
-/* expanded — the full math */
-.ex__row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: calc(var(--u) * 5) 0;
-}
-
-.ex__row-k {
-  font-weight: 500;
-  font-size: calc(var(--u) * 14);
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.ex__row-v {
-  font-weight: 500;
-  font-size: calc(var(--u) * 15);
-  letter-spacing: -0.01em;
-  color: rgba(0, 0, 0, 0.85);
-  white-space: nowrap;
-}
-
 .ex__row-v i {
   font-style: normal;
-  font-weight: 400;
-  font-size: calc(var(--u) * 12.5);
-  color: rgba(0, 0, 0, 0.35);
-  margin-left: 3px;
-}
-
-.ex__row-v i s {
+  font-weight: 500;
   color: rgba(0, 0, 0, 0.3);
 }
 
+/* the -₹ figures wear the clay */
 .ex__row-v--ded {
   color: var(--ex-accent);
 }
 
+/* the withheld note — "21 days only" in green over the struck 3 months */
+.ex__row-v i:has(em) {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.ex__row-v i em {
+  font-style: normal;
+  color: #008247;
+}
+
+.ex__row-v i s {
+  color: rgba(0, 0, 0, 0.6);
+}
+
 .ex__rule {
-  margin: calc(var(--u) * 8) 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.ex__total {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding-top: calc(var(--u) * 8);
-}
-
-.ex__total span {
-  font-weight: 600;
-  font-size: calc(var(--u) * 13);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.45);
-}
-
-.ex__total strong {
-  font-weight: 500;
-  font-size: calc(var(--u) * 26);
-  letter-spacing: -0.03em;
-  color: rgba(0, 0, 0, 0.9);
+/* ---- reduced motion: the faces swap in place --------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .ex__story,
+  .ex__math,
+  .ex__mathcta,
+  .ex__mathcta-arrow,
+  .ex__back-arrow {
+    transition: none;
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   Mobile (≤640px) — width-fit 430 artboard; the sheet runs taller than
-   one screen and scrolls. Stats sit side by side, the bar spans the
-   column, and the card goes full width beneath the marker.
+   Mobile (≤640px) — width-fit 430 artboard; the story stacks into a
+   column (timeline furniture steps aside), the bar spans the column,
+   and the card goes full width beneath the marker.
    ════════════════════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
   .exit {
-    --ue: calc(100vw / 430);
+    /* WIDTH-fit, like every other phone section — type and margins hold
+       the design's real size (24px gutters at 402). A both-axis contain
+       fit was tried for "one frame" but browser chrome shrank the whole
+       artboard ~11% and floated it with odd side gaps — legibility loses.
+       The 874-unit canvas ≈ one viewport on standard phones anyway; on
+       shortened viewports the last sliver simply scrolls. */
+    --ue: calc(100vw / 402);
     --u: var(--ue);
-    height: calc(var(--ue) * 780);
-    min-height: 100vh;
+    height: auto;
+    min-height: 100dvh;
+    /* the phone artboard warms a touch deeper (413:794) */
+    background: linear-gradient(to bottom, #ffffff 0%, #f2e5d3 100%);
   }
 
+  /* the frame is the full-width 402×874 design canvas in flow; both
+     faces (story in flow, math overlaying absolute) share it */
   .ex__frame {
-    width: calc(var(--ue) * 430);
-    height: calc(var(--ue) * 780);
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: calc(var(--ue) * 402);
+    height: calc(var(--ue) * 874);
+    min-height: 0;
+    margin: 0 auto;
   }
 
-  .ex__head {
-    left: calc(var(--ue) * 24);
-    top: calc(var(--ue) * 36);
-    width: calc(var(--ue) * 382);
-    gap: calc(var(--ue) * 10);
-  }
-
-  .ex__title {
-    font-size: calc(var(--ue) * 30);
-  }
-
-  .ex__sub {
-    font-size: calc(var(--ue) * 15);
-  }
-
-  /* stats side by side */
-  .ex__stat {
-    top: calc(var(--ue) * 168);
-    padding: 12px 14px;
-    gap: 5px;
-    border-radius: 10px;
-  }
-
-  .ex__stat--paid {
-    left: calc(var(--ue) * 24);
-  }
-
-  .ex__stat--pend {
-    right: calc(var(--ue) * 24);
-  }
-
-  .ex__stat-k {
-    font-size: 11px;
-  }
-
-  .ex__stat-v {
-    font-size: 14px;
-    gap: 5px;
-  }
-
-  .ex__stat-v i,
-  .ex__stat-v s {
-    font-size: 10px;
-  }
-
-  .ex__loan {
-    right: calc(var(--ue) * 20);
-    top: calc(var(--ue) * 156);
-    padding: 4px 8px;
-    font-size: 10px;
-  }
-
-  .ex__loan svg {
-    width: 11px;
-    height: 11px;
-  }
-
-  /* the pin */
-  .ex__pin-cap {
-    top: calc(var(--ue) * 268);
-    font-size: 10px;
-  }
-
-  .ex__pin {
-    top: calc(var(--ue) * 288);
-    padding: 9px 14px;
-    font-size: 15px;
-    border-radius: 30px;
-  }
-
-  .ex__stem {
-    top: calc(var(--ue) * 328);
-    /* down through the bar (top 352ue) to the hanging dot's top edge
-       (44px − 8px into the bar's own px space) */
-    height: calc(var(--ue) * 24 + 36px);
-  }
-
-  /* the bar */
-  .ex__rail {
-    left: calc(var(--ue) * 24);
-    width: calc(var(--ue) * 382);
-  }
-
-  .ex__bar {
-    left: calc(var(--ue) * 24);
-    top: calc(var(--ue) * 352);
-    width: calc(var(--ue) * 382);
-    height: 48px;
-  }
-
-  .ex__bar-fill,
-  .ex__bar-rest {
-    top: 14px;
-    height: 20px;
-  }
-
-  .ex__bar-line {
-    top: 23.5px;
-  }
-
-  .ex__bar-grad {
-    top: 23px;
-  }
-
-  .ex__tickmark {
-    top: 16px;
-    height: 16px;
-  }
-
-  .ex__dot {
-    top: 44px;
-    width: 16px;
-    height: 16px;
-  }
-
-  .ex__dot::before {
-    inset: -7px;
-  }
-
-  /* only the endpoints keep their labels on the phone column */
-  .ex__tick {
-    display: none;
-  }
-
-  .ex__notice {
-    top: calc(var(--ue) * 412);
-    font-size: 8.5px;
-  }
-
-  .ex__month {
-    top: calc(var(--ue) * 432);
-    font-size: 12px;
-  }
-
-  /* the card — full column width */
-  .ex__card {
-    left: 0 !important;
-    top: calc(var(--ue) * 478);
-    width: 100%;
-    padding: 18px 20px;
-    border-radius: 16px;
-  }
-
-  .ex__card-title {
-    font-size: 12px;
-  }
-
-  .ex__card-toggle {
-    font-size: 12px;
-  }
-
-  .ex__chip {
-    font-size: 11px;
-    padding: 5px 10px;
-  }
-
-  .ex__waiver {
-    font-size: 15px;
-    margin-top: 10px;
-  }
-
-  .ex__waiver-sub {
-    font-size: 11px;
-  }
-
-  .ex__row-k {
-    font-size: 11px;
-  }
-
-  .ex__row-v {
-    font-size: 12px;
-  }
-
-  .ex__row-v i {
-    font-size: 9.5px;
-  }
-
-  .ex__total strong {
-    font-size: 19px;
-  }
-
-  .ex__total span {
-    font-size: 10px;
-  }
-
-  /* ── the story reflows to a stacked column; the horizontal timeline
-     furniture steps aside and each moment carries its caption as an
-     overline instead ── */
+  /* ── the story is one 874u screen (413:794): the THREAD TURNS
+     VERTICAL — a 1px line at x114 the moments sit on, captions in its
+     left gutter, the CTA resting on the line with its arrow pointing
+     the way DOWN ── */
   .ex__story {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding: calc(var(--ue) * 36) calc(var(--ue) * 24) 0;
+    position: relative;
+    inset: auto;
+    height: calc(var(--ue) * 874);
   }
 
-  .ex__tl-line,
-  .ex__tl-when,
-  .ex__tl-mark,
+  .ex__thread {
+    left: calc(var(--ue) * 114);
+    right: auto;
+    top: calc(var(--ue) * 405);
+    bottom: 0;
+    width: 1px;
+    margin-left: -0.5px;
+    border-top: 0;
+    border-left: 0;
+    /* the running baseline carries a gradient stroke (416:246): black@0.2
+       at the ends, fading to transparent ~15.5% down so it never strikes
+       through the title / rent text — the legibility gradient */
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0) 15.5%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+    /* the top glides so the line can GROW to full height when the
+       calculator face arrives — the thread visibly continues */
+    transition: top 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+
   .ex__tl-drop {
     display: none;
   }
 
+  /* head (413:853) */
   .ex__shead {
-    position: static;
-    width: 100%;
-    gap: 8px;
+    left: calc(var(--ue) * 24);
+    top: calc(var(--ue) * 60);
+    width: calc(var(--ue) * 354);
+    gap: calc(var(--ue) * 18);
   }
 
+  .ex__title {
+    font-size: max(calc(var(--ue) * 28), 1.5rem);
+  }
+
+  .ex__sub {
+    font-size: max(calc(var(--ue) * 14), 0.8rem);
+    line-height: 1.43;
+  }
+
+  /* captions move to the line's left gutter (413:937…) */
+  .ex__tl-when {
+    left: calc(var(--ue) * 24) !important;
+    transform: none;
+    align-items: flex-start;
+  }
+
+  .ex__tl-when--0 {
+    top: calc(var(--ue) * 390);
+  }
+
+  .ex__tl-when--1 {
+    top: calc(var(--ue) * 487);
+  }
+
+  .ex__tl-when--2 {
+    top: calc(var(--ue) * 607);
+  }
+
+  .ex__tl-when--3 {
+    top: calc(var(--ue) * 693);
+  }
+
+  .ex__tl-stem {
+    display: none;
+  }
+
+  .ex__tl-cap {
+    width: calc(var(--ue) * 55);
+    max-width: none;
+    font-size: max(calc(var(--ue) * 9), 8px);
+    line-height: 1.44;
+    text-align: left;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  /* the moments sit ON the line (413:1007 — chips at x96, line x114) */
   .ex__tls {
-    position: static;
-    width: 100%;
-    gap: 6px;
+    gap: calc(var(--ue) * 8);
   }
 
-  .ex__tls-when {
-    display: block;
-    font-style: normal;
-    font-weight: 600;
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    color: rgba(0, 0, 0, 0.4);
+  .ex__tls--0 {
+    left: calc(var(--ue) * 96) !important;
+    top: calc(var(--ue) * 390) !important;
+    width: calc(var(--ue) * 282) !important;
+  }
+
+  .ex__tls--1 {
+    left: calc(var(--ue) * 96) !important;
+    top: calc(var(--ue) * 485) !important;
+    width: calc(var(--ue) * 282) !important;
+  }
+
+  .ex__tls--2 {
+    left: calc(var(--ue) * 96) !important;
+    top: calc(var(--ue) * 598) !important;
+    width: calc(var(--ue) * 282) !important;
+  }
+
+  .ex__tls--3 {
+    left: calc(var(--ue) * 96) !important;
+    top: calc(var(--ue) * 693) !important;
+    width: calc(var(--ue) * 282) !important;
   }
 
   .ex__tls-pill {
-    padding: 8px 14px;
-    font-size: 14px;
-    white-space: normal;
+    width: calc(var(--ue) * 282) !important;
+    height: calc(var(--ue) * 31);
+    padding: 0 calc(var(--ue) * 20) 0 calc(var(--ue) * 40);
+    border-radius: calc(var(--ue) * 30);
+    font-size: max(calc(var(--ue) * 12), 11px);
+  }
+
+  .ex__tls-chip {
+    width: calc(var(--ue) * 32);
+    height: calc(var(--ue) * 32);
+    filter: drop-shadow(4px 2px 6px rgba(0, 0, 0, 0.2));
+  }
+
+  .ex__tls-chip img {
+    transform: scale(0.8);
   }
 
   .ex__tls-copy {
-    font-size: 12px;
+    margin-left: calc(var(--ue) * 40);
+    width: calc(var(--ue) * 242) !important;
+    font-size: max(calc(var(--ue) * 12), 10px);
+    line-height: 1.5;
   }
 
+  .ex__tls-copy strong {
+    font-weight: 700;
+  }
+
+  /* pledges — a 3-up row above the timeline (413:1025) */
   .ex__pledges {
-    position: static;
-    gap: 8px;
-    margin-top: 4px;
+    left: calc(var(--ue) * 24);
+    top: calc(var(--ue) * 241);
+    width: calc(var(--ue) * 354);
+    gap: calc(var(--ue) * 12);
+    align-items: stretch;
   }
 
   .ex__pledge {
-    flex: 1;
-    width: auto;
-    height: auto;
-    padding: 10px 12px;
-    border-radius: 10px;
-    font-size: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--ue) * 16);
+    padding: calc(var(--ue) * 10);
+    border-radius: calc(var(--ue) * 12);
+    font-size: max(calc(var(--ue) * 12), 10px);
+    line-height: 1.33;
   }
 
+  .ex__pledge-tile {
+    width: calc(var(--ue) * 30);
+    height: calc(var(--ue) * 30);
+    border-radius: calc(var(--ue) * 8);
+    border-width: 0.5px;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.5),
+      rgba(242, 229, 211, 0.5)
+    );
+  }
+
+  .ex__pledge-tile img {
+    width: calc(var(--ue) * 16);
+    height: calc(var(--ue) * 15.7);
+  }
+
+  /* the CTA rests on the vertical line, arrow pointing DOWN (413:1014 —
+     centre x 113.5 ≈ the line's 114) */
   .ex__mathcta {
-    position: relative; /* keeps the arrow anchored while in flow */
-    left: auto;
-    top: auto;
-    width: 100%;
-    height: auto;
-    padding: 14px 16px;
-    gap: 4px;
-    margin-top: 4px;
+    left: calc(var(--ue) * 49);
+    top: calc(var(--ue) * 793);
+    height: calc(var(--ue) * 27);
+    padding: 0 calc(var(--ue) * 10);
+    gap: calc(var(--ue) * 6);
+    border-radius: calc(var(--ue) * 52);
+    background: #864728;
+    font-size: max(calc(var(--ue) * 12), 11px);
   }
 
-  .ex__mathcta-t {
-    font-size: 15px;
-  }
-
-  .ex__mathcta-s {
-    font-size: 11px;
+  .ex__mathcta:hover {
+    background: #864728;
   }
 
   .ex__mathcta-arrow {
-    width: 18px;
-    height: 18px;
-    right: 12px;
-    top: 12px;
+    width: calc(var(--ue) * 12);
+    height: calc(var(--ue) * 9.7);
+    transform: rotate(90deg);
   }
 
+  .ex__mathcta:hover .ex__mathcta-arrow {
+    transform: rotate(90deg);
+  }
+
+  /* ── the swipe turns VERTICAL with the thread: the story rides up as
+     the calculator arrives from below the fold ── */
+  .ex__story {
+    transform: translateY(calc(-100vh - 20%));
+  }
+
+  .ex__math {
+    transform: translateY(calc(100vh + 20%));
+  }
+
+  .ex__story.is-on,
+  .ex__math.is-on {
+    transform: none;
+  }
+
+  /* ══ the calculator (416:242) — the thread stays put and becomes the
+     TRACK: it stretches to full height as this face arrives, months
+     tick down it, and the marker rides it. The desktop's horizontal
+     rail steps aside entirely. ══ */
+
+  /* the thread stretches to the top of the screen while the math is up —
+     one continuous line handing off between the faces */
+  .exit:has(.ex__math.is-on) .ex__thread {
+    top: 0;
+  }
+
+  .ex__stat,
+  .ex__rail,
+  .ex__bar {
+    display: none;
+  }
+
+  /* head (416:243) — Back, the title, the rent rows */
   .ex__back {
     left: calc(var(--ue) * 24);
-    top: calc(var(--ue) * 10);
-    font-size: 12px;
+    top: calc(var(--ue) * 60);
+    gap: calc(var(--ue) * 5.3);
+    font-size: max(calc(var(--ue) * 14), 12px);
+    color: #864728;
+  }
+
+  .ex__back-arrow {
+    width: calc(var(--ue) * 12);
+    height: calc(var(--ue) * 10);
+  }
+
+  .ex__head {
+    left: calc(var(--ue) * 24);
+    top: calc(var(--ue) * 96);
+    width: calc(var(--ue) * 354);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--ue) * 18);
+  }
+
+  .ex__mtitle {
+    font-size: max(calc(var(--ue) * 28), 1.35rem);
+  }
+
+  .ex__mtitle br {
+    display: none;
+  }
+
+  .ex__rent {
+    align-items: flex-start;
+    gap: calc(var(--ue) * 8);
+  }
+
+  .ex__rent-row {
+    gap: calc(var(--ue) * 24);
+  }
+
+  .ex__rent-k {
+    width: calc(var(--ue) * 118);
+    font-size: max(calc(var(--ue) * 12), 10px);
+  }
+
+  .ex__rent-field {
+    width: calc(var(--ue) * 178);
+    padding: calc(var(--ue) * 6) calc(var(--ue) * 10);
+  }
+
+  .ex__rent-field span,
+  .ex__rent-field input {
+    font-size: max(calc(var(--ue) * 12), 11px);
+  }
+
+  .ex__rent-v {
+    width: auto;
+    font-size: max(calc(var(--ue) * 12), 11px);
+  }
+
+  .ex__rent-v s {
+    font-size: max(calc(var(--ue) * 10), 9px);
+  }
+
+  /* ── the vertical slider — pointer-transparent shell; only the drag
+     band takes touches, so Back and the rent field stay tappable ── */
+  .ex__vslider {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .ex__vband {
+    pointer-events: auto;
+  }
+
+  /* tick dashes across the line (416:464 — w10 at x109) */
+  .ex__vtick {
+    position: absolute;
+    left: calc(var(--ue) * 109);
+    width: calc(var(--ue) * 10);
+    height: 1px;
+    margin-top: -0.5px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  /* month labels in the gutter (416:433 — right edge at x102) */
+  .ex__vmonth {
+    position: absolute;
+    left: calc(var(--ue) * 24);
+    width: calc(var(--ue) * 62);
+    transform: translateY(-50%);
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: max(calc(var(--ue) * 10), 8.5px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.5);
+    transition: color 0.3s ease;
+  }
+
+  .ex__vmonth.is-exit {
+    color: #864728;
+  }
+
+  .ex__vmonth.is-ahead {
+    color: rgba(0, 0, 0, 0.2);
+  }
+
+  /* GAVE NOTICE / LOAN CLOSED under their months (416:523 / 416:521) */
+  .ex__vtag {
+    position: absolute;
+    left: calc(var(--ue) * 24);
+    width: calc(var(--ue) * 78);
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: max(calc(var(--ue) * 10), 8px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.3);
+    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .ex__vtag--closed {
+    color: #008247;
+  }
+
+  /* the touch band riding the line — labels + line + bob zone */
+  .ex__vband {
+    position: absolute;
+    left: 0;
+    top: calc(var(--ue) * 356.5);
+    width: calc(var(--ue) * 200);
+    height: calc(var(--ue) * 473);
+    z-index: 1;
+    cursor: grab;
+    touch-action: none;
+    outline: none;
+  }
+
+  .ex__vband:focus-visible {
+    outline: 2px solid #864728;
+    outline-offset: -2px;
+    border-radius: 8px;
+  }
+
+  /* the marker (416:487/489/492) — stem off the line, bob, refund pill */
+  .ex__vstem {
+    position: absolute;
+    left: calc(var(--ue) * 107);
+    width: calc(var(--ue) * 31);
+    height: 2px;
+    margin-top: -1px;
+    background: #522d12;
+    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .ex__vdot {
+    position: absolute;
+    left: calc(var(--ue) * 139);
+    width: calc(var(--ue) * 32);
+    height: calc(var(--ue) * 32);
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: rgba(178, 96, 37, 0.2);
+    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .ex__vdot::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: calc(var(--ue) * 16);
+    height: calc(var(--ue) * 16);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: #522d12;
+  }
+
+  .ex__vpin {
+    position: absolute;
+    left: calc(var(--ue) * 178);
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--ue) * 8);
+    padding: calc(var(--ue) * 6) calc(var(--ue) * 12);
+    border-radius: calc(var(--ue) * 42);
+    background: #864728;
+    font-family: var(--sans);
+    white-space: nowrap;
+    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .ex__vpin span {
+    font-weight: 600;
+    font-size: max(calc(var(--ue) * 10), 9px);
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .ex__vpin strong {
+    font-weight: 600;
+    font-size: max(calc(var(--ue) * 14), 12px);
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  /* the deductions card floating beside the line (416:495) */
+  .ex__vcard {
+    position: absolute;
+    left: calc(var(--ue) * 128);
+    width: calc(var(--ue) * 253);
+    padding: calc(var(--ue) * 12);
+    border-radius: calc(var(--ue) * 12.8);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.7),
+      #ffffff
+    );
+    font-family: var(--sans);
+    /* below the marker: card top sits 29u under the marker line, clearing
+       the refund pill's lower half */
+    transform: translateY(calc(var(--ue) * 29));
+    transition:
+      top 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+  }
+
+  /* above the marker: the card's BOTTOM rests 27u above the marker line
+     (~14u above the pill top) — a real gap independent of card height */
+  .ex__vcard.is-above {
+    transform: translateY(calc(-100% - var(--ue) * 27));
+  }
+
+  .ex__vcard-title {
+    display: block;
+    margin-bottom: calc(var(--ue) * 8);
+    font-weight: 600;
+    font-size: max(calc(var(--ue) * 10), 9px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  .ex__vrow {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--ue) * 8);
+    padding: calc(var(--ue) * 4) 0;
+  }
+
+  .ex__vrow-k {
+    flex: none;
+    width: calc(var(--ue) * 67);
+    font-weight: 600;
+    font-size: max(calc(var(--ue) * 9), 8px);
+    letter-spacing: -0.02em;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .ex__vrow-v {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--ue) * 5);
+    font-weight: 500;
+    font-size: max(calc(var(--ue) * 10), 9px);
+    letter-spacing: -0.02em;
+    color: rgba(0, 0, 0, 0.9);
+    white-space: nowrap;
+  }
+
+  .ex__vrow-v i {
+    font-style: normal;
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  .ex__vrow-v--ded {
+    color: #864728;
+  }
+
+  .ex__vrow-v i em {
+    font-style: normal;
+    color: #008247;
+  }
+
+  .ex__vrow-v i s {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .ex__vrule {
+    margin: calc(var(--ue) * 2) 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  /* flanking chips — paid above the track head, pending past its foot */
+  .ex__vchip {
+    position: absolute;
+    left: calc(var(--ue) * 221);
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--ue) * 4);
+    padding: calc(var(--ue) * 10);
+    border-radius: calc(var(--ue) * 12);
+    font-family: var(--sans);
+    z-index: 2;
+  }
+
+  .ex__vchip--paid {
+    top: calc(var(--ue) * 303);
+    background: rgba(165, 103, 80, 0.1);
+  }
+
+  .ex__vchip--pend {
+    top: calc(var(--ue) * 758);
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .ex__vchip-k {
+    font-weight: 600;
+    font-size: max(calc(var(--ue) * 10), 9px);
+    letter-spacing: -0.02em;
+    color: rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+  }
+
+  .ex__vchip-v {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--ue) * 6);
+    font-weight: 500;
+    font-size: max(calc(var(--ue) * 14), 12px);
+    letter-spacing: -0.02em;
+    color: rgba(0, 0, 0, 0.9);
+    white-space: nowrap;
+  }
+
+  .ex__vchip-v i {
+    font-style: normal;
+    font-weight: 600;
+    font-size: max(calc(var(--ue) * 10), 9px);
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  .ex__vchip-v em {
+    font-style: normal;
+    color: #008247;
+  }
+
+  .ex__vchip-v s {
+    font-weight: 400;
+    font-size: max(calc(var(--ue) * 10), 9px);
+    color: rgba(0, 0, 0, 0.4);
   }
 }

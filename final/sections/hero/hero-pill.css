@@ -10,9 +10,9 @@
   width: 100%;
   height: 100vh;
   min-height: 560px;
-  /* the brand cream (329:2547 sheet #F1E2D8 — same family as the exit
-     peach and the footer wash) */
-  background: #f1e2d8;
+  /* the brand cream (329:2549 sheet — 2026-07-18 colour pass: #F2E5D3,
+     a touch more golden than the footer's #F1E2D8) */
+  background: #f2e5d3;
   overflow: hidden;
 }
 
@@ -42,40 +42,59 @@
   will-change: clip-path;
 }
 
-/* the photo never moves — Figma 294:770: (−26,−61) 1859×1045 */
+/* the photo never moves — Figma 329:2548: (−26,−81) 1859×1045 */
 .hp__img {
   position: absolute;
   left: calc(var(--u) * -26);
-  top: calc(var(--u) * -61);
+  top: calc(var(--u) * -81);
   width: calc(var(--u) * 1859);
   height: calc(var(--u) * 1045);
   object-fit: cover;
   display: block;
 }
 
-/* wordmark (294:798) */
+/* wordmark (329:2558) */
 .hp__brand {
+  /* top-left "Flent 11" wordmark hidden for now (per request) — remove
+     this line to restore it */
+  display: none;
   position: absolute;
   z-index: 3;
-  left: calc(var(--u) * 99);
-  top: calc(var(--u) * 45);
+  left: calc(var(--u) * 83);
+  top: calc(var(--u) * 65);
   width: calc(var(--u) * 87.66);
   height: calc(var(--u) * 25.8);
 }
 
-/* headline (294:792) — 64u regular, "worth it" medium italic */
+/* headline (329:2553) — 56u regular, "worth it" medium italic */
 .hp__title {
   position: absolute;
   z-index: 3;
-  left: calc(var(--u) * 99);
+  left: calc(var(--u) * 83);
   top: calc(var(--u) * 717);
   margin: 0;
   font-family: var(--sans);
   font-weight: 400;
-  font-size: calc(var(--u) * 64);
-  line-height: calc(var(--u) * 81);
+  font-size: calc(var(--u) * 56);
+  line-height: normal;
   letter-spacing: -0.04em;
   color: #000;
+}
+
+/* the supporting line, right of the headline (402:1082) */
+.hp__sub {
+  position: absolute;
+  z-index: 3;
+  left: calc(var(--u) * 877);
+  top: calc(var(--u) * 769);
+  width: calc(var(--u) * 552);
+  margin: 0;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  line-height: calc(var(--u) * 30);
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.7);
 }
 
 .hp__title em {
@@ -83,12 +102,12 @@
   font-weight: 500;
 }
 
-/* the CTA pill (294:795) — black, 24u/14u pad, r40 */
+/* the CTA pill (329:2556) — black, top-right of the frame */
 .hp__cta {
   position: absolute;
   z-index: 3;
-  left: calc(var(--u) * 1170);
-  top: calc(var(--u) * 821);
+  left: calc(var(--u) * 1217);
+  top: calc(var(--u) * 51);
   display: flex;
   align-items: center;
   gap: calc(var(--u) * 8);
@@ -98,7 +117,7 @@
   background: #000;
   font-family: var(--sans);
   font-weight: 500;
-  font-size: calc(var(--u) * 24);
+  font-size: calc(var(--u) * 20);
   letter-spacing: -0.02em;
   color: #fff;
   white-space: nowrap;
@@ -114,8 +133,23 @@
   transform: translateX(3px);
 }
 
-/* ---- phone (≤640) — same story, portrait proportions ---------------- */
+/* the mobile slat windows — desktop never shows them */
+.hp__slats {
+  display: none;
+}
+
+/* ---- phone (≤640) — the designed mobile frame (404:251, 402×874):
+   the window is THREE stacked capsule slats over the fixed photo; the
+   copy stacks at the bottom. x rides --ux (1 design px of the 402
+   width), y rides --uy (1 design px of the 874 height, svh so short
+   screens compress instead of overflowing); type stays at design px. */
 @media (max-width: 640px) {
+  .hp {
+    --ux: calc(100vw / 402);
+    --uy: calc(100vh / 874);
+    --uy: calc(100svh / 874);
+  }
+
   .hp__frame {
     left: 0;
     top: 0;
@@ -124,35 +158,84 @@
     height: 100%;
   }
 
-  .hp__img {
-    /* cover the settled capsule (6vw..94vw × 12vh..53vh) with room to
-       spare through every beat */
-    left: -6vw;
-    top: 0;
-    width: 112vw;
-    height: 64vh;
+  /* the single desktop window rests; the slats take over */
+  .hp__clip {
+    display: none;
+  }
+
+  .hp__slats {
+    display: block;
+  }
+
+  .hp__slat {
+    position: absolute;
+    left: calc(var(--ux) * 29);
+    width: calc(var(--ux) * 352);
+    /* capsule ends at any height (CSS clamps the oversize radius) */
+    clip-path: inset(0 round 999px);
+    will-change: clip-path;
+  }
+
+  .hp__slat--0 {
+    top: calc(var(--uy) * 122);
+    height: calc(var(--uy) * 114);
+  }
+
+  .hp__slat--1 {
+    top: calc(var(--uy) * 246);
+    height: calc(var(--uy) * 113);
+  }
+
+  .hp__slat--2 {
+    top: calc(var(--uy) * 369);
+    height: calc(var(--uy) * 114);
+  }
+
+  /* every slat carries the SAME photo at the same artboard placement
+     (404:275 — 941×529 @ (−270,30)), so the three windows read as one
+     scene behind the sheet */
+  .hp__slat img {
+    position: absolute;
+    left: calc(var(--ux) * (-270 - 29));
+    top: calc(var(--uy) * (30 - var(--sy)));
+    width: calc(var(--ux) * 941);
+    height: calc(var(--uy) * 529);
+    max-width: none;
+    object-fit: cover;
+    display: block;
   }
 
   .hp__brand {
-    left: 6vw;
-    top: 22px;
-    width: 76px;
-    height: 22.4px;
+    left: calc(var(--ux) * 29);
+    top: calc(var(--uy) * 54);
+    width: 63.1px;
+    height: 18.6px;
   }
 
+  /* the copy stack (404:283 @ (29,548), gap 20) — text at design px,
+     offsets fixed so the block never stretches with the viewport */
   .hp__title {
-    left: 6vw;
-    top: calc(50vh + 32px);
-    font-size: 34px;
-    line-height: 43px;
-    letter-spacing: -0.035em;
+    left: calc(var(--ux) * 29);
+    top: calc(var(--uy) * 548);
+    font-size: 36px;
+    line-height: normal;
+    letter-spacing: -0.04em;
+  }
+
+  .hp__sub {
+    left: calc(var(--ux) * 29);
+    top: calc(var(--uy) * 548 + 110px);
+    width: min(313px, 84vw);
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: -0.02em;
   }
 
   .hp__cta {
-    left: 6vw;
-    top: calc(50vh + 32px + 86px + 28px);
-    padding: 12px 20px;
-    border-radius: 28px;
-    font-size: 17px;
+    left: calc(var(--ux) * 29);
+    top: calc(var(--uy) * 548 + 190px);
+    padding: 8px 14px;
+    border-radius: 40px;
+    font-size: 14px;
   }
 }

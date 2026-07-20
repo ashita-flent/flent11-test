@@ -129,7 +129,9 @@ export default function Faq() {
     <section className="fq" ref={rootRef}>
       <div className="fq__inner">
         <h2 className="fq__title">
-          Questions you should ask
+          {/* the space before the break matters: phones hide the <br>
+              (see faq.css) and the words must not fuse */}
+          Questions you should ask{" "}
           <br />
           before choosing Flent&nbsp;11.
         </h2>

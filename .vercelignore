@@ -1,0 +1,9 @@
+# Conductor workspace scratch — gitignored globally, so the Vercel CLI
+# doesn't skip it on its own (it only reads the repo .gitignore); without
+# this line deploys upload ~550MB of agent attachments/screenshots
+.context
+
+node_modules
+final/dist
+dist
+*.log

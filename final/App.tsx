@@ -7,7 +7,6 @@ import ExitCalc from "./sections/exit/ExitCalc";
 import Trust from "./sections/trust/Trust";
 import Proof from "./sections/proof/Proof";
 import Faq from "./sections/faq/Faq";
-import Register from "./sections/register/Register";
 import Footer from "./sections/footer/Footer";
 
 /**
@@ -15,8 +14,8 @@ import Footer from "./sections/footer/Footer";
  * time — the keyhole → seasons hero, the scroll-driven "how it works"
  * journey, the exit calculator, then the closing run: trust cards, the
  * lock-in split comparison, the pay-upfront break (click-open detail),
- * social proof, FAQ, and the register CTA + footer. Keep the order here
- * matching the page flow.
+ * social proof, FAQ, and the puzzle footer (which closes with the legal
+ * bar). Keep the order here matching the page flow.
  */
 export default function App() {
   // The tenant's monthly rent — set on the journey's intro slide; every ₹
@@ -27,13 +26,12 @@ export default function App() {
     <main>
       <HeroPill />
       <HowItWorks rent={rent} onRentChange={setRent} />
-      <ExitCalc rent={rent} />
+      <ExitCalc rent={rent} onRentChange={setRent} />
       <Trust />
       <LockinSplit />
       <Upfront rent={rent} />
       <Proof />
       <Faq />
-      <Register />
       <Footer />
     </main>
   );

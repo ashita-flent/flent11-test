@@ -4,7 +4,9 @@ import "./hero-pill.css";
 
 /* ────────────────────────────────────────────────────────────────────────
    Hero — the "11 opens" intro (Figma Page 2 storyboard: Frame 18143615 →
-   18143614 → 18143613 → frame4 / 294:769).
+   18143614 → 18143613 → frame4 / 329:2547, 2026-07-18 layout pass:
+   wordmark+headline on the 83 column, CTA top-right, supporting line
+   right of the headline).
 
    The page opens on the brand's two chamfered bars — the "11". They part
    and grow while a capsule window emerges between them, expands across
@@ -22,7 +24,7 @@ import "./hero-pill.css";
 /* capsule hole per beat, frame coords [top, right-edge→, bottom, left] */
 const PILL_EMERGE = { t: 413, r: 1512 - 993, b: 982 - 569, l: 519 }; // 474×156
 const PILL_WIDE = { t: 309, r: 1512 - 1310, b: 982 - 674, l: 202 }; // 1108×365
-const PILL_SETTLE = { t: 183.41, r: 1512 - 1448.42, b: 982 - 639.84, l: 62.86 };
+const PILL_SETTLE = { t: 173.41, r: 1512 - 1448.56, b: 982 - 629.84, l: 63 }; // 329:2549
 
 /* the bars: 19u wide, chamfer dips 8.15% of height toward the seam */
 const BAR0 = { w: 19, h: 105, y: 438, lx: 725, rx: 768 }; // the "11"
@@ -63,11 +65,10 @@ export default function HeroPill() {
       const vh = window.innerHeight;
       fw = vw;
       fh = vh;
-      const cy = 0.42 * vh; // the show rides a touch above centre
-      emerge = { t: cy - 38, r: vw / 2 - 112, b: vh - (cy + 38), l: vw / 2 - 112 };
-      wide = { t: cy - 0.2 * vw, r: 0.08 * vw, b: vh - (cy + 0.2 * vw), l: 0.08 * vw };
-      // keeps reading as a capsule (not a circle) on a portrait screen
-      settle = { t: 0.13 * vh, r: 0.06 * vw, b: 0.5 * vh, l: 0.06 * vw };
+      // the bars sit on the middle slat's centre (404:257 — slat 2 spans
+      // 246..359 of the 874 frame); the slats do the rest
+      const cy = (302.5 / 874) * vh;
+      emerge = wide = settle = { t: 0, r: 0, b: 0, l: 0 }; // unused on phones
       bar0 = { w: 15, h: 84, y: cy - 42, lx: vw / 2 - 25, rx: vw / 2 + 10 };
       bar1 = { w: 15, h: 118, y: cy - 59, lx: vw / 2 - 158, rx: vw / 2 + 143 };
     }
@@ -87,35 +88,82 @@ export default function HeroPill() {
         clipPath: `inset(${hole.t}px ${hole.r}px ${hole.b}px ${hole.l}px round 9999px)`,
       });
 
+    const R = "round 999px"; // capsule ends, any slat height
+    const slats = [...section.querySelectorAll<HTMLElement>(".hp__slat")];
+    /* every slat starts as a closed centre slit and spreads WIDTHWISE —
+       the same pill-growth as the desktop capsule; the outer pair join
+       while the middle is still opening */
+    const SLAT_CLOSED = `inset(0% 50% 0% 50% ${R})`;
+
     const ctx = gsap.context(() => {
-      gsap.set(q(".hp__brand, .hp__title, .hp__cta"), { autoAlpha: 0, y: 16 });
+      gsap.set(q(".hp__brand, .hp__title, .hp__sub, .hp__cta"), { autoAlpha: 0, y: 16 });
       setBars(bar0);
       gsap.set([barL, barR], { autoAlpha: 0 });
-      paint();
+      if (mobile) {
+        slats.forEach((el) => gsap.set(el, { clipPath: SLAT_CLOSED }));
+      } else {
+        paint();
+      }
 
       if (reduce) {
-        Object.assign(hole, settle);
-        paint();
-        gsap.set(q(".hp__brand, .hp__title, .hp__cta"), { autoAlpha: 1, y: 0 });
+        if (mobile) {
+          slats.forEach((el) => gsap.set(el, { clipPath: `inset(0% ${R})` }));
+        } else {
+          Object.assign(hole, settle);
+          paint();
+        }
+        gsap.set(q(".hp__brand, .hp__title, .hp__sub, .hp__cta"), { autoAlpha: 1, y: 0 });
         gsap.set([barL, barR], { autoAlpha: 0 });
         return;
       }
 
-      /* ONE unbroken motion: the storyboard beats are waypoints inside a
-         single tween — emerge between the bars, take the width, settle —
-         so the capsule never stops growing (a per-beat chain reads
-         frame-by-frame; velocity must never touch zero mid-flight). */
-      const path = gsap.utils.interpolate([{ ...hole }, emerge, wide, settle]);
-      const prog = { p: 0 };
       const tl = gsap.timeline();
       // the 11 reads first...
       tl.to([barL, barR], { autoAlpha: 1, duration: 0.35, ease: "power1.out" }, 0.1);
-      // ...the bars lead apart, and the pill flows through the gap in one
-      // continuous breath — slow out of the logo, fastest mid-expansion,
-      // easing into its final frame
+      // ...the bars lead apart...
       tl.to(barL, { left: bar1.lx, top: bar1.y, width: bar1.w, height: bar1.h, duration: 0.7, ease: "power2.inOut" }, 0.7)
-        .to(barR, { left: bar1.rx, top: bar1.y, width: bar1.w, height: bar1.h, duration: 0.7, ease: "power2.inOut" }, 0.7)
-        .to(
+        .to(barR, { left: bar1.rx, top: bar1.y, width: bar1.w, height: bar1.h, duration: 0.7, ease: "power2.inOut" }, 0.7);
+
+      if (mobile) {
+        /* ...the middle pill flows through the gap and SPREADS — the same
+           widthwise growth as the desktop capsule — and while it's still
+           growing, the pills above and below it appear as centre slits
+           and spread with it, the image surfacing through all three
+           (404:257). Numeric proxies keep the insets symmetric every
+           frame (string-tweened clip-paths drift off-centre once the
+           browser serialises them to shorthand). */
+        const spread = (el: HTMLElement, at: number, dur: number) => {
+          const p = { v: 50 };
+          tl.to(
+            p,
+            {
+              v: 0,
+              duration: dur,
+              ease: "power2.inOut",
+              onUpdate: () =>
+                gsap.set(el, {
+                  clipPath: `inset(0% ${p.v}% 0% ${p.v}% ${R})`,
+                }),
+            },
+            at
+          );
+        };
+        spread(slats[1], 0.75, 1.35);
+        spread(slats[0], 1.05, 1.15);
+        spread(slats[2], 1.15, 1.15);
+        tl.set([barL, barR], { autoAlpha: 0 }, 1.6); // swallowed mid-spread
+        tl.to(q(".hp__brand"), { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.1)
+          .to(q(".hp__title"), { autoAlpha: 1, y: 0, duration: 0.6, ease: "power2.out" }, 2.25)
+          .to(q(".hp__sub"), { autoAlpha: 1, y: 0, duration: 0.6, ease: "power2.out" }, 2.35)
+          .to(q(".hp__cta"), { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.5);
+      } else {
+        /* ONE unbroken motion: the storyboard beats are waypoints inside a
+           single tween — emerge between the bars, take the width, settle —
+           so the capsule never stops growing (a per-beat chain reads
+           frame-by-frame; velocity must never touch zero mid-flight). */
+        const path = gsap.utils.interpolate([{ ...hole }, emerge, wide, settle]);
+        const prog = { p: 0 };
+        tl.to(
           prog,
           {
             p: 1,
@@ -128,11 +176,13 @@ export default function HeroPill() {
           },
           0.75
         );
-      tl.set([barL, barR], { autoAlpha: 0 }, 2.4); // long swallowed by now
-      // the frame furnishes itself while the capsule is still landing
-      tl.to(q(".hp__brand"), { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.55)
-        .to(q(".hp__title"), { autoAlpha: 1, y: 0, duration: 0.6, ease: "power2.out" }, 2.7)
-        .to(q(".hp__cta"), { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.9);
+        tl.set([barL, barR], { autoAlpha: 0 }, 2.4); // long swallowed by now
+        // the frame furnishes itself while the capsule is still landing
+        tl.to(q(".hp__brand"), { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.55)
+          .to(q(".hp__title"), { autoAlpha: 1, y: 0, duration: 0.6, ease: "power2.out" }, 2.7)
+          .to(q(".hp__sub"), { autoAlpha: 1, y: 0, duration: 0.6, ease: "power2.out" }, 2.8)
+          .to(q(".hp__cta"), { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.9);
+      }
     }, sectionRef);
 
     return () => ctx.revert();
@@ -162,6 +212,19 @@ export default function HeroPill() {
           />
         </div>
 
+        {/* phone: three capsule slats onto the same fixed scene (404:257) */}
+        <div className="hp__slats" aria-hidden>
+          {[122, 246, 369].map((sy, i) => (
+            <div
+              key={sy}
+              className={`hp__slat hp__slat--${i}`}
+              style={{ "--sy": sy } as React.CSSProperties}
+            >
+              <img src="/hero-room.jpg" alt="" />
+            </div>
+          ))}
+        </div>
+
         <img className="hp__brand" src="/hero-flent11.svg" alt="flent 11" />
 
         <h1 className="hp__title">
@@ -169,6 +232,11 @@ export default function HeroPill() {
           <br />
           finally made <em>worth it</em>
         </h1>
+        <p className="hp__sub">
+          Flent 11 turns a standard 11-month lock-in into a better rental
+          plan — with savings, monthly flexibility, and better terms around
+          early exits.
+        </p>
         <button type="button" className="hp__cta" onClick={goRegister}>
           Check Eligibility <span aria-hidden>→</span>
         </button>

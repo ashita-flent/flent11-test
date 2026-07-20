@@ -1,154 +1,220 @@
 /* ============================================================
    Section · Proof — "Flent 11 is new. Living with Flent is
-   not." Editorial stat blocks under dark top rules, then a
-   three-column wall of tweet placeholders (dashed frames with
-   the classic X) waiting on the real screenshots.
+   not." Centred copy + editorial stat blocks hold a sticky
+   screen; the tweet placeholders (dashed frames with the
+   classic X) are scattered with light tilts and drift up OVER
+   the copy at per-card speeds through the scroll runway.
    ============================================================ */
 
 .pr {
   --u: min(calc(100vw / 1512), calc(100vh / 982));
 
+  position: relative;
   width: 100%;
-  background: var(--bg);
-  padding: clamp(84px, 13vh, 160px) 0 clamp(96px, 14vh, 170px);
+  height: 300vh; /* the runway the drift is scrubbed across */
+  /* matches the pin's gradient tail so no seam shows at the handoff */
+  background: #eedcd0;
+}
+
+/* the held screen — the slide's warm ground (Figma 398:684) */
+.pr__pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #ffffff 0%, #eedcd0 100%);
 }
 
 /* same content column as the exit frame — 1320u centred */
 .pr__inner {
   width: calc(var(--u) * 1320);
-  margin: 0 auto;
 }
 
-/* ---- heading -------------------------------------------------------- */
+/* ---- heading (Figma 398:780) ----------------------------------------- */
 .pr__head {
-  margin-bottom: clamp(48px, 7vw, 84px);
+  margin-bottom: clamp(48px, 5.3vw, 80px);
+  text-align: center;
 }
 
-.pr__eyebrow {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 18px;
+/* the flent pill (398:813 — 102.4×42.5). The exported svg carries
+   percentage dimensions (no intrinsic size), so the box is pinned by
+   width + aspect-ratio or it stretches. */
+.pr__brand {
+  display: block;
+  width: clamp(84px, 6.8vw, 102px);
+  height: auto;
+  aspect-ratio: 102.4 / 42.533;
+  margin: 0 auto clamp(20px, 2.1vw, 32px);
 }
 
+/* 56u Regular, the opening line softened (398:781) */
 .pr__title {
   font-family: var(--sans);
-  font-weight: 500;
-  font-size: clamp(2rem, 4.6vw, 3.4rem);
-  line-height: 1.06;
-  letter-spacing: -0.035em;
+  font-weight: 400;
+  font-size: clamp(2rem, 3.7vw, 3.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
   color: var(--ink);
 }
 
-.pr__sub {
-  margin-top: 20px;
-  max-width: 54ch;
-  font-family: var(--sans);
-  font-size: clamp(1rem, 1.4vw, 1.18rem);
-  line-height: 1.5;
-  color: var(--ink-soft);
+.pr__title-soft {
+  color: rgba(0, 0, 0, 0.6);
 }
 
-/* ---- stats ----------------------------------------------------------- */
+/* 19u Medium on a 780 column (398:782) — the scatter is MEANT to lap
+   over its ends a little */
+.pr__sub {
+  margin: clamp(20px, 2.1vw, 32px) auto 0;
+  max-width: 780px;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(1rem, 1.26vw, 1.19rem);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* ---- stats (Figma 398:796) ------------------------------------------- */
+/* four columns on a 46u gap; each figure is a 56u Regular run wearing
+   the design's soft ink→bronze gradient (both stops at 80% alpha),
+   unit words stepping down to 36u inside the same wash */
 .pr__stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(24px, 4vw, 48px);
-  margin-bottom: clamp(56px, 8vw, 96px);
+  grid-template-columns: repeat(4, auto);
+  justify-content: center;
+  gap: clamp(28px, 3vw, 46px);
+  width: fit-content;
+  margin: 0 auto;
 }
 
-/* each stat opens with a strong editorial rule — the Ramp move */
 .pr__stat {
-  border-top: 1.5px solid var(--ink);
-  padding-top: 20px;
+  text-align: center;
 }
 
 .pr__stat-value {
   font-family: var(--sans);
-  font-weight: 500;
-  font-size: clamp(1.9rem, 3.2vw, 2.7rem);
-  letter-spacing: -0.03em;
-  color: var(--ink);
+  font-weight: 400;
+  font-size: clamp(2.1rem, 3.7vw, 3.5rem);
+  letter-spacing: -0.04em;
+  line-height: 1.12;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.8),
+    rgba(178, 96, 37, 0.8)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* "stars" / "months" — the 36u run (398:788 / 398:791) */
+.pr__stat-unit {
+  font-size: 0.643em;
+  font-weight: 500;
 }
 
 .pr__stat-label {
-  margin-top: 8px;
+  margin: 8px auto 0;
   font-family: var(--sans);
-  font-size: clamp(0.9rem, 1.1vw, 1rem);
-  line-height: 1.4;
-  color: var(--ink-soft);
+  font-weight: 500;
+  font-size: clamp(0.95rem, 1.26vw, 1.19rem);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.7);
 }
 
-/* ---- tweet wall ------------------------------------------------------- */
-.pr__wall {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  align-items: start;
+/* ---- the tweet scatter ------------------------------------------------ */
+/* full-viewport layer riding over the copy; cards are anchored by
+   inline left/top/rotate and swept vertically by the scrub */
+.pr__float {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.pr__col {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* the middle column hangs lower — the wall reads as a loose collage */
-.pr__col:nth-child(2) {
-  margin-top: 56px;
-}
-
-/* placeholder frame: dashed hairline + the drafting X, label centred */
+/* a tweet card: the screenshot on a white face (the images carry their
+   own inner padding), clipped to the design's 20u radius under its
+   soft wide throw (Figma 398:799…) */
 .pr__tweet {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed rgba(26, 23, 20, 0.22);
-  border-radius: 12px;
-  background-image: linear-gradient(
-      to top right,
-      transparent calc(50% - 0.5px),
-      var(--box-line) calc(50% - 0.5px),
-      var(--box-line) calc(50% + 0.5px),
-      transparent calc(50% + 0.5px)
-    ),
-    linear-gradient(
-      to bottom right,
-      transparent calc(50% - 0.5px),
-      var(--box-line) calc(50% - 0.5px),
-      var(--box-line) calc(50% + 0.5px),
-      transparent calc(50% + 0.5px)
-    );
+  position: absolute;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.15);
+  will-change: transform;
 }
 
-.pr__tweet span {
-  padding: 4px 10px;
-  background: var(--bg);
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(26, 23, 20, 0.35);
+.pr__tweet img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* ---- small screens ---------------------------------------------------- */
+/* the phone KEEPS the desktop grammar (Figma 422:1261 "iPhone 17 - 12" /
+   "iPhone 17 - 13"): the stats screen pins — pill, title, sub and the
+   four stats restacked as one centred column — while the tweets, now
+   edge-hugging zig-zag cards, drift up over it through the same runway.
+   Only the geometry changes; the pin/scrub wiring is shared. */
 @media (max-width: 860px) {
+  /* the 402-frame's 23px side margins */
+  .pr__inner {
+    width: calc(100vw - 46px);
+  }
+
+  /* head→stats gap 40 (422:1443) */
+  .pr__head {
+    margin-bottom: 40px;
+  }
+
+  /* pill 65.5×27.2, then 24 down to the title */
+  .pr__brand {
+    width: 65.5px;
+    margin-bottom: 24px;
+  }
+
+  /* 32px/1.12 on the 402 frame — clamped so tablets don't balloon */
+  .pr__title {
+    font-size: clamp(26px, 7.96vw, 34px);
+  }
+
+  /* 14px Medium on a 298 column (422:1453) */
+  .pr__sub {
+    margin-top: 24px;
+    max-width: 298px;
+    font-size: clamp(13px, 3.48vw, 15px);
+  }
+
+  /* one centred column, 24 between blocks (422:1454) */
   .pr__stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .pr__wall {
     grid-template-columns: 1fr;
+    width: 100%;
+    gap: 24px;
   }
 
-  .pr__col:nth-child(2) {
-    margin-top: 0;
+  .pr__stat-value {
+    font-size: clamp(26px, 7.96vw, 34px);
+  }
+
+  /* the unit words hold the full figure size on the phone (422:1462) */
+  .pr__stat-unit {
+    font-size: 1em;
+  }
+
+  .pr__stat-label {
+    margin-top: 4px;
+    font-size: clamp(13px, 3.48vw, 15px);
+  }
+
+  /* the cards read smaller here — tighter radius, softer throw */
+  .pr__tweet {
+    border-radius: 14px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
   }
 }
