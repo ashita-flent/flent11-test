@@ -1288,8 +1288,8 @@
   background: none;
   border: 0;
   color: rgba(255, 255, 255, 0.9);
-  cursor: pointer;
-  pointer-events: auto;
+  /* purely decorative — NOT interactive; you keep scrolling on into the exit */
+  pointer-events: none;
   /* rides ABOVE the window rig — the chevrons rest ON the frosted pane */
   z-index: 5;
 }
@@ -1301,13 +1301,6 @@
      bob read as a jump against a right-pointing chevron) */
   animation: how-chev-nudge 2.4s ease-in-out infinite;
   transition: color 0.25s ease;
-}
-
-/* clear invitation on hover — brighten and lean into the direction */
-.how__scroll-on:hover svg,
-.how__scroll-on:focus-visible svg {
-  color: #fff;
-  animation-play-state: paused;
 }
 
 @keyframes how-chev-nudge {
@@ -2480,6 +2473,12 @@
     /* the window's mobile unit — the intro home is 279.02 wide of the
        402 frame (405:321 — scale 0.5471 of the 510 window) */
     --uwin: calc(100vw / 402 * 0.54714);
+    /* nav clearance: the floating pills own the top ~76px of the frame
+       (34px .nav__inner pad + ~42px tallest pill) on TOP of the phone's
+       safe area. Every beat whose crown sticks at the top adds this so
+       the title copy never slips under the bar. The stack-solver reads
+       each copy's live foot, so the diagram rows below cascade down too. */
+    --how-crown-pad: calc(env(safe-area-inset-top, 0px) + 42px);
   }
 
   .how__frame {
@@ -2527,10 +2526,12 @@
     top: 10vh;
   }
 
-  /* move-in opens on the SAME crown line as the financing beats (84my)
-     — one consistent top across every journey piece */
+  /* move-in can't take the full crown-pad: its ₹0 window sits at a fixed
+     222my and doesn't cascade, so a big shove buries the body under the
+     card. A smaller lift clears the base-rent chip off the nav while the
+     body still clears the window (measured slack ≈ 19px). */
   .how__copy--movein {
-    top: calc(var(--my) * 84);
+    top: calc(var(--my) * 84 + 16px);
   }
 
   /* the base-rent chip at the phone spec (406:459 — 14 SemiBold on a
@@ -3077,8 +3078,9 @@
   .how__copy--mon {
     left: calc(var(--mx) * 29);
     /* pulled up from the designed 112 — the empty crown above the copy
-       becomes spacing BETWEEN the flow's pieces instead */
-    top: calc(var(--my) * 84);
+       becomes spacing BETWEEN the flow's pieces instead; +crown-pad keeps
+       the headline clear of the floating nav */
+    top: calc(var(--my) * 84 + var(--how-crown-pad));
   }
 
   .how__title--fin3,

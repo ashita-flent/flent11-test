@@ -884,17 +884,21 @@
        shortened viewports the last sliver simply scrolls. */
     --ue: calc(100vw / 402);
     --u: var(--ue);
-    /* the math page's contain-fit unit: width-fit normally, shrinking
-       with the viewport height so the whole calculator (874-canvas)
-       always lands in one frame */
-    --um: min(calc(100vw / 402), calc(100svh / 874));
+    /* the fixed nav's clearance — the whole frame is pushed down by this
+       so the story head and the math page's Back/title never hide behind
+       it (the math page also sizes its height to sit fully below it) */
+    --nav-safe: 56px;
     height: auto;
     min-height: 100dvh;
     background: transparent;
   }
 
   /* the frame wraps the story's flow height (one steps-screen + the
-     safety cards past the fold); the math page overlays it */
+     safety cards past the fold); the math page overlays it. It's pushed
+     down by the fixed nav's height (~92) + a gap so neither the story head
+     nor the math page's Back/title hide behind the nav when parked. The
+     whole frame shifts as a unit, so the thread, timeline and math stay
+     aligned. */
   .ex__frame {
     position: relative;
     left: auto;
@@ -903,7 +907,7 @@
     width: calc(var(--ue) * 402);
     height: auto;
     min-height: 100svh;
-    margin: 0 auto;
+    margin: var(--nav-safe) auto 0;
   }
 
   /* ── the story (413:794, 2026-07-20 layout): head + the See-math pill
@@ -1089,17 +1093,17 @@
     height: calc(var(--ue) * 11.8);
   }
 
-  /* the way in sits right under the copy (413:1014 @ (40,226)) — the
-     arrow points the way the page will slide */
+  /* the way in — a HUG-CONTENTS pill under the copy (413:1014 @ (40,226),
+     w151, px12 py8, 14px); arrow points the way the page will slide */
   .ex__mathcta {
     left: calc(var(--ue) * 40);
     top: calc(var(--ue) * 226);
-    height: calc(var(--ue) * 27);
-    padding: 0 calc(var(--ue) * 10);
+    height: auto;
+    padding: calc(var(--ue) * 8) calc(var(--ue) * 12);
     gap: calc(var(--ue) * 6);
     border-radius: calc(var(--ue) * 52);
     background: #864728;
-    font-size: max(calc(var(--ue) * 12), 11px);
+    font-size: max(calc(var(--ue) * 14), 12px);
   }
 
   .ex__mathcta:hover {
@@ -1107,13 +1111,15 @@
   }
 
   .ex__mathcta-arrow {
-    width: calc(var(--ue) * 12);
-    height: calc(var(--ue) * 9.7);
+    width: calc(var(--ue) * 14);
+    height: calc(var(--ue) * 11.3);
   }
 
-  /* ══ the calculator (416:242) — a NESTED PAGE: it pushes in from the
-     right (the base horizontal swipe), sized by --um so the whole
-     874-canvas lands inside one viewport, and draws its own thread ══ */
+  /* ══ the calculator (416:242) — a NESTED PAGE that pushes in from the
+     right (the base horizontal swipe). It's WIDTH-FIT like every other
+     phone section (full width, real type — no letterbox squeeze); the
+     vertical timeline is spread by --vtop/--vpitch (set in JS) to fill the
+     viewport below the nav ══ */
 
   /* the story's line steps aside while the math page is up */
   .exit:has(.ex__math.is-on) .ex__thread {
@@ -1121,27 +1127,25 @@
   }
 
   .ex__math {
-    --ue: var(--um);
-    --u: var(--um);
-    left: 50%;
+    left: 0;
     right: auto;
     top: 0;
     bottom: auto;
-    width: calc(var(--um) * 402);
-    margin-left: calc(var(--um) * -201);
-    height: 100svh;
+    width: 100vw;
+    margin-left: 0;
+    /* sit fully below the nav and fill to the viewport foot */
+    height: calc(100dvh - var(--nav-safe));
   }
 
   /* the math page's own thread — Vector 13 (416:246): a FIXED line, not a
-     gradient. x114, top 265, height 473 (the track's slot 0 → slot 11), a
-     flat black@0.2. It starts well below the head, so it never strikes the
-     title / rent rows — no fade needed. */
+     gradient, at x114. It runs the fluid timeline's height (tick 0 → tick
+     11), starting under the head so it never strikes the title / rent. */
   .ex__math::before {
     content: "";
     position: absolute;
-    left: calc(var(--um) * 114);
-    top: calc(var(--um) * 265);
-    height: calc(var(--um) * 473);
+    left: calc(var(--ue) * 114);
+    top: var(--vtop);
+    height: calc(var(--vpitch) * 11);
     width: 1px;
     margin-left: -0.5px;
     background: rgba(0, 0, 0, 0.2);
@@ -1287,14 +1291,16 @@
     color: #008247;
   }
 
-  /* the touch band riding the line — labels + line + bob zone.
-     top = vY(1) − VPITCH/2 = 308 − 21.5 (mirrors VBAND_TOP in the TSX) */
+  /* the touch band riding the line — labels + line + bob zone. It spans
+     tick 0.5 → tick 11.5 (half a pitch beyond the first/last month), which
+     the JS drag mapping reads rect-relative so it stays correct at any
+     pitch. */
   .ex__vband {
     position: absolute;
     left: 0;
-    top: calc(var(--ue) * 286.5);
+    top: calc(var(--vtop) + var(--vpitch) * 0.5);
     width: calc(var(--ue) * 200);
-    height: calc(var(--ue) * 473);
+    height: calc(var(--vpitch) * 11);
     z-index: 1;
     cursor: grab;
     touch-action: none;
@@ -1477,13 +1483,15 @@
     z-index: 2;
   }
 
+  /* the flanking stat cards ride the fluid timeline too — paid at its
+     head, pending down near Month 10 */
   .ex__vchip--paid {
-    top: calc(var(--ue) * 259);
+    top: var(--vtop);
     background: rgba(165, 103, 80, 0.1);
   }
 
   .ex__vchip--pend {
-    top: calc(var(--ue) * 688);
+    top: calc(var(--vtop) + var(--vpitch) * 9.3);
     background: rgba(0, 0, 0, 0.05);
   }
 

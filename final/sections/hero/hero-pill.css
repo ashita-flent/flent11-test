@@ -108,7 +108,9 @@
   z-index: 3;
   left: calc(var(--u) * 1217);
   top: calc(var(--u) * 51);
-  display: flex;
+  /* superseded by the floating global Nav (same top-right pill) — hidden so
+     the two don't stack. Restore to `flex` to bring back the hero's own CTA. */
+  display: none;
   align-items: center;
   gap: calc(var(--u) * 8);
   padding: calc(var(--u) * 14) calc(var(--u) * 24);

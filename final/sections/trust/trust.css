@@ -562,7 +562,12 @@
   font-family: var(--sans);
   font-weight: 600;
   font-size: calc(var(--tc) * 10);
-  line-height: calc(var(--tc) * 14);
+  /* unitless so the two lines keep their gap even where the phone floors
+     the font at 9px — the old absolute calc(--tc * 14) shrank BELOW the
+     floored font and crammed "GAVE NOTICE ON" onto "MONTH 6". 1.5 (a hair
+     over the design's 1.4) gives the two-line uppercase caption
+     comfortable air on desktop too. */
+  line-height: 1.5;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-align: center;

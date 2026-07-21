@@ -206,7 +206,7 @@ export default function HeroPill() {
         <div className="hp__clip" ref={clipRef}>
           <img
             className="hp__img"
-            src="/hero-room.jpg"
+            src="/hero-room.jpg?v=2"
             alt="A flent home — staircase, gallery wall, someone at ease"
             fetchPriority="high"
           />
@@ -220,7 +220,7 @@ export default function HeroPill() {
               className={`hp__slat hp__slat--${i}`}
               style={{ "--sy": sy } as React.CSSProperties}
             >
-              <img src="/hero-room.jpg" alt="" />
+              <img src="/hero-room.jpg?v=2" alt="" />
             </div>
           ))}
         </div>

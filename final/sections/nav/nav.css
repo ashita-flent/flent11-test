@@ -1,0 +1,258 @@
+/* ============================================================
+   Nav — fixed over every section, wearing a light or dark skin per
+   the ground scrolling under it. TWO glassy floating pills — a logo
+   capsule and a CTA capsule ("Talk to us" + the "Check Eligibility →"
+   pill) — on BOTH desktop and mobile (Figma 498:988), sized per
+   breakpoint. On mobile they float over a camera-dock fade that
+   dissolves scrolled content under the notch.
+   Light = white glass; dark = the colours flipped.
+   ============================================================ */
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  /* the sections' shared contain-fit frame — the pills align their outer edges
+     to the sections' content column off this unit (see .nav__inner) */
+  --u: min(calc(100vw / 1512), calc(100vh / 982));
+  /* reach up into the phone's top safe area (notch / camera dock) so the dock
+     fade covers that strip; the pills' own top padding lives on .nav__inner,
+     so the two never double up. 0 on desktop ⇒ no effect there. Needs
+     viewport-fit=cover on the meta (set). */
+  padding-top: env(safe-area-inset-top, 0px);
+  box-sizing: border-box;
+  color: var(--nav-ink);
+  /* pointer-events:none so the empty band between the pills doesn't eat clicks
+     — the logo + CTA capsules re-enable them. */
+  pointer-events: none;
+  transition: color 0.4s ease;
+}
+
+/* ---- skins (light/dark design tokens) ---------------------------------- */
+.nav--light {
+  --nav-ink: #222; /* logo + "Talk to us" ink */
+  --nav-sec-text: #222; /* colour/text/body/900 */
+  --nav-pri-bg: #000;
+  --nav-pri-text: #fff;
+  --nav-pri-bg-hover: #1f1f1f;
+  --nav-glass: rgba(255, 255, 255, 0.3); /* floating-pill glass (498:988) */
+  --dock-scrim: rgba(255, 255, 255, 0.72); /* camera-dock fade */
+}
+
+.nav--dark {
+  --nav-ink: #eee; /* colour/text/headings/100 */
+  --nav-sec-text: #eee; /* colour/text/body/100 */
+  --nav-pri-bg: #eee; /* colour/text/headings/100 */
+  --nav-pri-text: #222; /* colour/text/headings/900 */
+  --nav-pri-bg-hover: #fff;
+  --nav-glass: rgba(0, 0, 0, 0.28); /* flipped: dark glass */
+  --dock-scrim: rgba(18, 16, 14, 0.72);
+}
+
+/* ---- the two floating pills -------------------------------------------- */
+.nav__inner {
+  position: relative;
+  z-index: 1;
+  /* align the pills' OUTER edges to the sections' content column: the shared
+     1512×982 frame inset 94u (matches faq / proof / exit / journey) — so the
+     logo pill's left edge and the CTA pill's right edge sit on the margins */
+  padding: 20px calc((100vw - var(--u) * 1512) / 2 + var(--u) * 94);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nav__logo,
+.nav__ctas {
+  pointer-events: auto;
+}
+
+/* the logo capsule — glass around the wordmark */
+.nav__logo {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 20px;
+  border: 0;
+  border-radius: 100px;
+  background: var(--nav-glass);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  cursor: pointer;
+  transition:
+    background-color 0.4s ease,
+    transform 0.2s ease;
+}
+
+/* the flent wordmark itself, recoloured to the skin's ink via a mask */
+.nav__logo-mark {
+  display: block;
+  width: 87.66px;
+  aspect-ratio: 87.6556 / 25.8048;
+  background-color: var(--nav-ink);
+  -webkit-mask: url(/nav-flent.svg) center / contain no-repeat;
+  mask: url(/nav-flent.svg) center / contain no-repeat;
+  transition: background-color 0.4s ease;
+}
+
+@media (hover: hover) {
+  .nav__logo:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.nav__logo:focus-visible {
+  outline: 2px solid var(--nav-ink);
+  outline-offset: 4px;
+  border-radius: 100px;
+}
+
+/* the CTA capsule — "Talk to us" + the "Check Eligibility" pill in one glass
+   capsule; row-reverse ⇒ Talk left, Check right (DOM stays primary-first) */
+.nav__ctas {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 14px;
+  padding: 6px 6px 6px 20px;
+  border-radius: 100px;
+  background: var(--nav-glass);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.nav__cta {
+  font-family: var(--sans, "Plus Jakarta Sans", sans-serif);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: normal;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  border: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease,
+    transform 0.2s ease;
+}
+
+/* primary: the solid "Check Eligibility" pill nested in the capsule */
+.nav__cta--primary {
+  padding: 11px 16px;
+  border-radius: 100px;
+  background: var(--nav-pri-bg);
+  color: var(--nav-pri-text);
+}
+
+.nav__cta--primary span {
+  margin-left: 2px;
+}
+
+/* secondary: plain "Talk to us" text */
+.nav__cta--secondary {
+  padding: 0;
+  background: transparent;
+  color: var(--nav-sec-text);
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .nav__cta--primary:hover {
+    background: var(--nav-pri-bg-hover);
+    transform: translateY(-1px);
+  }
+  .nav__cta--secondary:hover {
+    opacity: 0.65;
+  }
+}
+
+.nav__cta--primary:active {
+  transform: translateY(0);
+}
+
+.nav__cta:focus-visible {
+  outline: 2px solid var(--nav-ink);
+  outline-offset: 3px;
+  border-radius: 100px;
+}
+
+/* the camera-dock fade lives only on mobile (see the media query) */
+.nav__dock {
+  display: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   Mobile (≤640px) — smaller pills + the camera-dock fade (Figma 498:988).
+   ════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .nav__dock {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* the phone's status-bar / notch strip, plus a fade tail below it */
+    height: calc(env(safe-area-inset-top, 0px) + 60px);
+    background: var(--dock-scrim);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 28%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 28%, transparent 100%);
+    pointer-events: none;
+    z-index: 0; /* behind the pills (.nav__inner z1), above the page content */
+    transition: background-color 0.4s ease;
+  }
+
+  .nav__inner {
+    /* 34 clears the dock (498:1045); sides match the phone sections' 24u gutter */
+    padding: 34px calc(100vw * 24 / 402) 0;
+    gap: 12px;
+  }
+
+  .nav__logo {
+    padding: 10px 14px;
+    border-radius: 30px;
+  }
+
+  .nav__logo-mark {
+    width: 50.489px;
+  }
+
+  .nav__ctas {
+    gap: 10px;
+    padding: 4px 4px 4px 14px;
+    border-radius: 40px;
+  }
+
+  .nav__cta {
+    font-size: 14px;
+  }
+
+  .nav__cta--primary {
+    padding: 8px 10px;
+  }
+}
+
+/* very small phones */
+@media (max-width: 380px) {
+  .nav__inner {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .nav__cta {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav,
+  .nav__logo,
+  .nav__ctas,
+  .nav__cta {
+    transition: none;
+  }
+}

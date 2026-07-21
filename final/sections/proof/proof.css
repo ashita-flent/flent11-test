@@ -218,3 +218,15 @@
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
   }
 }
+
+/* the pinned stats screen centres its column; at phone widths (the floating
+   nav regime) the flent pill + title dipped up under the bar. Reserve the
+   nav's band at the top and, if the column ever outgrows the viewport, anchor
+   it there rather than lifting it up under the pills. */
+@media (max-width: 640px) {
+  .pr__pin {
+    box-sizing: border-box;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 88px);
+    align-items: safe center;
+  }
+}

@@ -541,12 +541,6 @@ export default function HowItWorks({
       behavior: "smooth",
     });
   };
-  // the completion's chevrons walk you past the runway — the exit covers there
-  const goToExit = () => {
-    const st = mainSTRef.current;
-    if (!st) return;
-    window.scrollTo({ top: st.end, behavior: "smooth" });
-  };
   // clicking a progress dot jumps to that step's settled frame. The START
   // dot (no step maps to it) rewinds to the pinned intro; every other dot
   // goes to the FIRST step that lights it (its settled beat = 0.9 + step).
@@ -799,6 +793,21 @@ export default function HowItWorks({
 
       const anchors: number[] = [];
 
+      // the frame we last settled on (index into snapPoints). On phones the
+      // snap is clamped to ±1 of this, so a fast fling can't blow past the
+      // steps — one swipe advances one frame and momentum overshoot is
+      // reeled back to the very next step (the story is read in order).
+      let settledIdx = 0;
+      const nearestIdx = (value: number) => {
+        let best = 0;
+        for (let i = 1; i < snapPoints.length; i++)
+          if (
+            Math.abs(snapPoints[i] - value) < Math.abs(snapPoints[best] - value)
+          )
+            best = i;
+        return best;
+      };
+
       const tl = gsap.timeline({
         defaults: { ease: "power2.inOut" },
         scrollTrigger: {
@@ -809,20 +818,43 @@ export default function HowItWorks({
           pin: true,
           anticipatePin: 1,
           // landing break at each step's settled frame. inertia off so a
-          // fast fling still rests at the nearest step instead of skipping
-          // ahead — the user is meant to stop at every frame.
+          // fast fling still rests at a step instead of coasting ahead —
+          // the user is meant to stop at every frame.
           snap: {
             snapTo: (value: number) => {
               if (!snapPoints.length) return value;
-              let best = snapPoints[0];
-              for (const p of snapPoints)
-                if (Math.abs(p - value) < Math.abs(best - value)) best = p;
-              return best;
+              if (mobileLayout) {
+                // ── FRAME-BY-FRAME (daylightcomputer-style) ──
+                // Any deliberate scroll commits to the ADJACENT frame in
+                // that direction — one swipe = one frame. It never snaps
+                // back to where it came from (the old "nearest" rule did
+                // that whenever a swipe fell short of the next frame's
+                // midpoint), and a long fling still only advances one
+                // frame. A tiny deadzone keeps a resting settle from
+                // drifting off its frame.
+                const cur = snapPoints[settledIdx];
+                const eps = 0.01;
+                if (value > cur + eps)
+                  return snapPoints[
+                    Math.min(settledIdx + 1, snapPoints.length - 1)
+                  ];
+                if (value < cur - eps)
+                  return snapPoints[Math.max(settledIdx - 1, 0)];
+                return cur;
+              }
+              return snapPoints[nearestIdx(value)];
             },
             inertia: false,
-            duration: { min: 0.25, max: 0.7 },
-            delay: 0.1,
+            // a firm, consistent settle so each frame lands cleanly
+            duration: mobileLayout
+              ? { min: 0.3, max: 0.7 }
+              : { min: 0.25, max: 0.7 },
+            delay: mobileLayout ? 0.08 : 0.1,
             ease: "power2.out",
+            onComplete: () => {
+              const st = mainSTRef.current;
+              if (st) settledIdx = nearestIdx(st.progress);
+            },
           },
         },
       });
@@ -1571,14 +1603,10 @@ export default function HowItWorks({
                     <h3 className="how__title">{step.title}</h3>
                     <p className="how__body">{step.body}</p>
                   </div>
-                  <button
-                    type="button"
-                    className="how__scroll-on"
-                    onClick={goToExit}
-                    aria-label="Continue to the exit terms"
-                  >
-                    {/* chevrons-right (329:2661) — onward, resting in the
-                        frosted exit pane */}
+                  {/* chevrons-right (329:2661) — a DECORATIVE "onward" hint
+                      resting in the frosted exit pane; not clickable, you
+                      simply keep scrolling on into the exit terms */}
+                  <div className="how__scroll-on" aria-hidden>
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
@@ -1586,12 +1614,11 @@ export default function HowItWorks({
                       strokeWidth="1.6"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      aria-hidden
                     >
                       <path d="M6 17l5-5-5-5" />
                       <path d="M13 17l5-5-5-5" />
                     </svg>
-                  </button>
+                  </div>
                 </>
               )}
             </div>

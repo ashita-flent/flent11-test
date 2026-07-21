@@ -8,6 +8,7 @@ import Trust from "./sections/trust/Trust";
 import Proof from "./sections/proof/Proof";
 import Faq from "./sections/faq/Faq";
 import Footer from "./sections/footer/Footer";
+import Nav from "./sections/nav/Nav";
 
 /**
  * The final Flent site. Sections stack top-to-bottom and are added one at a
@@ -23,18 +24,21 @@ export default function App() {
   const [rent, setRent] = useState(45_000);
 
   return (
-    <main>
-      <HeroPill />
-      <HowItWorks rent={rent} onRentChange={setRent} />
-      <div className="exit-trust-wash">
-        <ExitCalc rent={rent} onRentChange={setRent} />
-        <Trust />
-      </div>
-      <LockinCards />
-      <Upfront rent={rent} />
-      <Faq />
-      <Proof />
-      <Footer />
-    </main>
+    <>
+      <Nav />
+      <main>
+        <HeroPill />
+        <HowItWorks rent={rent} onRentChange={setRent} />
+        <div className="exit-trust-wash">
+          <ExitCalc rent={rent} onRentChange={setRent} />
+          <Trust />
+        </div>
+        <LockinCards />
+        <Upfront rent={rent} />
+        <Faq />
+        <Proof />
+        <Footer />
+      </main>
+    </>
   );
 }

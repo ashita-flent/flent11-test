@@ -50,11 +50,13 @@ const DOT0 = TICK0 - BAR_L;
    the track waist and the CTA's centre all sit on it */
 
 /* ── the phone's VERTICAL slider (Figma 416:242) — the thread itself is
-   the track: month m's tick crosses it at y = 265 + 43m (slot 0 is the
-   track head at the fixed line's top), the marker rides it as a stem →
-   bob → refund pill row ── */
+   the track: month m's tick crosses it at y = 265 + 48m (slot 0 is the
+   track head at the fixed line's top). The frame draws this at a 43 pitch,
+   but real phones leave dead space under Month 11, so the pitch is opened
+   to 48 to spread the timeline down into it. The marker rides the line as a
+   stem → bob → refund pill row ── */
 const V0 = 265;
-const VPITCH = 43;
+const VPITCH = 48;
 const vY = (m: number) => V0 + VPITCH * m;
 /* the touch band spans month 1..11 tick centres ± half a pitch */
 const VBAND_TOP = vY(1) - VPITCH / 2;
@@ -160,6 +162,13 @@ const PLEDGES = [
 ];
 
 const u = (n: number) => `calc(var(--u) * ${n})`;
+/* the phone math page's vertical axis is FLUID: JS measures the space
+   under the header and sets --vtop (where tick 0 sits) + --vpitch (the
+   per-month gap) so the 11-month timeline spreads to fill the viewport
+   instead of being letterbox-squeezed. Month/tick m sits at vtop + pitch·m
+   (optional px nudge for the sub-captions). */
+const vpos = (m: number, px = 0) =>
+  `calc(var(--vtop) + var(--vpitch) * ${m}${px ? ` + ${px}px` : ""})`;
 
 export default function ExitCalc({
   rent = 45_000,
@@ -367,17 +376,23 @@ export default function ExitCalc({
           },
         });
       } else {
-        // phones keep the light recapture: momentum that dribbles past
-        // the journey's pin still lands the sheet parked at full cover
+        // phones: a firmer, wider recapture so the exit steps actually
+        // LAND when the section comes up — a fast fling that would sail
+        // past them is reeled back to the parked frame. Only a deliberate
+        // downward scroll past the lean threshold releases onward (to the
+        // safety cards / trust); an idle nudge settles back to parked.
         ScrollTrigger.create({
           trigger: section,
           start: "top top",
-          end: "+=25%",
+          end: "+=55%",
           snap: {
-            snapTo: (v: number) => (v < 0.5 ? 0 : v),
+            snapTo: (v: number, self?: ScrollTrigger) => {
+              const threshold = (self?.direction ?? 1) > 0 ? 0.55 : 0.4;
+              return v < threshold ? 0 : v;
+            },
             inertia: false,
-            duration: { min: 0.2, max: 0.45 },
-            delay: 0.06,
+            duration: { min: 0.3, max: 0.6 },
+            delay: 0.1,
             ease: "power2.out",
           },
         });
@@ -511,6 +526,36 @@ export default function ExitCalc({
       root.style.overflow = "";
       root.style.paddingRight = "";
     };
+  }, [view]);
+
+  /* ── the phone math page's fluid vertical axis — measure the room under
+     the header and spread the 11-month timeline into it so the calculator
+     fills the viewport (width-fit horizontal handles the sides). Recomputed
+     on open and on resize/rotate; a no-op / cleared on desktop. ── */
+  useLayoutEffect(() => {
+    const section = sectionRef.current!;
+    const math = section.querySelector<HTMLElement>(".ex__math");
+    if (!math) return;
+    const compute = () => {
+      if (!window.matchMedia("(max-width: 640px)").matches) {
+        math.style.removeProperty("--vtop");
+        math.style.removeProperty("--vpitch");
+        return;
+      }
+      const head = math.querySelector<HTMLElement>(".ex__head");
+      if (!head) return;
+      const mTop = math.getBoundingClientRect().top;
+      const mH = math.clientHeight;
+      const headBottom = head.getBoundingClientRect().bottom - mTop;
+      const vtop = headBottom + 40; // breathing room under the rent block
+      const vfoot = 64; // room below Month 11 for its label + the pending chip
+      const pitch = Math.max(34, (mH - vtop - vfoot) / TERM);
+      math.style.setProperty("--vtop", `${Math.round(vtop)}px`);
+      math.style.setProperty("--vpitch", `${pitch.toFixed(2)}px`);
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
   }, [view]);
 
   return (
@@ -663,7 +708,7 @@ export default function ExitCalc({
               <i
                 key={k}
                 className="ex__vtick"
-                style={{ top: u(V0 + VPITCH * k) }}
+                style={{ top: vpos(k) }}
                 aria-hidden
               />
             ))}
@@ -673,18 +718,18 @@ export default function ExitCalc({
               <span
                 key={m}
                 className={`ex__vmonth${m === month ? " is-exit" : ""}${m > month ? " is-ahead" : ""}`}
-                style={{ top: u(vY(m)) }}
+                style={{ top: vpos(m) }}
               >
                 Month {m}
               </span>
             ))}
-            <span className="ex__vtag" style={{ top: u(vY(noticeMonth) + 8) }}>
+            <span className="ex__vtag" style={{ top: vpos(noticeMonth, 8) }}>
               Gave notice
             </span>
             {closedMonth <= TERM && (
               <span
                 className="ex__vtag ex__vtag--closed"
-                style={{ top: u(vY(closedMonth) + 8) }}
+                style={{ top: vpos(closedMonth, 8) }}
               >
                 Loan closed
               </span>
@@ -706,9 +751,9 @@ export default function ExitCalc({
             />
 
             {/* the marker — stem off the line, the bob, the refund pill */}
-            <span className="ex__vstem" style={{ top: u(vY(month)) }} aria-hidden />
-            <span className="ex__vdot" style={{ top: u(vY(month)) }} aria-hidden />
-            <div className="ex__vpin" style={{ top: u(vY(month)) }}>
+            <span className="ex__vstem" style={{ top: vpos(month) }} aria-hidden />
+            <span className="ex__vdot" style={{ top: vpos(month) }} aria-hidden />
+            <div className="ex__vpin" style={{ top: vpos(month) }}>
               <span>Total refund</span>
               <strong>₹{inr(refund)}</strong>
             </div>
@@ -720,7 +765,7 @@ export default function ExitCalc({
                 the card renders (the px-floored mobile type grows it) */}
             <div
               className={`ex__vcard${month >= 6 ? " is-above" : ""}`}
-              style={{ top: u(vY(month)) }}
+              style={{ top: vpos(month) }}
             >
               <span className="ex__vcard-title">Deductions</span>
               <div className="ex__vrow">
