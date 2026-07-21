@@ -10,8 +10,8 @@
   width: 100%;
   height: 100vh;
   min-height: 560px;
-  /* the brand cream (329:2549 sheet — 2026-07-18 colour pass: #F2E5D3,
-     a touch more golden than the footer's #F1E2D8) */
+  /* the brand pale-yellow sheet (#F2E5D3) — the one warm ground shared
+     across the page (hero, proof, exit/trust wash, footer) */
   background: #f2e5d3;
   overflow: hidden;
 }

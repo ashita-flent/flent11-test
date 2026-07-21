@@ -1157,9 +1157,6 @@ export default function HowItWorks({
         gsap.set(q(".how__pdisc"), { autoAlpha: 1, scale: 1 });
         if (gsum) gsum.textContent = `₹ ${inr(rent * cards.length)}`;
       } else {
-        // the front slot, measured once — every flight departs from here
-        const slot = cards[0]?.getBoundingClientRect();
-
         // ── assembly ──
         m.to(q(".how__mon-tenant"), { autoAlpha: 1, y: 0, duration: 0.45 }, 0.55)
           .to(q(".how__mon-wire"), { autoAlpha: 1, duration: 0.01 }, 0.95)
@@ -1193,48 +1190,57 @@ export default function HowItWorks({
           const amt = section.querySelector<HTMLElement>(`.how__pamt[data-m="${paneMonth}"]`);
           const disc = section.querySelector<HTMLElement>(`.how__pdisc[data-m="${paneMonth}"]`);
           const pane = amt?.closest<HTMLElement>(".how__pane");
-          if (!pane || !slot) return;
+          if (!pane) return;
           const flash = pane.querySelector<HTMLElement>(".how__pflash");
-          const pr = pane.getBoundingClientRect();
-          const slotCx = slot.left + slot.width / 2;
-          const slotCy = slot.top + slot.height / 2;
-          const paneCx = pr.left + pr.width / 2;
-          const paneCy = pr.top + pr.height / 2;
-          // the frame would clip a card that crossed into the window, so it
-          // stops SHORT of the glass and dissolves in the open room, capped
-          // at the window's NEAR edge along the layout's travel axis while
-          // keeping the heading toward the pane. Desktop flows sideways
-          // into the window at its right; the phone's deck sits above the
-          // glass, so the card dives DOWN and melts above the top edge.
-          let dx: number;
-          let dy: number;
-          if (vertFlight) {
-            const winTop = pr.top - Math.floor((paneMonth - 1) / 3) * pr.height;
-            const capY = Math.min(paneCy, winTop - pr.height * 0.3);
-            dy = capY - slotCy;
-            dx =
-              paneCy === slotCy
-                ? 0
-                : (paneCx - slotCx) * (dy / (paneCy - slotCy));
-          } else {
+          // Desktop: the frame would clip a card that crossed into the
+          // window, so it stops SHORT of the glass and dissolves in the
+          // open room, capped at the window's NEAR edge while keeping
+          // the heading toward the pane. Phones: the deck floats straight
+          // ABOVE the glass and the window rig paints OVER the steps, so
+          // a diving card slides UNDER the frost and the pane's own
+          // backdrop blur soaks it up — no cap needed: it travels the
+          // WHOLE way down onto its pane and dissolves there.
+          // Aim LAZILY (function-based values, evaluated at each
+          // flight's own start), and from the flying card's OWN rect —
+          // by then it holds the front slot with the step's entrance
+          // y-shift long settled. Measuring either end at micro start
+          // baked in ~30px of entrance/dolly offset and the card melted
+          // visibly short of its pane.
+          const aim = () => {
+            const pr = pane.getBoundingClientRect();
+            const sr = card.getBoundingClientRect();
+            const slotCx = sr.left + sr.width / 2;
+            const slotCy = sr.top + sr.height / 2;
+            const paneCx = pr.left + pr.width / 2;
+            const paneCy = pr.top + pr.height / 2;
+            if (vertFlight)
+              return {
+                dx: paneCx - slotCx,
+                // + the scale-origin correction: the flight shrinks to
+                // 0.6 around 50% 0, which lifts the rendered centre by
+                // (1−0.6)·h/2 — without it the card melts a third high
+                dy: paneCy - slotCy + (1 - 0.6) * (sr.height / 2),
+              };
             const winLeft = pr.left - ((paneMonth - 1) % 3) * pr.width;
             const capX = Math.min(paneCx, winLeft - pr.width * 0.35);
-            dx = capX - slotCx;
-            dy = (paneCy - slotCy) * (dx / (paneCx - slotCx));
-          }
+            const dx = capX - slotCx;
+            return { dx, dy: (paneCy - slotCy) * (dx / (paneCx - slotCx)) };
+          };
 
-          // the drift + dissolve: eases toward the pane while softening,
-          // then melts FAST — blur builds and opacity drops quickly so the
-          // card is gone well before the glass; nothing hard-edged ever
-          // reaches the window to be clipped
+          // the drift + dissolve. Desktop melts FAST — blur builds and
+          // opacity drops quickly so the card is gone well before the
+          // glass; nothing hard-edged ever reaches the window to be
+          // clipped. The phone's card TRAVELS first — it holds visible
+          // for most of the dive and only dissolves as it arrives on its
+          // pane (the frost soaks up what's left).
           m.to(
             card,
             {
-              x: dx,
-              y: dy,
+              x: () => aim().dx,
+              y: () => aim().dy,
               scale: 0.6,
-              // the phone's dive is short — the desktop's 20px melt
-              // blooms the little card into an unreadable white smear
+              // the phone's card stays readable through the dive — the
+              // desktop's 20px melt blooms it into a white smear
               filter: `blur(${vertFlight ? 10 : 20}px)`,
               zIndex: 2,
               duration: 0.85,
@@ -1244,11 +1250,14 @@ export default function HowItWorks({
           ).to(
             card,
             { autoAlpha: 0, duration: 0.42, ease: "power1.in" },
-            T + 0.12
+            T + (vertFlight ? 0.45 : 0.12)
           );
 
           // the pane FLASHES as the payment lands — a bright bloom that
-          // snaps on and clears fast, then the ₹ it now carries settles in
+          // snaps on and clears fast, then the ₹ it now carries settles
+          // in. On phones the landing is when the card actually reaches
+          // the pane (~T+0.75), not the desktop's early melt-point.
+          const HIT = vertFlight ? 0.72 : 0.48;
           if (flash)
             m.add(() => {
               gsap.fromTo(
@@ -1256,18 +1265,18 @@ export default function HowItWorks({
                 { opacity: 1 },
                 { opacity: 0, duration: 0.6, ease: "power2.out" }
               );
-            }, T + 0.48);
+            }, T + HIT);
           if (amt)
-            m.to(amt, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power1.out" }, T + 0.54);
+            m.to(amt, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power1.out" }, T + HIT + 0.06);
           if (disc)
-            m.to(disc, { autoAlpha: 1, scale: 1, duration: 0.45, ease: "power2.out" }, T + 0.6);
+            m.to(disc, { autoAlpha: 1, scale: 1, duration: 0.45, ease: "power2.out" }, T + HIT + 0.12);
 
           // Gromor's received total climbs with each payment
           if (gsum)
             m.add(() => {
               gsum.textContent = `₹ ${inr(rent * (k + 1))}`;
               gsap.fromTo(gsum, { scale: 1.08 }, { scale: 1, duration: 0.35, ease: "power2.out" });
-            }, T + 0.66);
+            }, T + HIT + 0.18);
 
           // the deck settles forward the INSTANT this card starts its
           // flight — so the next card pulls into focus immediately behind
@@ -1681,10 +1690,14 @@ export default function HowItWorks({
             </span>
             <div className="how__track" />
             {/* width reaches back to the viewport's left edge (50vw − 50%
-                spans the contain-fit frame's side margin) */}
+                spans the contain-fit frame's side margin). Desktop carries
+                the design's 8u nub past the dot; the phone frame (405:372
+                — Vector 3 w 48 = dot-1 centre) ends EXACTLY on it. */}
             <div
               className="how__progress"
-              style={{ width: `calc(50vw - 50% + var(--u) * ${activeX + 8})` }}
+              style={{
+                width: `calc(50vw - 50% + var(--u) * ${activeX + (mobileInd ? 0 : 8)})`,
+              }}
             />
             {dotXs.map((x, i) => {
               // dot 0 has no step (the intro); the rest label from their

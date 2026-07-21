@@ -1,6 +1,6 @@
 import { useState } from "react";
 import HeroPill from "./sections/hero/HeroPill";
-import LockinSplit from "./sections/lockin/LockinSplit";
+import LockinCards from "./sections/lockin/LockinCards";
 import HowItWorks from "./sections/how/HowItWorks";
 import Upfront from "./sections/upfront/Upfront";
 import ExitCalc from "./sections/exit/ExitCalc";
@@ -26,12 +26,14 @@ export default function App() {
     <main>
       <HeroPill />
       <HowItWorks rent={rent} onRentChange={setRent} />
-      <ExitCalc rent={rent} onRentChange={setRent} />
-      <Trust />
-      <LockinSplit />
+      <div className="exit-trust-wash">
+        <ExitCalc rent={rent} onRentChange={setRent} />
+        <Trust />
+      </div>
+      <LockinCards />
       <Upfront rent={rent} />
-      <Proof />
       <Faq />
+      <Proof />
       <Footer />
     </main>
   );

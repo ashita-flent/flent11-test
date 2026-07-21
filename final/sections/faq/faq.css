@@ -10,7 +10,9 @@
   --u: min(calc(100vw / 1512), calc(100vh / 982));
 
   width: 100%;
-  background: var(--bg);
+  /* eases the cream into white at the foot so it merges seamlessly into
+     the tweet section's white opening below (no hard cream/white seam) */
+  background: linear-gradient(to bottom, var(--bg) 0%, #ffffff 100%);
   padding: clamp(84px, 13vh, 160px) 0 clamp(110px, 16vh, 190px);
 }
 

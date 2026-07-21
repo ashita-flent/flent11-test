@@ -8,8 +8,8 @@ gsap.registerPlugin(ScrollTrigger);
 /* ────────────────────────────────────────────────────────────────────────
    Footer — the capsule close + the puzzle (Figma 400:823).
 
-   Two beats on one warm ground (the page's cream easing into the sheet
-   peach #F1E2D8, continuing the scroll's gradient):
+   Two beats on one warm ground (the page's cream easing into the shared
+   pale-yellow sheet #F2E5D3, continuing the scroll's gradient):
 
    1. The CLOSING CAPSULE — the pill returns for the closing argument:
       a near-white capsule holding "You were going to commit anyway. /
@@ -17,10 +17,10 @@ gsap.registerPlugin(ScrollTrigger);
       and the black Check Eligibility pill.
 
    2. The PUZZLE BAND — the room photo behind the blurred peach wash,
-      eleven squares held open. Same interactive roots as before (hover
-      a cell, the wash wipes, the room shows through) but the standing
-      tiles now cluster to the RIGHT, leaving the left of the band for
-      the slots message + "Talk to us".
+      squares held open across the whole band. Same interactive roots as
+      before (hover a cell, the wash wipes, the room shows through); the
+      standing tiles frame the slots message + "Talk to us" — above and
+      below it — leaving only the cells right behind the words washed.
 
    Implementation notes carried over: the wash is ONE backdrop-blurred
    sheet; revealed cells are tiles painting the sharp photo ON TOP of it
@@ -34,14 +34,21 @@ const ROW0 = 305;
 const TOP = 164; // the photo region's top edge in its 982-frame terms
 const COLS = [-1, 0, 1, 2, 3, 4, 5, 6, 7]; // −1 = the partial edge column
 const ROWS = [-1, 0, 1, 2, 3];
-/* the eleven — a staircase WEIGHTED RIGHT (cols 3–7), the left third of
-   the band left washed for the slots copy */
+/* the standing tiles — a staircase across the whole band. The right
+   (cols 3–7) carries the bulk; the left (cols 0–2) now tiles too, but
+   ONLY above (rows −1, 0) and below (row 3) the slots copy — the copy's
+   own cells (left cols, rows 1–2) stay washed so the words read clean */
 const FIXED = new Set([
+  // right mosaic
   "3,-1", "5,-1",
   "4,0", "6,0",
   "3,1", "5,1", "7,1",
   "4,2", "6,2",
   "5,3", "7,3",
+  // left mosaic — framing the copy, never behind it
+  "1,-1",
+  "0,0", "2,0",
+  "0,3", "2,3",
 ]);
 
 export default function Footer() {
@@ -96,16 +103,16 @@ export default function Footer() {
       const yu = ((e.clientY - r.top) / r.height) * 818 + TOP;
       const c = Math.min(7, Math.max(-1, Math.floor((xu - COL0) / CELL)));
       const rw = Math.min(3, Math.max(-1, Math.floor((yu - ROW0) / CELL)));
-      // the copy's columns never reveal — a sharp slice lighting up
-      // behind the words made them unreadable; the wipe belongs to the
-      // mosaic's right zone alone (cols 3–7, where the standing tiles
-      // live)
-      const next =
-        c < 3
-          ? null
-          : region.querySelector<HTMLElement>(
-              `.ft__tile[data-cell="${c},${rw}"]`
-            );
+      // the reveal covers the whole mosaic EXCEPT the cells right behind
+      // the slots copy (left cols, the copy's two rows) — a sharp slice
+      // lighting up under the words made them unreadable. Everywhere else,
+      // including above/below the copy, wipes freely.
+      const behindCopy = c < 3 && (rw === 1 || rw === 2);
+      const next = behindCopy
+        ? null
+        : region.querySelector<HTMLElement>(
+            `.ft__tile[data-cell="${c},${rw}"]`
+          );
       if (next === litRef.current) return;
       litRef.current?.classList.remove("is-lit");
       next?.classList.add("is-lit");

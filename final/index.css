@@ -9,6 +9,8 @@
   /* palette */
   --bg: #faf8f4; /* warm near-white */
   --bg-2: #f2efe9; /* slightly deeper warm */
+  --exit-trust-wash-start: #ffffff;
+  --exit-trust-wash-end: #f2e5d3;
   --ink: #1a1714; /* near-black warm */
   --ink-soft: #6b645c; /* muted label ink */
   --red: #be3b2c; /* editorial vermillion */
@@ -38,4 +40,21 @@ body {
   /* clip, not hidden: no sideways scroll container, and any stray
      absolutely-positioned overflow can't zoom the mobile viewport out */
   overflow-x: clip;
+}
+
+.exit-trust-wash {
+  --exit-u: min(calc(100vw / 1512), calc(100vh / 982));
+
+  position: relative;
+  display: flow-root;
+  margin-top: -100vh;
+  z-index: 10;
+  background: linear-gradient(
+    to bottom,
+    var(--exit-trust-wash-start) 0%,
+    var(--exit-trust-wash-end) 100%
+  );
+  box-shadow: 0 calc(var(--exit-u) * -24) calc(var(--exit-u) * 80)
+    rgba(15, 8, 3, 0.35);
+  clip-path: inset(-9999px 0 0 0);
 }

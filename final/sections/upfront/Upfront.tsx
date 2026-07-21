@@ -95,7 +95,13 @@ export default function Upfront({ rent }: { rent: number }) {
       // the window arrives only with the detail page — at its HOME pose
       // (Frame 7's placement; the swap adds the −31u x shift)
       gsap.set(rigs, { autoAlpha: 0 });
-      gsap.set(rigRef.current, { "--frost": "16.445px" });
+      // phone panes mush at the desktop frost — match the journey's
+      // resting glass so the greens stay readable
+      gsap.set(rigRef.current, {
+        "--frost": window.matchMedia("(max-width: 640px)").matches
+          ? "4px"
+          : "16.445px",
+      });
       gsap.set(uBRef.current, { autoAlpha: 0 });
       gsap.set(q(".how__plit, .how__m2, .how__m2-glow, .how__wprice"), {
         autoAlpha: 0,
@@ -360,7 +366,7 @@ export default function Upfront({ rent }: { rent: number }) {
               className="how__break-down"
               onClick={goOnward}
             >
-              Not for you? Keep scrolling
+              Not for you? Keep scrolling <span aria-hidden>&darr;</span>
             </button>
           </div>
 

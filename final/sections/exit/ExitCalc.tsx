@@ -50,9 +50,10 @@ const DOT0 = TICK0 - BAR_L;
    the track waist and the CTA's centre all sit on it */
 
 /* ── the phone's VERTICAL slider (Figma 416:242) — the thread itself is
-   the track: month m's tick crosses it at y = 335 + 43m (slot 0 is the
-   track head), the marker rides it as a stem → bob → refund pill row ── */
-const V0 = 335;
+   the track: month m's tick crosses it at y = 265 + 43m (slot 0 is the
+   track head at the fixed line's top), the marker rides it as a stem →
+   bob → refund pill row ── */
+const V0 = 265;
 const VPITCH = 43;
 const vY = (m: number) => V0 + VPITCH * m;
 /* the touch band spans month 1..11 tick centres ± half a pitch */
@@ -151,11 +152,11 @@ const STORY: {
   },
 ];
 
-/* the three pledges under the line (391:819…845) */
+/* the three pledges under the line (391:819…845 / phone 413:1025) */
 const PLEDGES = [
   "No full deposit forfeiture.",
   "No unclear penalties.",
-  "No loan left open after you leave.",
+  "Loan closed after you leave.",
 ];
 
 const u = (n: number) => `calc(var(--u) * ${n})`;
@@ -291,19 +292,19 @@ export default function ExitCalc({
         defaults: { ease: "power3.out" },
       });
       if (window.matchMedia("(max-width: 640px)").matches) {
-        /* the phone story (413:794) reads top-down: head, the pledge
-           row, then the vertical timeline's moments walk down the line,
-           and the CTA lands on it */
+        /* the phone story (413:794) reads top-down: head with the
+           way-in right under it, then the vertical timeline's moments
+           walk down the line; the safety cards wait past the fold */
         tlStory
           .to(q(".ex__shead"), { autoAlpha: 1, y: 0, duration: 0.5 }, 0.1)
+          .to(q(".ex__mathcta"), { autoAlpha: 1, y: 0, duration: 0.45 }, 0.35)
+          .to(q(".ex__tl-when"), { autoAlpha: 1, duration: 0.4 }, 0.5)
+          .to(steps, { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.12 }, 0.5)
           .to(
             q(".ex__pledge"),
             { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.08 },
-            0.3
-          )
-          .to(q(".ex__tl-when"), { autoAlpha: 1, duration: 0.4 }, 0.55)
-          .to(steps, { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.12 }, 0.55)
-          .to(q(".ex__mathcta"), { autoAlpha: 1, y: 0, duration: 0.5 }, "-=0.2");
+            "-=0.15"
+          );
       } else {
         tlStory
           .to(q(".ex__shead"), { autoAlpha: 1, y: 0, duration: 0.6 }, 0.15)
@@ -476,6 +477,42 @@ export default function ExitCalc({
     runDemoRef.current?.();
   };
 
+  /* ── the math page is a separate single page on EVERY viewport (phone +
+     desktop): opening it parks the section flush and freezes the page until
+     Back — you can only return to the exit story, never scroll past it into
+     trust. Scrolling onward would strand the story mid-frame behind the
+     nested page. overflow:hidden stops native gestures + keyboard + the
+     scrollbar; the re-pin catches everything else (momentum hand-offs,
+     ScrollTrigger snaps, programmatic scrolls). On desktop with a classic
+     scrollbar we reserve its width so hiding it doesn't reflow the page
+     (a no-op under Mac's overlay scrollbars, where the width is 0). ── */
+  useLayoutEffect(() => {
+    if (view !== "math") return;
+    const s = sectionRef.current!;
+    const topY = Math.round(s.getBoundingClientRect().top + window.scrollY);
+    window.scrollTo({ top: topY, behavior: "auto" });
+    const root = document.documentElement;
+    const sbw = window.innerWidth - root.clientWidth; // classic-scrollbar width
+    root.style.overflow = "hidden";
+    if (sbw > 0) root.style.paddingRight = `${sbw}px`;
+    const repin = () => {
+      if (Math.abs(window.scrollY - topY) > 1) window.scrollTo(0, topY);
+    };
+    const block = (e: Event) => e.preventDefault();
+    window.addEventListener("scroll", repin);
+    // wheel/touchmove die here so nothing reaches the scroller; the
+    // slider's drag rides pointer events, which these don't cancel
+    window.addEventListener("wheel", block, { passive: false });
+    window.addEventListener("touchmove", block, { passive: false });
+    return () => {
+      window.removeEventListener("scroll", repin);
+      window.removeEventListener("wheel", block);
+      window.removeEventListener("touchmove", block);
+      root.style.overflow = "";
+      root.style.paddingRight = "";
+    };
+  }, [view]);
+
   return (
     <section className="exit" ref={sectionRef}>
       <div className="ex__frame">
@@ -583,7 +620,7 @@ export default function ExitCalc({
           {/* ── header row (394:523) — title + the rent block ── */}
           <div className="ex__head">
             <h2 className="ex__mtitle">
-              Slide to the month you wish to leave,
+              Slide to the month you wish to leave,{" "}
               <br />
               and see the math work for you
             </h2>

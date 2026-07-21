@@ -14,13 +14,9 @@
 
   position: relative;
   width: 100%;
-  /* the page's cream easing into the sheet peach — the scroll keeps
-     its gradient through the close (400:823 ground #F1E2D8) */
-  background: linear-gradient(
-    to bottom,
-    var(--bg),
-    #f1e2d8 calc(var(--uf) * 420)
-  );
+  /* the shared pale-yellow ground (400:823 #F2E5D3) — held flat so it
+     picks up the tweet section's #f2e5d3 foot above with no seam */
+  background: #f2e5d3;
   overflow: hidden;
 }
 
@@ -118,20 +114,30 @@
   display: block;
 }
 
-/* the Subtract sheet: solid cream through a gradient mask, so the
-   backdrop blur fades in step with the wash (Figma bg-blur 10 ≙ 5px,
-   fill #F1E2D8 100% → ~43% at the sheet's bottom edge) */
+/* the Subtract sheet: a TRANSLUCENT peach over a uniform backdrop blur,
+   so the concealed room reads properly FROSTED (Figma bg-blur 10). Two
+   earlier traps, both fixed here:
+     · a SOLID #F2E5D3 fill hides the blurred backdrop entirely — you
+       only ever see flat peach, never the blur. The fill must be
+       semi-transparent for the frost to show through.
+     · a mask-image faded the whole layer (blur included) toward the
+       foot, which re-exposed the SHARP photo behind — reading as plain
+       opacity, not blur. So the fade lives in the FILL's own alpha
+       gradient instead, and the blur stays uniform (never masked).
+   Fill opens FULLY OPAQUE #F2E5D3 at the band's top — so the solid
+   ground above merges into the frosted photo with no seam — then eases
+   86%→52% top-to-foot; the squares still carry the sharp image on top. */
 .ft__wash {
   position: absolute;
   inset: 0;
-  background: #f1e2d8;
-  /* the concealed room stays properly BLURRED (Figma bg-blur 10) — only
-     the squares carry the sharp image; the show-through under the wash
-     must never compete with the copy */
+  background: linear-gradient(
+    to bottom,
+    #f2e5d3 0%,
+    rgba(242, 229, 211, 0.86) 18%,
+    rgba(242, 229, 211, 0.52) 100%
+  );
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  mask-image: linear-gradient(to bottom, #000, rgba(0, 0, 0, 0.428));
-  -webkit-mask-image: linear-gradient(to bottom, #000, rgba(0, 0, 0, 0.428));
 }
 
 /* a puzzle piece — a hard-edged slice of the sharp photo over the wash */
@@ -238,7 +244,7 @@
        its right-weighted cluster filling the frame) — every uf consumer
        (band height, tile size/positions, slice boxes) scales together */
     --uf: calc(100vw / 756);
-    background: linear-gradient(to bottom, var(--bg), #f1e2d8 240px);
+    background: #f2e5d3;
   }
 
   .ft__close {

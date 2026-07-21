@@ -265,7 +265,12 @@ export default function Proof() {
                     }
               }
             >
-              <img src={c.src} alt="" loading="lazy" />
+              {/* eager, not lazy: the cards are swept through the viewport
+                  by the scroll-driven drift, so a lazy load (which only
+                  fires as the card nears view) can't finish before the
+                  card passes — on mobile they render as blank frames.
+                  Preloading the 7 small JPGs up front avoids that. */}
+              <img src={c.src} alt="" decoding="async" />
             </div>
           ))}
         </div>

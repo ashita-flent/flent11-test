@@ -1,6 +1,6 @@
 /* ============================================================
    Section · Trust — "Read everything, before you sign
-   anything." (Figma 268:3343). The exit sheet's peach runs on
+   anything." (Figma 268:3343). The exit sheet's warm wash runs on
    under four cards: two bronze (handoff, slip pocket), two
    glass (EMI loop, CIBIL dial). Every card is a 312.5-tall
    design miniature laid out in its own unit --tc (1 design px);
@@ -17,10 +17,7 @@
 
   position: relative;
   width: 100%;
-  /* one continuous wash out of the exit sheet: its bottom (#eedcd0) keeps
-     going and only fully dissolves into the page ground by the section's
-     end, so the cards live on the same warm surface as the calculator */
-  background: linear-gradient(to bottom, #eedcd0 0%, var(--bg) 100%);
+  background: transparent;
   /* tuck a few px under the exit sheet (which paints above at z 10): the
      sections' antialiased boundary otherwise lets the black body ground
      bleed through as a hairline at fractional scroll heights */
@@ -894,13 +891,182 @@
     font-size: max(calc(var(--tc) * 21.76), 13px);
   }
 
-  /* the slip is a fixed paper (rows can't reflow it) — the WHOLE
-     document scales up from its pocket corner instead, fine print,
-     rules and scallops together; the total-refund line becomes the
-     readable takeaway. (Its grown left edge still clears the LEAVING
-     caption by a hair — checked at 390.) */
-  .tc__slip-wrap {
-    transform: scale(1.3);
-    transform-origin: 100% 0;
+  /* ══════════════════════════════════════════════════════════════════
+     Cards 2 & 3 · faithful mobile re-layout (Figma iPhone 17-9, 418:617).
+     The desktop-miniature scaling collided the slip over its own timeline
+     and crowded the EMI ghosts; these two cards now follow the
+     purpose-built mobile frame instead. --fm is one Figma-mobile px (the
+     frame's 316u card mapped onto our 362u card ⇒ ×1.14557), so every
+     value below is read straight off the frame. Body copy keeps the 14px
+     floor from the shared rule; the fine furniture rides --fm as drawn.
+     These rules come last so they win over the scaled overrides above.
+     ══════════════════════════════════════════════════════════════════ */
+  .tc--emi,
+  .tc--slip {
+    --fm: calc(var(--tmx) * 1.14557);
+  }
+
+  /* ── card 2 · the no-cost EMI loop (418:727) ── */
+  .tc--emi {
+    height: calc(var(--fm) * 232);
+  }
+
+  .tc--emi .tc__copy {
+    left: calc(var(--fm) * 24);
+    top: calc(var(--fm) * 19);
+    width: calc(var(--fm) * 267);
+  }
+
+  .tc--emi .tc__wire {
+    left: calc(var(--fm) * 118.3);
+    top: calc(var(--fm) * 135.7);
+    width: calc(var(--fm) * 132.096);
+    height: calc(var(--fm) * 3.75);
+  }
+
+  .tc--emi .tc__emi-chip {
+    left: calc(var(--fm) * 23.58);
+    top: calc(var(--fm) * 112.47);
+    width: calc(var(--fm) * 94.72);
+    padding: calc(var(--fm) * 6.144) calc(var(--fm) * 8.192);
+    gap: calc(var(--fm) * 4);
+    border-radius: calc(var(--fm) * 6.144);
+  }
+  .tc--emi .tc__emi-chip-label {
+    font-size: calc(var(--fm) * 6.144);
+  }
+  .tc--emi .tc__emi-chip-amt {
+    font-size: calc(var(--fm) * 12.288);
+    line-height: calc(var(--fm) * 14.336);
+  }
+  .tc--emi .tc__emi-chip-sub {
+    margin-top: calc(var(--fm) * -2);
+    font-size: calc(var(--fm) * 6.144);
+  }
+
+  .tc--emi .tc__emi-flent {
+    left: calc(var(--fm) * 165.4);
+    top: calc(var(--fm) * 123.74);
+    width: calc(var(--fm) * 27.525);
+    height: calc(var(--fm) * 27.525);
+    border-radius: calc(var(--fm) * 7.209);
+  }
+  .tc--emi .tc__emi-flent img {
+    width: calc(var(--fm) * 13.422);
+    height: calc(var(--fm) * 13.422);
+  }
+
+  .tc--emi .tc__emi-interest {
+    left: calc(var(--fm) * 196.89);
+    top: calc(var(--fm) * 122.2);
+    font-size: calc(var(--fm) * 5.12);
+  }
+
+  .tc--emi .tc__emi-gromor {
+    left: calc(var(--fm) * 240.15);
+    top: calc(var(--fm) * 112.47);
+    width: calc(var(--fm) * 67.584);
+    gap: calc(var(--fm) * 6.144);
+  }
+  .tc--emi .tc__emi-gromor .tc__tile {
+    width: calc(var(--fm) * 40.96);
+    height: calc(var(--fm) * 40.96);
+    border-radius: calc(var(--fm) * 8.192);
+  }
+  .tc--emi .tc__emi-gromor .tc__gromor-crop {
+    width: calc(var(--fm) * 14.746);
+    height: calc(var(--fm) * 24.576);
+  }
+  .tc--emi .tc__emi-gromor .tc__party-name {
+    font-size: calc(var(--fm) * 8.192);
+  }
+
+  .tc--emi .tc__emi-ghost--feb {
+    left: calc(var(--fm) * 33.3);
+    top: calc(var(--fm) * 151.38);
+    width: calc(var(--fm) * 76.384);
+    height: calc(var(--fm) * 40.141);
+    padding: calc(var(--fm) * 4.915) calc(var(--fm) * 6.554);
+    gap: calc(var(--fm) * 4.915);
+    border-radius: calc(var(--fm) * 4.915);
+  }
+  .tc--emi .tc__emi-ghost--feb .tc__emi-ghost-row {
+    font-size: calc(var(--fm) * 4.915);
+  }
+  .tc--emi .tc__emi-ghost--feb .tc__emi-ghost-amt {
+    font-size: calc(var(--fm) * 9.83);
+    line-height: calc(var(--fm) * 11.469);
+  }
+
+  .tc--emi .tc__emi-ghost--mar {
+    left: calc(var(--fm) * 43.03);
+    top: calc(var(--fm) * 181);
+    width: calc(var(--fm) * 56.107);
+    height: calc(var(--fm) * 32.113);
+    padding: calc(var(--fm) * 3.932) calc(var(--fm) * 5.243);
+    gap: calc(var(--fm) * 3.932);
+    border-radius: calc(var(--fm) * 3.932);
+  }
+  .tc--emi .tc__emi-ghost--mar .tc__emi-ghost-row {
+    font-size: calc(var(--fm) * 3.932);
+  }
+  .tc--emi .tc__emi-ghost--mar .tc__emi-ghost-amt {
+    font-size: calc(var(--fm) * 7.864);
+    line-height: calc(var(--fm) * 9.175);
+  }
+
+  /* ── card 3 · the slip pocket (418:756) — the receipt now sits at its
+     natural size in the right pocket (no 1.3× blow-up), the notice thread
+     keeps the clear left band, and the copy reads below. Nothing overlaps. ── */
+  .tc--slip {
+    height: calc(var(--fm) * 188);
+  }
+
+  .tc--slip .tc__notice-line {
+    left: 0;
+    top: calc(var(--fm) * 22.3);
+    width: calc(var(--fm) * 293.376);
+  }
+  .tc--slip .tc__notice-dot--small {
+    left: calc(var(--fm) * 50.71);
+    top: calc(var(--fm) * 18.2);
+    width: calc(var(--fm) * 8.192);
+    height: calc(var(--fm) * 8.192);
+  }
+  .tc--slip .tc__notice-dot--big {
+    left: calc(var(--fm) * 121.37);
+    top: calc(var(--fm) * 14.62);
+    width: calc(var(--fm) * 15.36);
+    height: calc(var(--fm) * 15.36);
+  }
+  .tc--slip .tc__notice-label {
+    top: calc(var(--fm) * 33.56);
+    /* Figma draws these at 5.12u; hold a 9px floor so they stay legible
+       (still clears the receipt's rotated left edge with room) */
+    font-size: max(calc(var(--fm) * 5.12), 9px);
+  }
+  .tc--slip .tc__notice-label--a {
+    left: calc(var(--fm) * 54.55);
+  }
+  .tc--slip .tc__notice-label--b {
+    left: calc(var(--fm) * 128.79);
+  }
+
+  .tc__copy--slip {
+    left: calc(var(--fm) * 22);
+    top: calc(var(--fm) * 95);
+    /* the copy font holds a 14px floor (not enlarged), so the box tracks
+       the Figma text measure rather than the ×fm card width — this keeps
+       the frame's 4-line wrap, so "Repayment" drops clear of the pocket */
+    width: calc(var(--fm) * 184);
+  }
+
+  .tc--slip .tc__slip-wrap {
+    /* Figma parks the pocket at 203.7u; nudged ~16u left so the build's
+       right-aligned ₹2,01,000 payoff clears the card's clip edge (still
+       ~35u of daylight to the LEAVING caption) */
+    left: calc(var(--fm) * 187.5);
+    top: calc(var(--fm) * -31.64);
+    transform: none;
   }
 }

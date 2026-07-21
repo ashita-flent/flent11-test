@@ -248,9 +248,10 @@
 .how__iwash {
   position: absolute;
   inset: 0;
+  /* Figma-exact veil (405:341): white 40% over a 1.78px backdrop blur */
   background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(1.78px);
+  -webkit-backdrop-filter: blur(1.78px);
   pointer-events: none;
 }
 
@@ -1905,13 +1906,16 @@
 
 .how__when {
   position: absolute;
-  top: 0;
+  /* bottom-anchored just above the dots (top 42u): the caption hugs its
+     dot with a 6u gap instead of floating a line-height away */
+  top: auto;
+  bottom: calc(var(--u) * 22);
   transform: translateX(-50%);
   white-space: nowrap;
   font-family: var(--sans);
   font-weight: 600;
   font-size: calc(var(--u) * 14);
-  line-height: 2.14;
+  line-height: 1.4;
   letter-spacing: 0.06em;
   color: var(--ind-when);
   text-shadow: var(--ind-when-shadow);
@@ -2316,28 +2320,61 @@
   transform: translateX(-3px);
 }
 
-/* the way past — a light "this is optional" nudge low on the paper.
-   Reads as a quiet skip affordance, not a primary action. */
+/* the way past — an optional "keep scrolling" affordance low on the
+   paper. Lifted so it reads clearly (desktop only — hidden on phones):
+   medium weight at the sibling CTA's size, with a down-arrow bobbing as
+   a scroll cue. Still secondary — no pill, no white — just legible. */
 .how__break-down {
   position: absolute;
   left: calc(var(--u) * 114);
   top: calc(var(--u) * 812);
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--u) * 8);
   padding: calc(var(--u) * 6) 0;
   background: none;
   border: 0;
   font-family: var(--sans);
-  font-weight: 400;
-  font-size: calc(var(--u) * 16);
+  font-weight: 500;
+  font-size: calc(var(--u) * 18);
   letter-spacing: -0.01em;
-  color: rgba(0, 0, 0, 0.4);
+  color: rgba(0, 0, 0, 0.6);
   white-space: nowrap;
   cursor: pointer;
   transition: color 0.2s ease;
 }
 
+.how__break-down span {
+  display: inline-block;
+  font-size: calc(var(--u) * 20);
+  animation: how-scrollcue 1.8s ease-in-out infinite;
+}
+
 .how__break-down:hover,
 .how__break-down:focus-visible {
-  color: rgba(0, 0, 0, 0.65);
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.how__break-down:hover span,
+.how__break-down:focus-visible span {
+  animation: none;
+  transform: translateY(3px);
+}
+
+@keyframes how-scrollcue {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--u) * 4));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .how__break-down span {
+    animation: none;
+  }
 }
 
 /* ---- month 1–11 totals in the glass (174:744 @ (157, 304.5)) ------- */
@@ -2786,16 +2823,34 @@
     display: none;
   }
 
-  /* the detail page's window on the phone (418:1111 @ 73.15,477.7 —
-     231.2×308.27): a smaller pose than the journey's intro home, tucked
-     low-left under the tenant card. The 0.4533 factor sizes the 510-wide
-     window to the frame's 231.2. */
+  /* the detail page's window on the phone (418:1111 @ 73.15,477.7),
+     tucked low-left under the tenant card — sized to the JOURNEY's
+     resting glass (222 of the 402 frame, factor 222/510) so the shared
+     window reads as one object across the whole flow */
   .upf .how__winrig,
   .upf .how__glowrig,
   .upf .how__framerig {
-    --uwin: calc(100vw / 402 * 0.4533);
+    --uwin: calc(100vw / 402 * 0.4353);
     left: calc(var(--mx) * 73.15);
     top: calc(var(--my) * 477.7);
+  }
+
+  /* the month 1–11 total in the glass — the window unit ran it to
+     8–10px; the whole stay's price is the page's POINT, floor it */
+  .upf .how__wprice {
+    gap: 8px;
+  }
+
+  .upf .how__wprice-label {
+    font-size: max(calc(var(--u) * 20), 12px);
+  }
+
+  .upf .how__wprice-amts {
+    font-size: max(calc(var(--u) * 24), 17px);
+  }
+
+  .upf .how__wprice-amts s {
+    font-size: max(calc(var(--u) * 20), 12px);
   }
 
   .how__ustep--a .how__uhead {
@@ -2852,7 +2907,7 @@
 
   .how__uback {
     left: 6vw;
-    top: 3.5vh;
+    top: calc(var(--my) * 34);
     font-size: 15px;
   }
 
@@ -2862,10 +2917,12 @@
 
   /* ── the detail page (iPhone 17 - 11, 418:1102) — copy (29,70),
      dark-glass tenant card (29,307) w148 paying flent directly, the
-     white flent tile (290.84,332) with a dashed run between them ── */
+     white flent tile (290.84,332) with a dashed run between them.
+     The copy drops to the journey's crown line (the designed 70 ran
+     it into the Back button). ── */
   .how__ustep--b .how__copy--scaffold {
     left: calc(var(--mx) * 29);
-    top: calc(var(--my) * 70);
+    top: calc(var(--my) * 96);
   }
 
   .how__ustep--b .how__body {
@@ -2995,6 +3052,9 @@
 
   .how__when {
     font-size: 12px;
+    /* bottom-anchored 4px above the dots — one- and two-line captions
+       both hug their dot instead of hanging from the band's top */
+    bottom: 24px;
   }
 
   /* the caption owns the band's top; track and dots drop to its foot so
@@ -3068,12 +3128,21 @@
 
   /* the deck must READ on a phone — floors keep the card's figures at
      legible sizes even though the diagram's unit is width-bound */
+  /* …and it centres on the SCREEN axis (iPhone 17 - 5): the desktop
+     composition parks it at 230u (centre 322.5 of 672), a touch left
+     of centre. The max() mirrors the min-width floor so the half-width
+     offset tracks whichever wins. */
   .how__mon-card {
-    min-width: 118px;
+    /* wide enough that "Next Payment September" + the bank mark can
+       share the top row with clear air (118 smushed them together) */
+    min-width: 136px;
+    left: calc(50% - max(var(--u) * 92.5, 68px));
   }
 
   .how__mon-card-head {
     font-size: max(calc(var(--u) * 12), 8.5px);
+    /* the head's nowrap run stops short of the bank mark's corner */
+    padding-right: 24px;
   }
 
   .how__mon-card-amt {
@@ -3088,6 +3157,8 @@
   .how__mon-card-bank {
     width: max(calc(var(--u) * 15.4), 11px);
     height: max(calc(var(--u) * 15.4), 11px);
+    right: 10px;
+    top: 10px;
   }
 
   .how__mon-tenant span,

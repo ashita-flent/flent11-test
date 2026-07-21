@@ -1,0 +1,436 @@
+/* ============================================================
+   Section · Lock-in — CARD version (Figma 443:407).
+   Full-bleed loft photo; a PROGRESSIVE white veil over its head
+   (Figma radius 100 → 4 down the 358u band ⇒ ~50px → 2px CSS,
+   layered here as two masked blur bands under the white ramp);
+   three comparison cards, each its own glass recipe:
+     1 · gradient glass — milky→white fill whose alpha
+         GATES a 44u backdrop blur (Figma spec): the room
+         reads clear at the card's head and frosts to its foot
+     2 · even glass — white 0.8 over a uniform 24u blur
+     3 · solid white with the photo art bleeding in top-right
+   Phone: the heading then the three cards stacked full-width,
+   normal scroll, same veiled photo behind.
+   ============================================================ */
+
+.lc {
+  --u: min(calc(100vw / 1512), calc(100vh / 980));
+
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 720px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.lc__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* the room stays SHARP — the whole-image blur was wrong; the design's
+     blur is a top-band gradient (see .lc__blur). Only the cards' own
+     backdrop-filter frosts what sits directly behind them. */
+}
+
+/* ---- progressive blur (Figma 450:391): the room is heavily blurred
+   behind the heading and ramps to fully SHARP by the card line, via a
+   vertical gradient — NOT a flat blur on the whole photo. CSS has no
+   native progressive blur, so three backdrop-blur layers are stacked,
+   each masked to reach a little lower than the last: their overlap near
+   the top compounds to a strong haze that clears smoothly downward. ---- */
+.lc__blur {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(var(--u) * 430);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.lc__blur-layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* lightest, reaches furthest down */
+.lc__blur-layer--1 {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 80%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 80%);
+}
+
+.lc__blur-layer--2 {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 22%, transparent 55%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 22%, transparent 55%);
+}
+
+/* strongest, hugs the very top */
+.lc__blur-layer--3 {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 32%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 32%);
+}
+
+/* ---- the white wash over the heading (450:391 fill) — sits ABOVE the
+   blur so the heading reads on a soft light ground; the blurred bright
+   window already shows through, so it stays light, not solid ---- */
+.lc__veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(var(--u) * 358);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0)
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* contain-fit 1512×980 design frame */
+.lc__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--u) * 1512);
+  height: calc(var(--u) * 980);
+  z-index: 2;
+}
+
+/* ---- heading (394:524 @ (122,122), gap 32) ---- */
+.lc__head {
+  position: absolute;
+  left: calc(var(--u) * 122);
+  top: calc(var(--u) * 122);
+  width: calc(var(--u) * 972);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 32);
+}
+
+.lc__title {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 48);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: #1a1714;
+}
+
+.lc__sub {
+  width: calc(var(--u) * 480);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: calc(var(--u) * 19);
+  line-height: 1.5;
+  letter-spacing: -0.017em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.lc__sub strong {
+  font-weight: 600;
+}
+
+/* ---- the card row (443:429 — 1298×456 centred, 169 below centre) ---- */
+.lc__cards {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + var(--u) * 169);
+  transform: translate(-50%, -50%);
+  width: calc(var(--u) * 1298);
+  height: calc(var(--u) * 456);
+  display: flex;
+  gap: calc(var(--u) * 24);
+  align-items: stretch;
+}
+
+.lc__card {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 40);
+  border-radius: calc(var(--u) * 20);
+  overflow: hidden;
+  font-family: var(--sans);
+}
+
+/* 1 · gradient glass (443:426): ONE uniform 22px backdrop blur (Figma's
+   background-blur 44 ⇒ ~22px CSS), and the milky→white FILL does the
+   "clears at the head, frosts to the foot" — the fill is near-transparent
+   up top (the soft room reads through the frost) and solid white by the
+   savings line. Blur is a fixed px (not ×--u) so the frost holds on
+   phones too. */
+.lc__card--typical {
+  padding: calc(var(--u) * 47) calc(var(--u) * 36);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.55) 52%,
+    #ffffff 86%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+/* 2 · even glass (443:427): white 0.8 over a uniform 12px blur (Figma
+   background-blur 24 ⇒ ~12px CSS), fixed px so phones frost the same */
+.lc__card--regular {
+  padding: calc(var(--u) * 48) calc(var(--u) * 44);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* 3 · solid white with the loft art bleeding in top-right (444:112) */
+.lc__card--f11 {
+  padding: calc(var(--u) * 47) calc(var(--u) * 49);
+  background: #ffffff;
+}
+
+.lc__card-art {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: calc(var(--u) * 287);
+  height: calc(var(--u) * 294);
+  pointer-events: none;
+}
+
+.lc__card > *:not(.lc__card-art) {
+  position: relative;
+  z-index: 1;
+}
+
+/* titles — 28u; 1/2 Regular #212121, 3 SemiBold (443:430/431/433) */
+.lc__card-title {
+  font-weight: 400;
+  font-size: calc(var(--u) * 28);
+  line-height: 1.35;
+  letter-spacing: -0.04em;
+  color: #212121;
+}
+
+.lc__card--f11 .lc__card-title {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgba(33, 33, 33, 0.8);
+}
+
+/* rows — icon 16u + 16u text, 14u apart (443:443…) */
+.lc__rows {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 14);
+}
+
+.lc__row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 6);
+}
+
+.lc__row-ic {
+  flex: none;
+  width: calc(var(--u) * 16);
+  height: calc(var(--u) * 16);
+}
+
+.lc__row-text {
+  font-weight: 400;
+  font-size: calc(var(--u) * 16);
+  line-height: 1.35;
+  color: #1a1714;
+}
+
+.lc__card--f11 .lc__row-text {
+  font-weight: 500;
+}
+
+.lc__row-text strong {
+  font-weight: 700;
+}
+
+/* the green "First month free" pill (443:474) */
+.lc__pill {
+  flex: none;
+  padding: calc(var(--u) * 4) calc(var(--u) * 8);
+  border-radius: calc(var(--u) * 40);
+  background: #008247;
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  line-height: 1.35;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* the savings foot (447:179 / 443:456 / 443:462) */
+.lc__save {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 2);
+}
+
+.lc__save-v {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--u) * 2);
+  font-weight: 500;
+  font-size: calc(var(--u) * 20);
+  line-height: 1.35;
+  letter-spacing: -0.04em;
+  color: #1a1714;
+}
+
+.lc__save-arrow {
+  width: calc(var(--u) * 16);
+  height: calc(var(--u) * 16);
+  margin-top: calc(var(--u) * 2);
+}
+
+.lc__save-k {
+  font-weight: 400;
+  font-size: calc(var(--u) * 16);
+  line-height: 1.35;
+  color: #1a1714;
+}
+
+/* ════ phone (≤760px) — heading then THREE FULL-WIDTH cards in normal
+   scroll, on the same veiled photo (fixed cover behind the flow) ════ */
+@media (max-width: 760px) {
+  .lc {
+    height: auto;
+    min-height: 100dvh;
+    /* clip the scaled+blurred bg to the section so it can't bleed the
+       soft room into the dark upfront slide below */
+    overflow: hidden;
+  }
+
+  .lc__bg,
+  .lc__veil {
+    position: absolute;
+  }
+
+  .lc__veil {
+    height: 280px;
+  }
+
+  /* the frame joins the flow */
+  .lc__frame {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 100%;
+    height: auto;
+    padding: 72px 24px 64px;
+    box-sizing: border-box;
+  }
+
+  .lc__head {
+    position: static;
+    width: 100%;
+    gap: 18px;
+    margin-bottom: 36px;
+  }
+
+  .lc__title {
+    font-size: clamp(26px, 7vw, 32px);
+  }
+
+  .lc__sub {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  /* three full-width cards, stacked, natural height */
+  .lc__cards {
+    position: static;
+    transform: none;
+    width: 100%;
+    height: auto;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .lc__card {
+    flex: none;
+    width: 100%;
+    gap: 24px;
+    border-radius: 16px;
+  }
+
+  .lc__card--typical {
+    padding: 24px 20px;
+  }
+
+  .lc__card--regular {
+    padding: 24px 20px;
+  }
+
+  .lc__card--f11 {
+    padding: 24px 20px;
+  }
+
+  .lc__card-art {
+    width: 191px;
+    height: 196px;
+  }
+
+  .lc__card-title {
+    font-size: 22px;
+  }
+
+  .lc__rows {
+    gap: 12px;
+  }
+
+  .lc__row {
+    gap: 6px;
+  }
+
+  .lc__row-ic {
+    width: 16px;
+    height: 16px;
+  }
+
+  .lc__row-text {
+    font-size: 14px;
+  }
+
+  .lc__pill {
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+
+  .lc__save-v {
+    font-size: 18px;
+    flex-wrap: wrap;
+  }
+
+  .lc__save-arrow {
+    width: 15px;
+    height: 15px;
+  }
+
+  .lc__save-k {
+    font-size: 14px;
+  }
+}

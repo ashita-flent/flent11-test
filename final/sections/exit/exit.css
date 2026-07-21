@@ -19,17 +19,12 @@
   width: 100%;
   height: 100vh;
   min-height: 620px;
-  background: linear-gradient(to bottom, #ffffff 0%, #eedcd0 100%);
+  background: transparent;
   overflow: hidden;
 
-  /* curtain transition: the journey's final frame stays pinned for one
-     extra viewport of runway while this section rides up OVER it */
-  margin-top: -100vh;
+  /* curtain transition is owned by .exit-trust-wash so the same gradient
+     can span the exit story and trust cards without a section seam. */
   z-index: 10;
-  box-shadow: 0 calc(var(--u) * -24) calc(var(--u) * 80) rgba(15, 8, 3, 0.35);
-  /* the shadow must only cast UP over the journey; the bottom clips 1px
-     inside the box so no sub-pixel sliver draws over the trust peach */
-  clip-path: inset(-9999px 0 1px 0);
 }
 
 /* contain-fit 1512×982 design frame */
@@ -889,56 +884,54 @@
        shortened viewports the last sliver simply scrolls. */
     --ue: calc(100vw / 402);
     --u: var(--ue);
+    /* the math page's contain-fit unit: width-fit normally, shrinking
+       with the viewport height so the whole calculator (874-canvas)
+       always lands in one frame */
+    --um: min(calc(100vw / 402), calc(100svh / 874));
     height: auto;
     min-height: 100dvh;
-    /* the phone artboard warms a touch deeper (413:794) */
-    background: linear-gradient(to bottom, #ffffff 0%, #f2e5d3 100%);
+    background: transparent;
   }
 
-  /* the frame is the full-width 402×874 design canvas in flow; both
-     faces (story in flow, math overlaying absolute) share it */
+  /* the frame wraps the story's flow height (one steps-screen + the
+     safety cards past the fold); the math page overlays it */
   .ex__frame {
     position: relative;
     left: auto;
     top: auto;
     transform: none;
     width: calc(var(--ue) * 402);
-    height: calc(var(--ue) * 874);
-    min-height: 0;
+    height: auto;
+    min-height: 100svh;
     margin: 0 auto;
   }
 
-  /* ── the story is one 874u screen (413:794): the THREAD TURNS
-     VERTICAL — a 1px line at x114 the moments sit on, captions in its
-     left gutter, the CTA resting on the line with its arrow pointing
-     the way DOWN ── */
+  /* ── the story (413:794, 2026-07-20 layout): head + the See-math pill
+     up top, the vertical timeline under it — ONE viewport of steps —
+     and the three safety cards waiting past the fold ── */
   .ex__story {
     position: relative;
     inset: auto;
-    height: calc(var(--ue) * 874);
+    /* the steps screen claims a full viewport (or the design's 700u
+       foot, whichever is taller); the pledge band adds its own run */
+    --sfoot: max(100svh, calc(var(--ue) * 700));
+    height: calc(var(--sfoot) + var(--ue) * 86 + 64px);
   }
 
+  /* Vector 13 — the timeline's own line at x112, y305→608 */
   .ex__thread {
-    left: calc(var(--ue) * 114);
+    left: calc(var(--ue) * 112);
     right: auto;
-    top: calc(var(--ue) * 405);
-    bottom: 0;
+    top: calc(var(--ue) * 305);
+    bottom: auto;
+    height: calc(var(--ue) * 303);
     width: 1px;
     margin-left: -0.5px;
     border-top: 0;
     border-left: 0;
-    /* the running baseline carries a gradient stroke (416:246): black@0.2
-       at the ends, fading to transparent ~15.5% down so it never strikes
-       through the title / rent text — the legibility gradient */
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.2) 0%,
-      rgba(0, 0, 0, 0) 15.5%,
-      rgba(0, 0, 0, 0.2) 100%
-    );
-    /* the top glides so the line can GROW to full height when the
-       calculator face arrives — the thread visibly continues */
-    transition: top 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+    background: rgba(0, 0, 0, 0.2);
+    /* the math page draws its own line — this one steps aside */
+    transition: opacity 0.35s ease;
   }
 
 
@@ -948,9 +941,9 @@
 
   /* head (413:853) */
   .ex__shead {
-    left: calc(var(--ue) * 24);
+    left: calc(var(--ue) * 40);
     top: calc(var(--ue) * 60);
-    width: calc(var(--ue) * 354);
+    width: calc(var(--ue) * 332);
     gap: calc(var(--ue) * 18);
   }
 
@@ -965,25 +958,25 @@
 
   /* captions move to the line's left gutter (413:937…) */
   .ex__tl-when {
-    left: calc(var(--ue) * 24) !important;
+    left: calc(var(--ue) * 34) !important;
     transform: none;
     align-items: flex-start;
   }
 
   .ex__tl-when--0 {
-    top: calc(var(--ue) * 390);
+    top: calc(var(--ue) * 290);
   }
 
   .ex__tl-when--1 {
-    top: calc(var(--ue) * 487);
+    top: calc(var(--ue) * 400);
   }
 
   .ex__tl-when--2 {
-    top: calc(var(--ue) * 607);
+    top: calc(var(--ue) * 524);
   }
 
   .ex__tl-when--3 {
-    top: calc(var(--ue) * 693);
+    top: calc(var(--ue) * 622);
   }
 
   .ex__tl-stem {
@@ -1006,30 +999,30 @@
 
   .ex__tls--0 {
     left: calc(var(--ue) * 96) !important;
-    top: calc(var(--ue) * 390) !important;
-    width: calc(var(--ue) * 282) !important;
+    top: calc(var(--ue) * 290) !important;
+    width: calc(var(--ue) * 276) !important;
   }
 
   .ex__tls--1 {
     left: calc(var(--ue) * 96) !important;
-    top: calc(var(--ue) * 485) !important;
-    width: calc(var(--ue) * 282) !important;
+    top: calc(var(--ue) * 393) !important;
+    width: calc(var(--ue) * 276) !important;
   }
 
   .ex__tls--2 {
     left: calc(var(--ue) * 96) !important;
-    top: calc(var(--ue) * 598) !important;
-    width: calc(var(--ue) * 282) !important;
+    top: calc(var(--ue) * 514) !important;
+    width: calc(var(--ue) * 276) !important;
   }
 
   .ex__tls--3 {
     left: calc(var(--ue) * 96) !important;
-    top: calc(var(--ue) * 693) !important;
-    width: calc(var(--ue) * 282) !important;
+    top: calc(var(--ue) * 617) !important;
+    width: calc(var(--ue) * 276) !important;
   }
 
   .ex__tls-pill {
-    width: calc(var(--ue) * 282) !important;
+    width: calc(var(--ue) * 250) !important;
     height: calc(var(--ue) * 31);
     padding: 0 calc(var(--ue) * 20) 0 calc(var(--ue) * 40);
     border-radius: calc(var(--ue) * 30);
@@ -1048,7 +1041,7 @@
 
   .ex__tls-copy {
     margin-left: calc(var(--ue) * 40);
-    width: calc(var(--ue) * 242) !important;
+    width: calc(var(--ue) * 236) !important;
     font-size: max(calc(var(--ue) * 12), 10px);
     line-height: 1.5;
   }
@@ -1057,11 +1050,12 @@
     font-weight: 700;
   }
 
-  /* pledges — a 3-up row above the timeline (413:1025) */
+  /* the safety cards — a 3-up band PAST the steps screen (413:1025):
+     the first viewport is the steps alone; these arrive on scroll */
   .ex__pledges {
-    left: calc(var(--ue) * 24);
-    top: calc(var(--ue) * 241);
-    width: calc(var(--ue) * 354);
+    left: calc(var(--ue) * 34);
+    top: calc(var(--sfoot) + 16px);
+    width: calc(var(--ue) * 338);
     gap: calc(var(--ue) * 12);
     align-items: stretch;
   }
@@ -1069,17 +1063,19 @@
   .ex__pledge {
     flex-direction: column;
     align-items: flex-start;
-    gap: calc(var(--ue) * 16);
+    gap: calc(var(--ue) * 12);
     padding: calc(var(--ue) * 10);
     border-radius: calc(var(--ue) * 12);
+    background: rgba(255, 255, 255, 0.7);
     font-size: max(calc(var(--ue) * 12), 10px);
     line-height: 1.33;
+    color: rgba(0, 0, 0, 0.8);
   }
 
   .ex__pledge-tile {
-    width: calc(var(--ue) * 30);
-    height: calc(var(--ue) * 30);
-    border-radius: calc(var(--ue) * 8);
+    width: calc(var(--ue) * 22);
+    height: calc(var(--ue) * 22);
+    border-radius: calc(var(--ue) * 6);
     border-width: 0.5px;
     background: linear-gradient(
       to bottom,
@@ -1089,15 +1085,15 @@
   }
 
   .ex__pledge-tile img {
-    width: calc(var(--ue) * 16);
-    height: calc(var(--ue) * 15.7);
+    width: calc(var(--ue) * 12);
+    height: calc(var(--ue) * 11.8);
   }
 
-  /* the CTA rests on the vertical line, arrow pointing DOWN (413:1014 —
-     centre x 113.5 ≈ the line's 114) */
+  /* the way in sits right under the copy (413:1014 @ (40,226)) — the
+     arrow points the way the page will slide */
   .ex__mathcta {
-    left: calc(var(--ue) * 49);
-    top: calc(var(--ue) * 793);
+    left: calc(var(--ue) * 40);
+    top: calc(var(--ue) * 226);
     height: calc(var(--ue) * 27);
     padding: 0 calc(var(--ue) * 10);
     gap: calc(var(--ue) * 6);
@@ -1113,37 +1109,42 @@
   .ex__mathcta-arrow {
     width: calc(var(--ue) * 12);
     height: calc(var(--ue) * 9.7);
-    transform: rotate(90deg);
   }
 
-  .ex__mathcta:hover .ex__mathcta-arrow {
-    transform: rotate(90deg);
-  }
+  /* ══ the calculator (416:242) — a NESTED PAGE: it pushes in from the
+     right (the base horizontal swipe), sized by --um so the whole
+     874-canvas lands inside one viewport, and draws its own thread ══ */
 
-  /* ── the swipe turns VERTICAL with the thread: the story rides up as
-     the calculator arrives from below the fold ── */
-  .ex__story {
-    transform: translateY(calc(-100vh - 20%));
+  /* the story's line steps aside while the math page is up */
+  .exit:has(.ex__math.is-on) .ex__thread {
+    opacity: 0;
   }
 
   .ex__math {
-    transform: translateY(calc(100vh + 20%));
-  }
-
-  .ex__story.is-on,
-  .ex__math.is-on {
-    transform: none;
-  }
-
-  /* ══ the calculator (416:242) — the thread stays put and becomes the
-     TRACK: it stretches to full height as this face arrives, months
-     tick down it, and the marker rides it. The desktop's horizontal
-     rail steps aside entirely. ══ */
-
-  /* the thread stretches to the top of the screen while the math is up —
-     one continuous line handing off between the faces */
-  .exit:has(.ex__math.is-on) .ex__thread {
+    --ue: var(--um);
+    --u: var(--um);
+    left: 50%;
+    right: auto;
     top: 0;
+    bottom: auto;
+    width: calc(var(--um) * 402);
+    margin-left: calc(var(--um) * -201);
+    height: 100svh;
+  }
+
+  /* the math page's own thread — Vector 13 (416:246): a FIXED line, not a
+     gradient. x114, top 265, height 473 (the track's slot 0 → slot 11), a
+     flat black@0.2. It starts well below the head, so it never strikes the
+     title / rent rows — no fade needed. */
+  .ex__math::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--um) * 114);
+    top: calc(var(--um) * 265);
+    height: calc(var(--um) * 473);
+    width: 1px;
+    margin-left: -0.5px;
+    background: rgba(0, 0, 0, 0.2);
   }
 
   .ex__stat,
@@ -1152,9 +1153,9 @@
     display: none;
   }
 
-  /* head (416:243) — Back, the title, the rent rows */
+  /* head (416:243 @ x40) — Back, the title, the rent rows */
   .ex__back {
-    left: calc(var(--ue) * 24);
+    left: calc(var(--ue) * 40);
     top: calc(var(--ue) * 60);
     gap: calc(var(--ue) * 5.3);
     font-size: max(calc(var(--ue) * 14), 12px);
@@ -1167,16 +1168,18 @@
   }
 
   .ex__head {
-    left: calc(var(--ue) * 24);
+    left: calc(var(--ue) * 40);
     top: calc(var(--ue) * 96);
-    width: calc(var(--ue) * 354);
+    width: calc(var(--ue) * 332);
     flex-direction: column;
     align-items: flex-start;
     gap: calc(var(--ue) * 18);
   }
 
+  /* 416:244 — 20px Medium (the redesign shrank the title from 28) */
   .ex__mtitle {
-    font-size: max(calc(var(--ue) * 28), 1.35rem);
+    font-size: max(calc(var(--ue) * 20), 17px);
+    font-weight: 500;
   }
 
   .ex__mtitle br {
@@ -1198,7 +1201,7 @@
   }
 
   .ex__rent-field {
-    width: calc(var(--ue) * 178);
+    width: calc(var(--ue) * 190);
     padding: calc(var(--ue) * 6) calc(var(--ue) * 10);
   }
 
@@ -1239,10 +1242,10 @@
     background: rgba(0, 0, 0, 0.2);
   }
 
-  /* month labels in the gutter (416:433 — right edge at x102) */
+  /* month labels in the gutter (416:433 @ x40, w62 — right edge x102) */
   .ex__vmonth {
     position: absolute;
-    left: calc(var(--ue) * 24);
+    left: calc(var(--ue) * 40);
     width: calc(var(--ue) * 62);
     transform: translateY(-50%);
     font-family: var(--sans);
@@ -1263,10 +1266,11 @@
     color: rgba(0, 0, 0, 0.2);
   }
 
-  /* GAVE NOTICE / LOAN CLOSED under their months (416:523 / 416:521) */
+  /* GAVE NOTICE / LOAN CLOSED under their months (416:523 / 416:521 @ x32,
+     w78 — centred on x71 with the month labels above) */
   .ex__vtag {
     position: absolute;
-    left: calc(var(--ue) * 24);
+    left: calc(var(--ue) * 32);
     width: calc(var(--ue) * 78);
     font-family: var(--sans);
     font-weight: 600;
@@ -1283,11 +1287,12 @@
     color: #008247;
   }
 
-  /* the touch band riding the line — labels + line + bob zone */
+  /* the touch band riding the line — labels + line + bob zone.
+     top = vY(1) − VPITCH/2 = 308 − 21.5 (mirrors VBAND_TOP in the TSX) */
   .ex__vband {
     position: absolute;
     left: 0;
-    top: calc(var(--ue) * 356.5);
+    top: calc(var(--ue) * 286.5);
     width: calc(var(--ue) * 200);
     height: calc(var(--ue) * 473);
     z-index: 1;
@@ -1473,12 +1478,12 @@
   }
 
   .ex__vchip--paid {
-    top: calc(var(--ue) * 303);
+    top: calc(var(--ue) * 259);
     background: rgba(165, 103, 80, 0.1);
   }
 
   .ex__vchip--pend {
-    top: calc(var(--ue) * 758);
+    top: calc(var(--ue) * 688);
     background: rgba(0, 0, 0, 0.05);
   }
 

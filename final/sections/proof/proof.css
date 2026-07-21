@@ -13,7 +13,7 @@
   width: 100%;
   height: 300vh; /* the runway the drift is scrubbed across */
   /* matches the pin's gradient tail so no seam shows at the handoff */
-  background: #eedcd0;
+  background: #f2e5d3;
 }
 
 /* the held screen — the slide's warm ground (Figma 398:684) */
@@ -25,7 +25,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to bottom, #ffffff 0%, #eedcd0 100%);
+  background: linear-gradient(to bottom, #ffffff 0%, #f2e5d3 100%);
 }
 
 /* same content column as the exit frame — 1320u centred */
