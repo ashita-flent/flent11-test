@@ -19,8 +19,7 @@ gsap.registerPlugin(ScrollTrigger);
    2 · Regular Flent Lock-in: even glass (white 0.8 + blur 24), green
        check rows.
    3 · Flent 11: solid white, the photo art bleeding in at the top
-       right, Medium rows, the green "First month free" pill and the
-       savings line with the ↗.
+       right, Medium rows, the green "First month free" pill.
 
    Phone: the same three cards stack as full-width scrollable blocks
    under the heading, on the same veiled photo.
@@ -31,8 +30,6 @@ type Col = {
   key: string;
   title: React.ReactNode;
   rows: Row[];
-  save: React.ReactNode;
-  arrow?: boolean;
 };
 
 const IC = {
@@ -55,7 +52,6 @@ const COLS: Col[] = [
       { icon: IC.upload, text: "Pay from month one" },
       { icon: IC.trenddown, text: "Leave early, lose full deposit" },
     ],
-    save: "₹ 0",
   },
   {
     key: "regular",
@@ -67,8 +63,6 @@ const COLS: Col[] = [
       { icon: IC.upload, text: "Pay from month one" },
       { icon: IC.check, text: "Leave early, lose full deposit" },
     ],
-    save: "₹ 22,000 + 1 month rent",
-    arrow: true,
   },
   {
     key: "f11",
@@ -88,8 +82,6 @@ const COLS: Col[] = [
         ),
       },
     ],
-    save: "₹ 65,000 + 2 months rent + deposit",
-    arrow: true,
   },
 ];
 
@@ -194,15 +186,6 @@ export default function LockinCards() {
                   </li>
                 ))}
               </ul>
-              <div className="lc__save">
-                <p className="lc__save-v">
-                  {col.save}
-                  {col.arrow && (
-                    <img className="lc__save-arrow" src="/lc-ic-arrow.svg" alt="" />
-                  )}
-                </p>
-                <p className="lc__save-k">saved over the year</p>
-              </div>
             </div>
           ))}
         </div>

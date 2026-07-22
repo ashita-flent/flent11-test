@@ -58,12 +58,13 @@ const FIXED_DESKTOP = new Set([
    rows −1/0, col 5 rows 2/3) break the alternation so the peeks land
    randomly with frosted gaps between. Drag reveals the frosted ones. */
 const FIXED_MOBILE = new Set([
-  "1,-1", "2,-1", "4,-1",
-  "4,0",
-  "1,1", "3,1",
-  "2,2", "3,2", "5,2",
-  "1,3", "4,3", "5,3",
-  "3,4",
+  // Figma 497:895 — the scatter is shaped to COMPLEMENT the copy: a sparse
+  // top (only the right-hand peek), then it clusters down and to the right,
+  // leaving the upper-left open for the "Still unsure / Talk to us" block.
+  "3,0",
+  "0,1", "2,1", "5,1",
+  "1,2", "3,2", "4,2",
+  "0,3", "2,3", "3,3", "5,3",
 ]);
 
 export default function Footer() {

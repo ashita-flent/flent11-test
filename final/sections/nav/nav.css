@@ -56,9 +56,10 @@
   position: relative;
   z-index: 1;
   /* align the pills' OUTER edges to the sections' content column: the shared
-     1512×982 frame inset 94u (matches faq / proof / exit / journey) — so the
-     logo pill's left edge and the CTA pill's right edge sit on the margins */
-  padding: 20px calc((100vw - var(--u) * 1512) / 2 + var(--u) * 94);
+     1320u column = 96u inset on the 1512 frame ((1512−1320)/2 — faq / proof /
+     lockin / exit measure exactly 96) — so the logo pill's left edge and the
+     CTA pill's right edge sit ON the site margin, not 2u shy of it */
+  padding: 20px calc((100vw - var(--u) * 1512) / 2 + var(--u) * 96);
   display: flex;
   align-items: center;
   justify-content: space-between;

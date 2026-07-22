@@ -251,11 +251,14 @@
 /* ---- phone (≤640) — capsule, then copy, then the puzzle band --------- */
 @media (max-width: 640px) {
   .ft {
-    /* the frame unit doubles to width-fit-half: the puzzle band and its
-       cells read at phone scale (the grid runs wider than the screen,
-       its right-weighted cluster filling the frame) — every uf consumer
-       (band height, tile size/positions, slice boxes) scales together */
-    --uf: calc(100vw / 756);
+    /* Figma 497:895 sizes the phone squares at 111.49u on a 540-tall band
+       (the 402 frame). The tile is CELL(169)·uf, so 169·uf = 111.49 ⇒
+       uf = 100vw/609; band height 818·uf = 540 falls out for free. */
+    --uf: calc(100vw / 609);
+    /* re-anchor the grid so col 0 lands at Figma's −29 (fx + uf·COL0 = −29,
+       COL0 = 159 ⇒ fx = uf·−203). The default half-frame centring pushed the
+       cluster too far right for the new around-the-copy scatter. */
+    --fx: calc(var(--uf) * -203);
     background: #f2e5d3;
   }
 
@@ -313,10 +316,19 @@
   }
 
   .ft__slots {
-    position: static;
+    /* the copy layers OVER the band's clear top strip (Figma 497:895 seats
+       "Still unsure / Talk to us" on the frosted photo, the squares stepping
+       around it) — z-index keeps it above the tiles, which the region's
+       negative margin below tucks up under the copy's lower half */
+    position: relative;
+    z-index: 2;
+    /* reset the desktop absolute offsets — relative would otherwise re-apply
+       the frame-anchored left/top and shove the copy off-screen */
+    left: auto;
+    top: auto;
     order: -1;
     width: auto;
-    padding: 0 6vw 34px;
+    padding: 0 6vw 0;
     gap: 20px;
   }
 
@@ -339,5 +351,9 @@
     /* the tile slices mirror the photo's 818uf cover box — the band must
        keep that height or the sharp reveals drift off the backdrop */
     height: calc(var(--uf) * 818);
+    /* tuck the band's empty top strip (row 0 starts 141uf ≈ 93px down) up
+       behind the copy so the squares begin right where the copy ends —
+       no dead peach band between them (Figma 497:895) */
+    margin-top: calc(var(--uf) * -141);
   }
 }

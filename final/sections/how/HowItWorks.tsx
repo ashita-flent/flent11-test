@@ -165,6 +165,8 @@ const DOT_X = [230, 578.67, 927.33, 1276];
    financing beats SHARE dot 2 (both Figma frames mark "2ND – 11TH MONTH").
    The inverse (first step per dot) drives click-to-navigate on the dots. */
 const DOT_FOR_STEP = [1, 2, 2, 3];
+/* phones fold BOTH financing beats onto dot 1's caption run (405:372) */
+const DOT_FOR_STEP_MOBILE = [1, 1, 2, 3];
 
 /* ── The pane window (Figma 33:410 — 510×680, 3×4 grid of 170px panes) ──
    Shared by steps 2–4: step 2 shows it zoomed 2.349× (Figma 33:398), step 3
@@ -532,9 +534,17 @@ export default function HowItWorks({
   // the pinned timeline's ScrollTrigger — the break slide's "see how it
   // works" link converts a beat position into a scroll target through it
   const mainSTRef = useRef<ScrollTrigger | null>(null);
+  // phones drive the journey frame-by-frame (no scrub); this steps the
+  // paused timeline straight to a snapPoint index (used by the dots)
+  const stepToRef = useRef<((i: number) => void) | null>(null);
   const goToBeat = (beat: number) => {
     const st = mainSTRef.current;
     if (!st) return;
+    // phones: hop straight to that step's frame (beat 0.9 + step → index)
+    if (stepToRef.current) {
+      stepToRef.current(Math.max(1, Math.round(beat - 0.9) + 1));
+      return;
+    }
     const t = (beat + 0.42) / TOTAL_BEATS;
     window.scrollTo({
       top: st.start + t * (st.end - st.start),
@@ -547,7 +557,16 @@ export default function HowItWorks({
   const goToDot = (dot: number) => {
     const st = mainSTRef.current;
     if (!st) return;
-    const step = DOT_FOR_STEP.indexOf(dot);
+    // invert through the SAME map the dots render with (phones collapse
+    // the financing beats differently than desktop)
+    const step = (
+      stepToRef.current ? DOT_FOR_STEP_MOBILE : DOT_FOR_STEP
+    ).indexOf(dot);
+    // phones: hop straight to that frame (index 0 = intro, else step + 1)
+    if (stepToRef.current) {
+      stepToRef.current(step < 0 ? 0 : step + 1);
+      return;
+    }
     if (step < 0) {
       window.scrollTo({ top: st.start, behavior: "smooth" });
       return;
@@ -628,9 +647,10 @@ export default function HowItWorks({
       const zoom = {
         scale: s1,
         xPercent: ((0.5 * vw - (W * s1) / 6 - X) / W) * 100,
-        // the glass rides a touch higher (0.53 → 0.50) so move-in's copy
-        // and the month-one cell share the frame evenly
-        yPercent: ((0.5 * vh - 0.045 * H * s1 - Y) / H) * 100,
+        // the glass parks just under the mid-line (0.545) — at the old
+        // 0.50-minus-4.5% seat its frame crowded the move-in copy's foot
+        // to a ~15px gap on real phones
+        yPercent: ((0.545 * vh - 0.045 * H * s1 - Y) / H) * 100,
       };
       // completion (iPhone 17 - 6, window 411:678) — the dive renders
       // the window at the design's literal 569.9 frame-px width and
@@ -793,11 +813,7 @@ export default function HowItWorks({
 
       const anchors: number[] = [];
 
-      // the frame we last settled on (index into snapPoints). On phones the
-      // snap is clamped to ±1 of this, so a fast fling can't blow past the
-      // steps — one swipe advances one frame and momentum overshoot is
-      // reeled back to the very next step (the story is read in order).
-      let settledIdx = 0;
+      // nearest snapPoint index to a scroll progress (desktop snap)
       const nearestIdx = (value: number) => {
         let best = 0;
         for (let i = 1; i < snapPoints.length; i++)
@@ -810,53 +826,30 @@ export default function HowItWorks({
 
       const tl = gsap.timeline({
         defaults: { ease: "power2.inOut" },
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: `+=${TOTAL_BEATS * 100}%`,
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-          // landing break at each step's settled frame. inertia off so a
-          // fast fling still rests at a step instead of coasting ahead —
-          // the user is meant to stop at every frame.
-          snap: {
-            snapTo: (value: number) => {
-              if (!snapPoints.length) return value;
-              if (mobileLayout) {
-                // ── FRAME-BY-FRAME (daylightcomputer-style) ──
-                // Any deliberate scroll commits to the ADJACENT frame in
-                // that direction — one swipe = one frame. It never snaps
-                // back to where it came from (the old "nearest" rule did
-                // that whenever a swipe fell short of the next frame's
-                // midpoint), and a long fling still only advances one
-                // frame. A tiny deadzone keeps a resting settle from
-                // drifting off its frame.
-                const cur = snapPoints[settledIdx];
-                const eps = 0.01;
-                if (value > cur + eps)
-                  return snapPoints[
-                    Math.min(settledIdx + 1, snapPoints.length - 1)
-                  ];
-                if (value < cur - eps)
-                  return snapPoints[Math.max(settledIdx - 1, 0)];
-                return cur;
-              }
-              return snapPoints[nearestIdx(value)];
+        // Phones DON'T scrub — the timeline is PAUSED and driven one frame
+        // at a time by the pin's snap (built after the timeline, below), so
+        // a frame stays dead still until the next swipe: no scrub chasing
+        // the scroll/momentum, no rubber-band snap-back. Desktop keeps the
+        // scrubbed pin with nearest-frame snapping.
+        paused: mobileLayout,
+        scrollTrigger: mobileLayout
+          ? undefined
+          : {
+              trigger: section,
+              start: "top top",
+              end: `+=${TOTAL_BEATS * 100}%`,
+              scrub: 1,
+              pin: true,
+              anticipatePin: 1,
+              snap: {
+                snapTo: (value: number) =>
+                  snapPoints.length ? snapPoints[nearestIdx(value)] : value,
+                inertia: false,
+                duration: { min: 0.25, max: 0.7 },
+                delay: 0.1,
+                ease: "power2.out",
+              },
             },
-            inertia: false,
-            // a firm, consistent settle so each frame lands cleanly
-            duration: mobileLayout
-              ? { min: 0.3, max: 0.7 }
-              : { min: 0.25, max: 0.7 },
-            delay: mobileLayout ? 0.08 : 0.1,
-            ease: "power2.out",
-            onComplete: () => {
-              const st = mainSTRef.current;
-              if (st) settledIdx = nearestIdx(st.progress);
-            },
-          },
-        },
       });
 
       // intro reads first, then lifts away — the veil dissolves with it,
@@ -997,35 +990,91 @@ export default function HowItWorks({
       // over during the hold)
       tl.set({}, {}, TOTAL_BEATS);
 
-      mainSTRef.current = tl.scrollTrigger ?? null;
-
       // snap targets: intro rest + every settled frame + release
       const total = tl.duration();
       snapPoints.push(0, ...anchors.map((a) => (a + 0.42) / total), 1);
 
-      // active-beat tracking, decoupled from the scrubbed timeline
-      ScrollTrigger.create({
-        trigger: section,
-        start: "top top",
-        end: `+=${TOTAL_BEATS * 100}%`,
-        onUpdate: (self) => {
-          const t = self.progress * total;
-          // TWO clocks: the INDICATOR flips early (a−0.45, the moment
-          // the previous copy starts leaving) so the dots lead the
-          // story; the MICRO trigger flips late (a−0.1, the step nearly
-          // settled) so arrival animations — and the mon beat's landed
-          // payments — are never reset while their step is still on
-          // screen
-          let dotIdx = -1;
-          let idx = -1;
-          anchors.forEach((a, i) => {
-            if (t >= a - 0.45) dotIdx = i;
-            if (t >= a - 0.1) idx = i;
+      // TWO clocks read off the timeline TIME: the INDICATOR flips early
+      // (a−0.45, as the previous copy starts leaving) so the dots lead the
+      // story; the MICRO trigger flips late (a−0.1, the step nearly
+      // settled) so arrival animations aren't reset while their step is
+      // still on screen.
+      const updateBeat = (t: number) => {
+        let dotIdx = -1;
+        let idx = -1;
+        anchors.forEach((a, i) => {
+          if (t >= a - 0.45) dotIdx = i;
+          if (t >= a - 0.1) idx = i;
+        });
+        setDotStep(dotIdx);
+        setActive(idx);
+      };
+
+      if (mobileLayout) {
+        // ── PHONE: frame-by-frame over NATIVE scroll (daylight-style) ──
+        // The section pins for the runway and scrolling stays fully native
+        // — nothing is intercepted, so it can never lock up. The runway is
+        // divided into a zone per frame; when the scroll crosses into a
+        // new zone, the paused timeline TWEENS to that frame (never
+        // scrubbed). Between zone changes the frame is perfectly still, so
+        // there's no chasing, no magnet, no snap-back — scroll freely,
+        // frames flip smoothly as you pass each zone.
+        let cur = -1; // current frame index
+        const reduceMo = () =>
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const driveTo = (i: number, dur = 0.65) => {
+          i = Math.max(0, Math.min(snapPoints.length - 1, i));
+          if (i === cur) return;
+          cur = i;
+          gsap.to(tl, {
+            time: snapPoints[i] * total,
+            duration: reduceMo() ? 0 : dur,
+            ease: "power2.inOut",
+            overwrite: true,
+            onUpdate: () => updateBeat(tl.time()),
           });
-          setDotStep(dotIdx);
-          setActive(idx);
-        },
-      });
+        };
+        const st = ScrollTrigger.create({
+          trigger: section,
+          start: "top top",
+          end: `+=${TOTAL_BEATS * 100}%`,
+          pin: true,
+          anticipatePin: 1,
+          // seat the edge frame instantly when arriving from either end
+          onEnter: () => {
+            cur = 0;
+            tl.time(0);
+            updateBeat(0);
+          },
+          onEnterBack: () => {
+            cur = snapPoints.length - 1;
+            tl.time(total);
+            updateBeat(total);
+          },
+          // the zone tracker: flip the frame when the scroll crosses the
+          // midpoint into the next frame's territory
+          onUpdate: (self) => driveTo(nearestIdx(self.progress)),
+        });
+        mainSTRef.current = st;
+
+        // dots / progress bar / intro lead hop straight to a frame: move
+        // the scroll into that frame's zone (instant — the pin holds the
+        // stage still) and tween the frame there
+        stepToRef.current = (i: number) => {
+          i = Math.max(0, Math.min(snapPoints.length - 1, i));
+          st.scroll(st.start + snapPoints[i] * (st.end - st.start));
+          driveTo(i);
+        };
+      } else {
+        mainSTRef.current = tl.scrollTrigger ?? null;
+        // active-beat tracking, decoupled from the scrubbed timeline
+        ScrollTrigger.create({
+          trigger: section,
+          start: "top top",
+          end: `+=${TOTAL_BEATS * 100}%`,
+          onUpdate: (self) => updateBeat(self.progress * total),
+        });
+      }
     }, sectionRef);
 
     return () => ctx.revert();
@@ -1366,7 +1415,7 @@ export default function HowItWorks({
   // financed shares the FIRST MONTH dot on phones (iPhone 17 - 4).
   // Everything the INDICATOR shows rides the early dotStep clock; the
   // stage's own states (finalCls, micro) stay on the settled `active`.
-  const dotMap = mobileInd ? [1, 1, 2, 3] : DOT_FOR_STEP;
+  const dotMap = mobileInd ? DOT_FOR_STEP_MOBILE : DOT_FOR_STEP;
   const dotIdx =
     dotStep < 0 ? 0 : dotMap[Math.min(dotStep, dotMap.length - 1)];
   const activeX = dotXs[dotIdx];
@@ -1698,6 +1747,24 @@ export default function HowItWorks({
           />
           <div
             className={`how__indicator${dotStep < STEPS.length ? " is-live" : ""}${dotStep >= 0 && STEPS[dotStepIdx].tone === "white" ? " is-white" : ""}`}
+            // the whole bar is a click target — jump to the nearest step
+            onClick={(e) => {
+              const dots = [
+                ...e.currentTarget.querySelectorAll<HTMLElement>(".how__dot"),
+              ];
+              if (!dots.length) return;
+              let best = 0;
+              let bestD = Infinity;
+              dots.forEach((d, i) => {
+                const r = d.getBoundingClientRect();
+                const dist = Math.abs(e.clientX - (r.left + r.width / 2));
+                if (dist < bestD) {
+                  bestD = dist;
+                  best = i;
+                }
+              });
+              goToDot(best);
+            }}
           >
             <span
               className="how__when"
@@ -1737,7 +1804,10 @@ export default function HowItWorks({
                   type="button"
                   className={`how__dot${i === dotIdx && dotStep < STEPS.length ? " is-active" : ""}`}
                   style={{ left: `calc(var(--u) * ${x})` }}
-                  onClick={() => goToDot(i)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToDot(i);
+                  }}
                   aria-label={`Go to ${label}`}
                 />
               );

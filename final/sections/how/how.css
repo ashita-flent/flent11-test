@@ -899,13 +899,16 @@
   gap: calc(var(--u) * 12);
   padding: calc(var(--u) * 12) calc(var(--u) * 16);
   border-radius: calc(var(--u) * 12);
-  /* 344:2794 — white easing to half-glass at the foot. What shows
-     through is the deck behind, and those cards carry their own
-     self-blur (Chromium never lets this card's backdrop-filter sample
-     its siblings), so the translucency stays soft. */
-  background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.5));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* 344:2794 — white easing toward glass at the foot, a hint of the deck
+     behind. The foot was half-glass, but the deck cards + room read
+     THROUGH it and fought the front card's text. Chromium never lets this
+     card's backdrop-filter sample its SIBLING cards, so a bigger blur
+     alone can't hide the deck — the foot's own opacity is the real lever;
+     it's lifted to 0.9 (deck now a whisper) and the blur raised to 22 for
+     the room that IS in the backdrop. */
+  background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.9));
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
   box-shadow: 0 calc(var(--u) * 4) calc(var(--u) * 16) rgba(0, 0, 0, 0.1);
   transform-origin: 50% 0;
 }
@@ -1895,6 +1898,13 @@
 
 .how__indicator.is-live {
   opacity: 1;
+  /* the whole bar becomes a tap target — click/tap anywhere jumps to the
+     nearest step (swipes still reach the window's gesture observer) */
+  pointer-events: auto;
+  cursor: pointer;
+  /* above every step layer (the complete step carries z 6) — without
+     this the final frame's content stacks over the dots and eats taps */
+  z-index: 8;
 }
 
 .how__when {
@@ -2057,7 +2067,9 @@
 
 .is-upfront.is-uB .how__plabel {
   opacity: 1;
-  color: rgba(255, 255, 255, 0.55);
+  /* 504:1177… — the waiting months sit QUIET (white 30%); they brighten
+     only in the reader's eye as they gather into the single payment */
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* month 2's own label retires — its lit ₹0 block owns the pane */
@@ -2408,10 +2420,44 @@
 
 /* ---- act B flow — Figma 174:685: wider card (the struck full price
    rides inline), shorter wire, same icon spot ---- */
-/* ── the detail page's flow (Figma 253:2664/2663/2661): the shared
-   tenant card at its Frame-7 seat, wire to the big flent tile ── */
+/* ── the detail page's flow (Frame 7 · 504:1204/1203/1215): the tenant
+   card at its Frame-7 seat goes DARK GLASS — a black .09→.45 gradient
+   under the same 22px blur, hairline white border, all-white ink — the
+   EMI beat's white frost reads wrong on the candle-lit wall ── */
 .how__fin2-card--ub {
+  /* the card hangs on the same 96u site column as the copy above it */
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 520);
+  border-color: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.09),
+    rgba(0, 0, 0, 0.45)
+  );
+}
+
+.how__fin2-card--ub .how__fin2-tname {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.how__fin2-card--ub .how__fin2-tname strong {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.how__fin2-card--ub .how__fin2-amts {
+  color: #fff;
+}
+
+.how__fin2-card--ub .how__fin2-amts s {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.how__fin2-card--ub .how__fin2-note {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.how__fin2-card--ub .how__fin2-note strong {
+  color: #fff;
 }
 
 .how__ub-wire {
@@ -2434,23 +2480,48 @@
 
 .how__ub-flent {
   position: absolute;
-  left: calc(var(--u) * 687);
-  top: calc(var(--u) * 548);
+  /* 504:1215 — centred at (734.33, 600.33) */
+  left: calc(var(--u) * 683);
+  top: calc(var(--u) * 549);
   width: calc(var(--u) * 103);
   height: calc(var(--u) * 103);
   display: block;
 }
 
+/* Frame 7 — the tile emits a soft warm glow into the dim room. A u-scaled
+   radial halo painted BEHIND the tile: it stays proportional at every screen
+   scale (a fixed-px drop-shadow read tight — and clipped by its own filter
+   region — on large displays) and, being a plain painted box, it can't hit
+   the drop-shadow filter-region clip at all. */
+.how__ub-flent::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--u) * -54);
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 240, 221, 0.55),
+    rgba(255, 231, 206, 0.34) 44%,
+    rgba(255, 224, 198, 0.13) 66%,
+    transparent 82%
+  );
+  pointer-events: none;
+}
+
 .how__ub-flent img {
+  position: relative; /* sit crisp above the ::before glow */
   width: 100%;
   height: 100%;
   display: block;
-  filter: drop-shadow(0 6px 22px rgba(0, 0, 0, 0.35));
+  /* just a whisper of dark ambient shadow to seat the tile on the wall */
+  filter: drop-shadow(0 calc(var(--u) * 3) calc(var(--u) * 12) rgba(0, 0, 0, 0.3));
 }
 
-/* Frame 7 seats the copy a touch left and high of the scaffold default */
+/* Frame 7 seats the copy high; its left edge joins the SITE column —
+   the shared 1320u/96u inset every section (faq/proof/lockin/nav) hangs
+   on — rather than the frame's own 85 (504:1151 drew 11u shy of it) */
 .how__ustep--b .how__copy--scaffold {
-  left: calc(var(--u) * 85);
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 212);
 }
 
@@ -2526,12 +2597,13 @@
     top: 10vh;
   }
 
-  /* move-in can't take the full crown-pad: its ₹0 window sits at a fixed
-     222my and doesn't cascade, so a big shove buries the body under the
-     card. A smaller lift clears the base-rent chip off the nav while the
-     body still clears the window (measured slack ≈ 19px). */
+  /* move-in can't take the full crown-pad: its ₹0 window doesn't cascade,
+     so a big shove buries the body under the glass. +40px drops the
+     base-rent chip clear of the nav's logo pill (it sat ~14px under it);
+     the window's own 0.545·vh seat leaves ~30px of slack below the body
+     on real phones even after this. */
   .how__copy--movein {
-    top: calc(var(--my) * 84 + 16px);
+    top: calc(var(--my) * 84 + 40px);
   }
 
   /* the base-rent chip at the phone spec (406:459 — 14 SemiBold on a
@@ -2825,15 +2897,22 @@
   }
 
   /* the detail page's window on the phone (418:1111 @ 73.15,477.7),
-     tucked low-left under the tenant card — sized to the JOURNEY's
-     resting glass (222 of the 402 frame, factor 222/510) so the shared
-     window reads as one object across the whole flow */
+     tucked low-left under the tenant card. It rides DOWN with the flow —
+     the copy/card/flent sit inside .how__ustep--b, which is shifted by the
+     nav clearance (safe-area + 40); the window is a sibling, so it must add
+     the same offset or the tenant card lands on top of it. Sized a touch
+     smaller than the journey glass so the extra drop still clears the foot
+     on short viewports (Figma 231w → 0.40 of the 510 window). */
   .upf .how__winrig,
   .upf .how__glowrig,
   .upf .how__framerig {
-    --uwin: calc(100vw / 402 * 0.4353);
-    left: calc(var(--mx) * 73.15);
-    top: calc(var(--my) * 477.7);
+    --uwin: calc(100vw / 402 * 0.4);
+    /* CENTRED in the frame: 510×0.4 = 204 of the 402-wide artboard, so the
+       left margin = (402 − 204) / 2 = 99 (shrinking it left-anchored had
+       pushed it off-centre) */
+    left: calc(var(--mx) * 99);
+    /* +64 matches the ustep drop so the tenant card → window gap holds */
+    top: calc(var(--my) * 477.7 + env(safe-area-inset-top, 0px) + 64px);
   }
 
   /* the month 1–11 total in the glass — the window unit ran it to
@@ -2916,13 +2995,14 @@
     display: none;
   }
 
-  /* ── the detail page (iPhone 17 - 11, 418:1102) — copy (29,70),
-     dark-glass tenant card (29,307) w148 paying flent directly, the
-     white flent tile (290.84,332) with a dashed run between them.
-     The copy drops to the journey's crown line (the designed 70 ran
-     it into the Back button). ── */
+  /* ── the detail page (iPhone 17 - 11, 418:1102) — copy, dark-glass
+     tenant card w148 paying flent directly, the white flent tile with
+     a dashed run between them. The frame drew its column at 29; the
+     SITE's phone gutter is the 402-frame's 24u (nav capsule, faq/proof
+     23px) — the whole flow shifts −5 to hang on it. The copy drops to
+     the journey's crown line (the designed 70 ran it into Back). ── */
   .how__ustep--b .how__copy--scaffold {
-    left: calc(var(--mx) * 29);
+    left: calc(var(--mx) * 24);
     top: calc(var(--my) * 96);
   }
 
@@ -2934,7 +3014,7 @@
      (419:1170): black 0.09→0.45 gradient, hairline white border,
      backdrop-blur, the price stacked over its struck original */
   .how__fin2-card--ub {
-    left: calc(var(--mx) * 29);
+    left: calc(var(--mx) * 24);
     top: calc(var(--my) * 307);
     width: calc(var(--mx) * 148);
     height: auto;
@@ -2995,7 +3075,7 @@
   /* the dashed run from the card to flent (Vector 9 @ 177,358 w111) —
      a light hairline + chevron over the dark wall */
   .how__ub-wire {
-    left: calc(var(--mx) * 177);
+    left: calc(var(--mx) * 172);
     right: auto;
     top: calc(var(--my) * 358);
     width: calc(var(--mx) * 111);
@@ -3032,23 +3112,33 @@
      mark; the shared asset is black-on-white, so invert flips it and a
      soft halo lifts it off the wall */
   .how__ub-flent {
-    left: calc(var(--mx) * 290.84);
+    left: calc(var(--mx) * 285.84);
     right: auto;
     top: calc(var(--my) * 332);
     width: calc(var(--mx) * 52.77);
     height: calc(var(--mx) * 52.77);
   }
 
+  /* the phone tile carries its OWN white halo via the invert drop-shadow
+     below, so the desktop warm ::before halo is off here */
+  .how__ub-flent::before {
+    display: none;
+  }
+
   .how__ub-flent img {
     filter: invert(1) drop-shadow(0 0 calc(var(--mx) * 14) rgba(255, 255, 255, 0.28));
   }
 
-  /* ── journey indicator — pulled BELOW the designed line (405:369 @
-     y775 → 812) so the flow band above gains breathing room ── */
+  /* ── journey indicator — near the designed line (405:369 @ y775; was
+     dropped to 812 for air, but that parked the dots in the browser's
+     bottom-bar tap zone where the chrome swallows touches — 796 keeps
+     the band low while the dots stay tappable) ── */
   .how__indicator {
-    top: calc(var(--my) * 812);
+    top: calc(var(--my) * 796);
     bottom: auto;
     height: 58px;
+    /* taps act immediately — no double-tap-zoom wait on the controls */
+    touch-action: manipulation;
   }
 
   .how__when {
@@ -3069,6 +3159,14 @@
     top: 38px;
     width: 12px;
     height: 12px;
+  }
+
+  /* finger-size hit pad (~44px square) replacing the desktop's --u-scaled
+     halo (≈3px here — untappable). Biased upward, away from the browser's
+     bottom-bar zone; plain rect, it's invisible anyway. */
+  .how__dot::before {
+    inset: -26px -16px -8px;
+    border-radius: 0;
   }
 
   /* ── the split financing beats: copy top, diagram mid, window low.

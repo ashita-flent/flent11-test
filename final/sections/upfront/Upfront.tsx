@@ -1,13 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  PaneWindow,
-  FlowWire,
-  LABEL_X,
-  LABEL_Y,
-  inr,
-} from "../how/HowItWorks";
+import { PaneWindow, LABEL_X, LABEL_Y, inr } from "../how/HowItWorks";
 import "../how/how.css";
 import "./upfront.css";
 
@@ -32,8 +26,8 @@ gsap.registerPlugin(ScrollTrigger);
 /* the preview card's rect, in viewport px, at reveal t (0 collapsed → 1
    full-bleed). Centred on the viewport so the clip opens symmetrically and
    the scene never shifts under it. */
-const CARD_W = 1139;
-const CARD_H = 372;
+const CARD_W = 1324; // 207:200 · 502:1046
+const CARD_H = 809;
 const clipAt = (t: number) => {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
@@ -43,10 +37,10 @@ const clipAt = (t: number) => {
   if (vw <= 640) return "inset(0px round 0px)";
   const u = Math.min(vw / 1512, vh / 982);
   const cardW = Math.min(CARD_W * u, 0.92 * vw);
-  const cardH = CARD_H * u;
+  const cardH = Math.min(CARD_H * u, 0.9 * vh);
   const hx = ((vw - cardW) / 2) * (1 - t);
   const vy = ((vh - cardH) / 2) * (1 - t);
-  const r = 40 * u * (1 - t);
+  const r = 60 * u * (1 - t);
   return `inset(${vy}px ${hx}px ${vy}px ${hx}px round ${r}px)`;
 };
 
@@ -81,8 +75,18 @@ export default function Upfront({ rent }: { rent: number }) {
       // desktop: the window shows in the preview card (clipped, dark).
       // phone (418:865): the offer is JUST the blurred room — the window
       // arrives with the detail on open.
+      // Frame 7 (504:1154) seats the window at x 904 — 31u left of the
+      // shared CSS home (935); the shift is static since the SAME scene
+      // shows clipped in the preview card.
+      const seatRigs = () => {
+        const u = Math.min(window.innerWidth / 1512, window.innerHeight / 982);
+        gsap.set(rigs, { x: mobile ? 0 : -31 * u });
+      };
+      seatRigs();
       gsap.set(rigs, { autoAlpha: mobile ? 0 : 1 });
-      gsap.set(rigRef.current, { "--frost": mobile ? "4px" : "16.445px" });
+      // the panes read FROSTED per Figma (418:1111) — the 4px mobile value
+      // left the greenery crisp; 8.47px matches the how-monthly green frost
+      gsap.set(rigRef.current, { "--frost": mobile ? "8.47px" : "16.445px" });
       gsap.set(q(".how__plit, .how__m2, .how__m2-glow, .how__wprice"), {
         autoAlpha: 0,
       });
@@ -131,6 +135,7 @@ export default function Upfront({ rent }: { rent: number }) {
       });
 
       const onResize = () => {
+        seatRigs();
         if (!openRef.current) scene.style.clipPath = clipAt(0);
       };
       window.addEventListener("resize", onResize);
@@ -178,6 +183,9 @@ export default function Upfront({ rent }: { rent: number }) {
           scale: 0.9,
           transformOrigin: "50% 50%",
         })
+        // the headline/body start hidden so they fade in ON CUE with the
+        // window, rather than popping in when their container is un-hidden
+        .set(q(".how__ustep--b .how__copy--monthly > *"), { autoAlpha: 0, y: 12 })
         // 1 · the offer copy steps aside and the card OPENS to full-bleed
         .to(q(".upf__copy, .upf__skip, .upf__see"), {
           autoAlpha: 0,
@@ -189,34 +197,43 @@ export default function Upfront({ rent }: { rent: number }) {
           ease: "power3.inOut",
           onUpdate: applyClip,
         }, 0)
-        // the dim + blur lift as the room comes forward; on phones the
-        // window fades in here (it was hidden in the bare offer)
-        .to(q(".upf__dim"), { autoAlpha: 0, duration: 0.6 * D }, 0.15)
-        .to(rigs, { autoAlpha: 1, duration: 0.4 * D }, 0.3)
-        .to(q(".how__ustep--b"), { autoAlpha: 1, duration: 0.01 }, 0.5)
-        .to(q(".upf__back"), { autoAlpha: 1, duration: 0.3 * D }, 0.7)
-        // 2 · the detail's story: the card pays Flent, months gather into one
+        // desktop (Frame 7 · 504:1150): the room's dim STAYS — the content is
+        // raised above it (see .upf.is-open in how.css) so only the room reads
+        // dimmed+blurred. Phones lift it to reveal the full-bleed detail.
+        .to(q(".upf__dim"), { autoAlpha: mobile ? 0 : 1, duration: 0.6 * D }, 0.15)
+        // 1 · TEXT + WINDOW arrive together — the opening pose. Headline/body
+        //     and the month window (months 1…11 shown INDIVIDUALLY) read at
+        //     once; the gather is held back for the payoff (beat 4).
+        .to(q(".how__ustep--b"), { autoAlpha: 1, duration: 0.01 }, 0.35)
+        .to(rigs, { autoAlpha: 1, duration: 0.5 * D }, 0.45)
         .to(
           q(".how__ustep--b .how__copy--monthly > *"),
-          { autoAlpha: 1, y: 0, duration: 0.4 * D, stagger: 0.1 },
-          0.6
+          { autoAlpha: 1, y: 0, duration: 0.45 * D, stagger: 0.1 },
+          0.45
         )
+        .to(q(".upf__back"), { autoAlpha: 1, duration: 0.3 * D }, 0.7)
+        // 2 · the payment card settles in
         .fromTo(
           q(".how__ustep--b .how__fin2-card"),
           { autoAlpha: 0, y: 14 },
-          { autoAlpha: 1, y: 0, duration: 0.4 * D },
-          0.9
+          { autoAlpha: 1, y: 0, duration: 0.45 * D },
+          1.15
         )
+        // 3 · the arrow draws FROM the card TO Flent; the tile lands as it arrives
         .to(
           q(".how__ustep--b .how__tflow-wire"),
-          { clipPath: "inset(0 0% 0 0)", duration: 0.7 * D, ease: "power1.inOut" },
-          1.2
+          { clipPath: "inset(0 0% 0 0)", duration: 0.65 * D, ease: "power1.inOut" },
+          1.6
         )
         .to(
           q(".how__ub-flent"),
           { autoAlpha: 1, scale: 1, duration: 0.35 * D, ease: "back.out(1.4)" },
-          1.75
+          2.05
         )
+        // 4 · …only NOW does the window tell the payoff: the months GATHER into
+        //     the one upfront payment — every label drifts to the wprice seat
+        //     and fades as the "month 1 – 11 / ₹total" block settles in.
+        //     (504:1147 is the pre-gather pose; this beat is the payoff.)
         .to(
           labels,
           {
@@ -235,9 +252,9 @@ export default function Upfront({ rent }: { rent: number }) {
             ease: "power2.inOut",
             stagger: 0.05 * D,
           },
-          1.95
+          2.5
         )
-        .to(q(".how__wprice"), { autoAlpha: 1, duration: 0.45 * D }, 2.8);
+        .to(q(".how__wprice"), { autoAlpha: 1, duration: 0.45 * D }, 3.25);
     } else {
       // collapse: the detail folds away, the card shrinks back to a preview
       tl.to(q(".how__ustep--b, .upf__back"), {
@@ -335,9 +352,13 @@ export default function Upfront({ rent }: { rent: number }) {
               </p>
             </div>
             <span className="how__ub-wire" aria-hidden>
-              <FlowWire w={271} id="upfWireUB" />
+              {/* Frame 7 (504:1203) — the dotted white 0.7 lead, arrowhead at
+                  the tile end; drawn in left→right by the clipPath tween */}
+              <img src="/upfront-wire.svg" className="how__tflow-wire" alt="" />
             </span>
             <span className="how__ub-flent" aria-hidden>
+              {/* Frame 7 (504:1215) — BLACK tile, WHITE mark, wrapped in a
+                  warm glow (the glow lives in .how__ub-flent img's filter) */}
               <img src="/trust-flent-tile.svg" alt="" />
             </span>
           </div>

@@ -17,12 +17,13 @@
   overflow: hidden;
 }
 
-/* ---- the offer copy (207:202) — centred, above the card ---------------- */
+/* ---- the offer copy (207:200 · 502:1133) — centred INSIDE the card, in
+   white over the dimmed room, just above the See-how pill ---------------- */
 .upf__copy {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(50% + var(--u) * 242);
+  bottom: calc(50% + var(--u) * 28);
   width: calc(var(--u) * 1315);
   max-width: 92vw;
   display: flex;
@@ -30,7 +31,7 @@
   align-items: center;
   gap: calc(var(--u) * 24);
   text-align: center;
-  z-index: 1;
+  z-index: 16; /* over the card's dim */
 }
 
 .upf__kicker {
@@ -40,7 +41,7 @@
   font-size: calc(var(--u) * 40);
   line-height: 1.1;
   letter-spacing: -0.02em;
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .upf__line {
@@ -50,12 +51,12 @@
   font-size: calc(var(--u) * 56);
   line-height: 1.05;
   letter-spacing: -0.04em;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .upf__line em {
   font-style: italic;
-  color: #b26025;
+  color: #fff;
 }
 
 /* ---- the scene — one full-scale detail, clipped to the preview card ----
@@ -66,7 +67,7 @@
   z-index: 2;
   /* a fallback in case JS hasn't run yet — the collapsed card, roughly */
   clip-path: inset(
-    calc(50% - var(--u) * 186) calc(50% - var(--u) * 570) round calc(var(--u) * 40)
+    calc(50% - var(--u) * 404.5) calc(50% - var(--u) * 662) round calc(var(--u) * 60)
   );
   will-change: clip-path;
 }
@@ -77,6 +78,15 @@
    was — the swap is seamless) */
 .upf.is-open .upf__scene {
   position: fixed;
+}
+
+/* expanded (Frame 7 · 504:1150): the room dim (.upf__dim, z15) STAYS over the
+   room, so the window, its wooden frame and the glow are raised above it to
+   read sharp — only the room behind reads dimmed + blurred */
+.upf.is-open .how__frame,
+.upf.is-open .how__framerig,
+.upf.is-open .how__glowrig {
+  z-index: 16;
 }
 
 /* the darkening blur that makes the preview read as a teaser (488:474 —
@@ -91,21 +101,25 @@
   pointer-events: none;
 }
 
-/* "See how it works →" centred in the card (488:479) */
+/* "See how it works →" — a white pill just below the copy (207:200 · 502:1142) */
 .upf__see {
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: calc(50% + var(--u) * 28);
+  transform: translateX(-50%);
   z-index: 16;
-  padding: calc(var(--u) * 10) calc(var(--u) * 16);
-  background: none;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--u) * 6);
+  padding: calc(var(--u) * 12) calc(var(--u) * 20);
+  background: #fff;
   border: 0;
+  border-radius: calc(var(--u) * 40);
   font-family: var(--sans);
   font-weight: 600;
-  font-size: calc(var(--u) * 28);
+  font-size: calc(var(--u) * 20);
   letter-spacing: -0.02em;
-  color: #fff;
+  color: #222;
   white-space: nowrap;
   cursor: pointer;
 }
@@ -123,7 +137,9 @@
 .upf__back {
   position: absolute;
   left: calc(var(--u) * 96);
-  top: calc(var(--u) * 64);
+  /* clear the fixed nav pill (~77px): on smaller frames 64u falls under
+     it. The detail copy sits far below (~194px), so only Back moves. */
+  top: max(calc(var(--u) * 64), calc(env(safe-area-inset-top, 0px) + 88px));
   z-index: 16;
   display: inline-flex;
   align-items: center;
@@ -146,28 +162,31 @@
   color: #fff;
 }
 
-/* ---- "Not for you? Keep scrolling" (488:482) — below the card --------- */
+/* ---- "Not for you? Keep scrolling" (207:200 · 502:1145) — low in the card,
+   white over the dim ----------------------------------------------------- */
 .upf__skip {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  top: calc(50% + var(--u) * 236);
-  z-index: 1;
+  top: calc(50% + var(--u) * 291);
+  z-index: 16;
   padding: calc(var(--u) * 6) 0;
   background: none;
   border: 0;
   font-family: var(--sans);
-  font-weight: 400;
-  font-size: calc(var(--u) * 24);
+  font-weight: 500;
+  /* quiet + secondary — must read SMALLER than the See-how pill (u*20). A cap
+     keeps it from ballooning on large screens where --u runs high. */
+  font-size: clamp(13px, calc(var(--u) * 15), 17px);
   letter-spacing: -0.02em;
-  color: rgba(26, 23, 20, 0.75);
+  color: rgba(255, 255, 255, 0.7);
   white-space: nowrap;
   cursor: pointer;
   transition: color 0.2s ease;
 }
 
 .upf__skip:hover {
-  color: #1a1714;
+  color: #fff;
 }
 
 /* ════ phone (≤640) — the OLD full-bleed offer (Figma 418:865), NOT the
@@ -227,19 +246,49 @@
     color: #fff;
   }
 
-  /* the invitation drops below the copy, quiet white */
+  /* the invitation drops below the copy, quiet white — NOT the desktop pill */
   .upf__see {
     top: 46vh;
     z-index: 20;
+    background: none;
+    padding: 0;
+    border-radius: 0;
     font-size: 20px;
     font-weight: 400;
     color: rgba(255, 255, 255, 0.6);
   }
 
+  /* clear the fixed nav pill (env safe-area + ~76px tall) — at 3.5vh the
+     way-back sat right behind it. Drop it below, and drop the detail block
+     with it so the copy stays clear of both the nav and the lowered Back
+     (the card/wire/flent ride down together; the window scene below has
+     ~100px of slack, so nothing clips). */
   .upf__back {
-    left: 6vw;
-    top: 3.5vh;
+    /* the site's phone gutter — the 402-frame's 24u, same edge as the
+       nav's logo capsule and the detail column below */
+    left: calc(100vw * 24 / 402);
+    top: calc(env(safe-area-inset-top, 0px) + 82px);
     font-size: 15px;
+  }
+
+  /* everything below Back rides lower — more air between the nav/Back and
+     the copy (the window, a sibling in how.css, adds the same drop) */
+  .upf .how__ustep--b {
+    transform: translateY(calc(env(safe-area-inset-top, 0px) + 64px));
+  }
+
+  /* the OPENED detail keeps the candle room softly frosted, matching Figma
+     (418:1110 — black 20% over a 4.947px blur). The teaser dim lifts fully
+     on open, so without this the room read sharp; this light frost persists
+     BEHIND the copy/card/window (a sibling ::after only blurs the photo). */
+  .upf.is-open .how__warmbg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4.947px);
+    -webkit-backdrop-filter: blur(4.947px);
+    pointer-events: none;
   }
 
   /* the skip stays reachable but quiet, low on the photo */

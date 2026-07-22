@@ -170,8 +170,8 @@
 /* 1 · gradient glass (443:426): ONE uniform 22px backdrop blur (Figma's
    background-blur 44 ⇒ ~22px CSS), and the milky→white FILL does the
    "clears at the head, frosts to the foot" — the fill is near-transparent
-   up top (the soft room reads through the frost) and solid white by the
-   savings line. Blur is a fixed px (not ×--u) so the frost holds on
+   up top (the soft room reads through the frost) and solid white toward
+   the foot. Blur is a fixed px (not ×--u) so the frost holds on
    phones too. */
 .lc__card--typical {
   padding: calc(var(--u) * 47) calc(var(--u) * 36);
@@ -281,36 +281,6 @@
   white-space: nowrap;
 }
 
-/* the savings foot (447:179 / 443:456 / 443:462) */
-.lc__save {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--u) * 2);
-}
-
-.lc__save-v {
-  display: flex;
-  align-items: flex-start;
-  gap: calc(var(--u) * 2);
-  font-weight: 500;
-  font-size: calc(var(--u) * 20);
-  line-height: 1.35;
-  letter-spacing: -0.04em;
-  color: #1a1714;
-}
-
-.lc__save-arrow {
-  width: calc(var(--u) * 16);
-  height: calc(var(--u) * 16);
-  margin-top: calc(var(--u) * 2);
-}
-
-.lc__save-k {
-  font-weight: 400;
-  font-size: calc(var(--u) * 16);
-  line-height: 1.35;
-  color: #1a1714;
-}
 
 /* ════ phone (≤760px) — heading then THREE FULL-WIDTH cards in normal
    scroll, on the same veiled photo (fixed cover behind the flow) ════ */
@@ -418,19 +388,5 @@
   .lc__pill {
     padding: 3px 8px;
     font-size: 12px;
-  }
-
-  .lc__save-v {
-    font-size: 18px;
-    flex-wrap: wrap;
-  }
-
-  .lc__save-arrow {
-    width: 15px;
-    height: 15px;
-  }
-
-  .lc__save-k {
-    font-size: 14px;
   }
 }
