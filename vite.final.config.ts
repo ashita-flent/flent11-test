@@ -11,4 +11,13 @@ export default defineConfig({
   root: 'final',
   plugins: [react()],
   server: { port: 5174 },
+  build: {
+    // Do NOT minify CSS. esbuild's CSS minifier drops the unprefixed
+    // `backdrop-filter: blur(var(--frost))` (keeping only the -webkit-
+    // one, which Chromium ignores), so every window frost / glass blur
+    // silently vanished in the production build while working in dev.
+    // JS is still minified; unminified CSS only costs a few KB gzip and
+    // guarantees prod renders exactly like dev.
+    cssMinify: false,
+  },
 })
