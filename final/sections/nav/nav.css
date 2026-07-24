@@ -1,10 +1,10 @@
 /* ============================================================
    Nav — fixed over every section, wearing a light or dark skin per
-   the ground scrolling under it. TWO glassy floating pills — a logo
-   capsule and a CTA capsule ("Talk to us" + the "Check Eligibility →"
-   pill) — on BOTH desktop and mobile (Figma 498:988), sized per
-   breakpoint. On mobile they float over a camera-dock fade that
-   dissolves scrolled content under the notch.
+   the ground scrolling under it. TWO floating pills — a glass logo
+   capsule and the solid "Check Eligibility →" pill (matched heights) —
+   on BOTH desktop and mobile (Figma 498:988), sized per breakpoint. On
+   mobile they float over a camera-dock fade that dissolves scrolled
+   content under the notch.
    Light = white glass; dark = the colours flipped.
    ============================================================ */
 
@@ -79,6 +79,7 @@
   justify-content: center;
   padding: 13px 20px;
   border: 0;
+  text-decoration: none;
   border-radius: 100px;
   background: var(--nav-glass);
   backdrop-filter: blur(22px);
@@ -92,8 +93,8 @@
 /* the flent wordmark itself, recoloured to the skin's ink via a mask */
 .nav__logo-mark {
   display: block;
-  width: 87.66px;
-  aspect-ratio: 87.6556 / 25.8048;
+  width: 86.46px;
+  aspect-ratio: 391.4 / 116.8;
   background-color: var(--nav-ink);
   -webkit-mask: url(/nav-flent.svg) center / contain no-repeat;
   mask: url(/nav-flent.svg) center / contain no-repeat;
@@ -112,18 +113,11 @@
   border-radius: 100px;
 }
 
-/* the CTA capsule — "Talk to us" + the "Check Eligibility" pill in one glass
-   capsule; row-reverse ⇒ Talk left, Check right (DOM stays primary-first) */
+/* the CTA — the lone "Check Eligibility" pill ("Talk to us" and its glass
+   capsule wrapper were dropped, so the pill itself IS the button) */
 .nav__ctas {
   display: flex;
   align-items: center;
-  flex-direction: row-reverse;
-  gap: 14px;
-  padding: 6px 6px 6px 20px;
-  border-radius: 100px;
-  background: var(--nav-glass);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
 }
 
 .nav__cta {
@@ -141,9 +135,10 @@
     transform 0.2s ease;
 }
 
-/* primary: the solid "Check Eligibility" pill nested in the capsule */
+/* the solid "Check Eligibility" pill — vertical padding tuned so its height
+   matches the glass logo pill on the left (logo mark 25.8px + 13px pad) */
 .nav__cta--primary {
-  padding: 11px 16px;
+  padding: 14.4px 24px;
   border-radius: 100px;
   background: var(--nav-pri-bg);
   color: var(--nav-pri-text);
@@ -153,21 +148,10 @@
   margin-left: 2px;
 }
 
-/* secondary: plain "Talk to us" text */
-.nav__cta--secondary {
-  padding: 0;
-  background: transparent;
-  color: var(--nav-sec-text);
-  font-weight: 600;
-}
-
 @media (hover: hover) {
   .nav__cta--primary:hover {
     background: var(--nav-pri-bg-hover);
     transform: translateY(-1px);
-  }
-  .nav__cta--secondary:hover {
-    opacity: 0.65;
   }
 }
 
@@ -223,18 +207,13 @@
     width: 50.489px;
   }
 
-  .nav__ctas {
-    gap: 10px;
-    padding: 4px 4px 4px 14px;
-    border-radius: 40px;
-  }
-
   .nav__cta {
     font-size: 14px;
   }
 
+  /* match the logo pill's height (mark 14.86px + 10px pad = 34.86px) */
   .nav__cta--primary {
-    padding: 8px 10px;
+    padding: 8.5px 14px;
   }
 }
 

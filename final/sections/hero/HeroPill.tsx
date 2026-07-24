@@ -27,8 +27,11 @@ const PILL_WIDE = { t: 309, r: 1512 - 1310, b: 982 - 674, l: 202 }; // 1108×365
 const PILL_SETTLE = { t: 173.41, r: 1512 - 1448.56, b: 982 - 629.84, l: 63 }; // 329:2549
 
 /* the bars: 19u wide, chamfer dips 8.15% of height toward the seam */
-const BAR0 = { w: 19, h: 105, y: 438, lx: 725, rx: 768 }; // the "11"
-const BAR1 = { w: 19, h: 145, y: 419, lx: 451, rx: 1043 }; // parted
+// bars widened 19→28 to read as the logo's chunky "1" (its stem/height
+// ratio); lx/rx pulled in 4.5 each so each bar's CENTRE holds — the "11"
+// stays centred, just heavier
+const BAR0 = { w: 28, h: 105, y: 438, lx: 720.5, rx: 763.5 }; // the "11"
+const BAR1 = { w: 28, h: 145, y: 419, lx: 446.5, rx: 1038.5 }; // parted
 
 export default function HeroPill() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -38,7 +41,6 @@ export default function HeroPill() {
     const section = sectionRef.current!;
     const clip = clipRef.current!;
     const q = (sel: string) => section.querySelectorAll(sel);
-    const mobile = window.matchMedia("(max-width: 640px)").matches;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     /* beat rects in px. Desktop: frame coords × u (the clip layer IS the
@@ -49,29 +51,39 @@ export default function HeroPill() {
     let bar0 = { ...BAR0 }, bar1 = { ...BAR1 };
     let fw: number, fh: number; // clip layer box
 
-    if (!mobile) {
-      const u = Math.min(window.innerWidth / 1512, window.innerHeight / 982);
-      const s = (v: number) => v * u;
-      fw = s(1512);
-      fh = s(982);
-      const px = (o: typeof PILL_EMERGE) => ({ t: s(o.t), r: s(o.r), b: s(o.b), l: s(o.l) });
-      emerge = px(PILL_EMERGE);
-      wide = px(PILL_WIDE);
-      settle = px(PILL_SETTLE);
-      bar0 = { w: s(BAR0.w), h: s(BAR0.h), y: s(BAR0.y), lx: s(BAR0.lx), rx: s(BAR0.rx) };
-      bar1 = { w: s(BAR1.w), h: s(BAR1.h), y: s(BAR1.y), lx: s(BAR1.lx), rx: s(BAR1.rx) };
-    } else {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      fw = vw;
-      fh = vh;
-      // the bars sit on the middle slat's centre (404:257 — slat 2 spans
-      // 246..359 of the 874 frame); the slats do the rest
-      const cy = (302.5 / 874) * vh;
-      emerge = wide = settle = { t: 0, r: 0, b: 0, l: 0 }; // unused on phones
-      bar0 = { w: 15, h: 84, y: cy - 42, lx: vw / 2 - 25, rx: vw / 2 + 10 };
-      bar1 = { w: 15, h: 118, y: cy - 59, lx: vw / 2 - 158, rx: vw / 2 + 143 };
-    }
+    /* the capsule's px insets are read from the LIVE viewport — on mount and
+       again on every resize — so the settled pill re-fits the frame at any
+       window size. Without this the clip-path keeps the px it was born with,
+       and shrinking the window squeezes the pill into a thin strip while the
+       CSS frame (driven by --u) resizes around it. */
+    const computeGeom = () => {
+      const mobile = window.matchMedia("(max-width: 640px)").matches;
+      if (!mobile) {
+        const u = Math.min(window.innerWidth / 1512, window.innerHeight / 982);
+        const s = (v: number) => v * u;
+        fw = s(1512);
+        fh = s(982);
+        const px = (o: typeof PILL_EMERGE) => ({ t: s(o.t), r: s(o.r), b: s(o.b), l: s(o.l) });
+        emerge = px(PILL_EMERGE);
+        wide = px(PILL_WIDE);
+        settle = px(PILL_SETTLE);
+        bar0 = { w: s(BAR0.w), h: s(BAR0.h), y: s(BAR0.y), lx: s(BAR0.lx), rx: s(BAR0.rx) };
+        bar1 = { w: s(BAR1.w), h: s(BAR1.h), y: s(BAR1.y), lx: s(BAR1.lx), rx: s(BAR1.rx) };
+      } else {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        fw = vw;
+        fh = vh;
+        // the bars sit on the middle slat's centre (404:257 — slat 2 spans
+        // 246..359 of the 874 frame); the slats do the rest
+        const cy = (302.5 / 874) * vh;
+        emerge = wide = settle = { t: 0, r: 0, b: 0, l: 0 }; // unused on phones
+        bar0 = { w: 22, h: 84, y: cy - 42, lx: vw / 2 - 28.5, rx: vw / 2 + 6.5 };
+        bar1 = { w: 22, h: 118, y: cy - 59, lx: vw / 2 - 161.5, rx: vw / 2 + 139.5 };
+      }
+      return mobile;
+    };
+    const mobile = computeGeom();
 
     const barL = section.querySelector<HTMLElement>(".hp__bar--l")!;
     const barR = section.querySelector<HTMLElement>(".hp__bar--r")!;
@@ -87,6 +99,11 @@ export default function HeroPill() {
       gsap.set(clip, {
         clipPath: `inset(${hole.t}px ${hole.r}px ${hole.b}px ${hole.l}px round 9999px)`,
       });
+
+    /* true once the capsule has reached its settled rect — the resize
+       handler only re-fits the pill after the intro has landed (or when
+       motion is reduced), never mid-flight */
+    let settled = false;
 
     const R = "round 999px"; // capsule ends, any slat height
     const slats = [...section.querySelectorAll<HTMLElement>(".hp__slat")];
@@ -112,6 +129,7 @@ export default function HeroPill() {
           Object.assign(hole, settle);
           paint();
         }
+        settled = true;
         gsap.set(q(".hp__brand, .hp__title, .hp__sub, .hp__cta"), { autoAlpha: 1, y: 0 });
         gsap.set([barL, barR], { autoAlpha: 0 });
         return;
@@ -173,6 +191,9 @@ export default function HeroPill() {
               Object.assign(hole, path(prog.p));
               paint();
             },
+            onComplete: () => {
+              settled = true;
+            },
           },
           0.75
         );
@@ -185,7 +206,29 @@ export default function HeroPill() {
       }
     }, sectionRef);
 
-    return () => ctx.revert();
+    /* re-fit the settled capsule to the live viewport on resize (rAF-coalesced).
+       Phones drive their slats with %-based clip-paths that are already fluid,
+       so only the desktop pill needs its px insets repainted. Mid-intro resizes
+       are left alone — settled flips true when the capsule lands. */
+    let raf = 0;
+    const onResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const nowMobile = computeGeom();
+        if (nowMobile) return;
+        if (settled || reduce) {
+          Object.assign(hole, settle);
+          paint();
+        }
+      });
+    };
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      ctx.revert();
+    };
   }, []);
 
   const goRegister = () =>
@@ -194,19 +237,23 @@ export default function HeroPill() {
   return (
     <section className="hp" ref={sectionRef}>
       <div className="hp__frame">
-        {/* the brand bars — chamfer stays 8.15% of height at any size */}
-        <svg className="hp__bar hp__bar--l" viewBox="0 0 19 105" preserveAspectRatio="none" aria-hidden>
-          <path d="M0 0L19 8.554V105H0V0Z" fill="#000" />
+        {/* the brand bars ARE the logo's "11" glyph (Flent11 Logo.svg, the
+            two 1-strokes at x407.8/445.6) — normalised to origin, the same
+            flagged stem for both (the logo's 1s are identical, not mirrored).
+            preserveAspectRatio:none lets the glyph stretch to the GSAP-driven
+            bar box, keeping its flag/slope proportional at any size. */}
+        <svg className="hp__bar hp__bar--l" viewBox="0 0 30.3 98" preserveAspectRatio="none" aria-hidden>
+          <path d="M0 3.6 30.3 0V98H8.9V13L0 3.6Z" fill="#000" />
         </svg>
-        <svg className="hp__bar hp__bar--r" viewBox="0 0 19 105" preserveAspectRatio="none" aria-hidden>
-          <path d="M19 0L0 8.554V105H19V0Z" fill="#000" />
+        <svg className="hp__bar hp__bar--r" viewBox="0 0 30.3 98" preserveAspectRatio="none" aria-hidden>
+          <path d="M0 3.6 30.3 0V98H8.9V13L0 3.6Z" fill="#000" />
         </svg>
 
         {/* the capsule window — the photo is fixed, only the hole grows */}
         <div className="hp__clip" ref={clipRef}>
           <img
             className="hp__img"
-            src="/hero-room.jpg?v=4"
+            src="/hero-room.jpg?v=5"
             alt="A flent home — staircase, gallery wall, someone at ease"
             fetchPriority="high"
           />
@@ -220,7 +267,7 @@ export default function HeroPill() {
               className={`hp__slat hp__slat--${i}`}
               style={{ "--sy": sy } as React.CSSProperties}
             >
-              <img src="/hero-room.jpg?v=4" alt="" />
+              <img src="/hero-room.jpg?v=5" alt="" />
             </div>
           ))}
         </div>
@@ -233,9 +280,9 @@ export default function HeroPill() {
           finally made <em>worth it</em>
         </h1>
         <p className="hp__sub">
-          Flent 11 turns a standard 11-month lock-in into a better rental
-          plan — with savings, monthly flexibility, and better terms around
-          early exits.
+          Flent 11 turns the standard lock-in into a better rental plan — with
+          your first month free, no-cost monthly payments, and flexibility
+          around early exits.
         </p>
         <button type="button" className="hp__cta" onClick={goRegister}>
           Check Eligibility <span aria-hidden>→</span>

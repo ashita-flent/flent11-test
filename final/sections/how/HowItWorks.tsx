@@ -123,7 +123,7 @@ const STEPS: Step[] = [
     when: "END OF 11TH MONTH",
     whenM: "END OF MONTH 11",
     title: "You complete 11 months. You pay for 10.",
-    body: "That’s the Flent 11 exchange. You commit to the full stay. We make the terms work harder for you.",
+    body: "That’s the Flent 11 exchange. You commit to the full stay.\nWe make the terms work harder for you.",
     // Figma 39:309 (2026-07-16 pass) — the camera dives into the room's
     // bottom-right: 3951×1650 anchored bottom-right (−2415, −668). The
     // node carries its OWN darker wide-room fill (/how-bg4.jpg — the
@@ -525,11 +525,6 @@ export default function HowItWorks({
   const [mobileInd] = useState(
     () => window.matchMedia("(max-width: 640px)").matches
   );
-  // the pane hover-reveal needs a real pointer — on touch, taps would
-  // latch :hover and strand the reveal over a pane
-  const [canHover] = useState(
-    () => window.matchMedia("(hover: hover)").matches
-  );
   const dotXs = mobileInd ? [76.42, 238.81, 401.19, 563.58] : DOT_X;
   // the pinned timeline's ScrollTrigger — the break slide's "see how it
   // works" link converts a beat position into a scroll target through it
@@ -686,7 +681,10 @@ export default function HowItWorks({
       };
       const indTop = 812 * my;
       const f3top = Math.max(foot(".how__copy--fin3") + 42, 200 * my);
-      const f3subtop = f3top + 344 * mx * 0.239 + 18;
+      // 354 = the row's new width on the site's 24u gutter (was 344 on
+      // the frame's 29); 0.239 is the row's height/width ratio, so the
+      // estimate rides the width change automatically
+      const f3subtop = f3top + 354 * mx * 0.239 + 18;
       const montop = Math.max(foot(".how__copy--mon") + 42, 244 * my);
       // the shared rest pose sits below the TALLER beat's stack
       // (fin3 sub ≈ 40 tall + 24 gap; the mon deck runs ≈ 98 + 23 gap)
@@ -1474,7 +1472,7 @@ export default function HowItWorks({
                    the deposit note ── */
                 <div className="how__copy how__copy--movein">
                   <label className="how__rentchip" htmlFor="how-rent">
-                    Your base rent&nbsp;-&nbsp;
+                    Your monthly rent&nbsp;-&nbsp;
                     <span className="how__rentfield-rupee" aria-hidden>
                       ₹
                     </span>
@@ -1498,13 +1496,20 @@ export default function HowItWorks({
                     </span>
                   </label>
                   <h3 className="how__title">
-                    You move-in.
+                    Just move-in.
                     <br />
-                    <strong>Your first month is on us.</strong>
+                    <strong>Your first month is free.</strong>
                   </h3>
                   <p className="how__body">
-                    For the first month - you pay nothing! You only pay the
-                    standard 3-month deposit to complete your booking.
+                    You just pay a standard security deposit to complete your
+                    booking.{" "}
+                    <span className="how__body-desk">
+                      {/* second sentence on its own line — the <br> lives
+                          inside the desk-only span, so mobile (which drops the
+                          span) gets no stray empty line */}
+                      <br />
+                      Your first rent payment starts in month two.
+                    </span>
                   </p>
                 </div>
               ) : step.variant === "financed" ? (
@@ -1526,9 +1531,9 @@ export default function HowItWorks({
                         </span>
                       </span>
                       <span className="how__fin3-tlabel">
-                        Gromor
+                        RBI registered
                         <br />
-                        Finance
+                        NBFC
                       </span>
                     </div>
                     <span className="how__fin3-w1">
@@ -1555,7 +1560,8 @@ export default function HowItWorks({
                     </div>
                   </div>
                   <p className="how__fin3-sub">
-                    We get the rent early; you get month one free.{" "}
+                    We get the rent early; you get month one free.
+                    <br />
                     <strong>That’s the trade working.</strong>
                   </p>
                 </>
@@ -1566,13 +1572,14 @@ export default function HowItWorks({
                 <>
                   <div className="how__copy how__copy--mon">
                     <h3 className="how__title how__title--mon">
-                      You pay monthly no-cost EMI{" "}
+                      You pay monthly,{" "}
                       <br />
-                      <strong>just like your regular rent cycle.</strong>
+                      <strong>like regular rent.</strong>
                     </h3>
                     <p className="how__mon-sub">
-                      You repay the financed rent as a no-cost EMI.{" "}
-                      <strong>We cover the interest</strong>.
+                      You repay the financed rent as a no-cost EMI.
+                      <br />
+                      <strong>Flent covers the interest</strong>.
                     </p>
                   </div>
                   <div className="how__mon" aria-hidden>
@@ -1639,7 +1646,11 @@ export default function HowItWorks({
                           <img src="/trust-gromor-logo.png" alt="" />
                         </span>
                       </span>
-                      <span className="how__mon-gname">Gromor</span>
+                      <span className="how__mon-gname">
+                        RBI registered
+                        <br />
+                        NBFC
+                      </span>
                       <span className="how__mon-gsum">₹ {inr(rent * 2)}</span>
                     </div>
                   </div>
@@ -1673,10 +1684,12 @@ export default function HowItWorks({
             </div>
           ))}
 
-          {/* pane window glass — hover armed on step 3 only; glassy white
-              (no EMI) once the greenery is full bleed */}
+          {/* pane window glass — glassy white (no EMI) once the greenery is
+              full bleed. (The per-pane hover-reveal was removed: the EMI
+              amount is already shown outright, so hovering just repeated it
+              in a different typeface.) */}
           <div
-            className={`how__winrig${active === 2 && canHover ? " is-hoverable" : ""}${finalCls}${plainCls}`}
+            className={`how__winrig${finalCls}${plainCls}`}
             ref={rigRef}
           >
             <PaneWindow rent={rent} />
@@ -1710,7 +1723,7 @@ export default function HowItWorks({
                 It changes what that commitment gets you.
               </p>
               <p className="how__intro-state">
-                <em>Your first month is free.</em>
+                <em>Your first month is&nbsp;free.</em>
                 Your rent starts from month two.
               </p>
             </div>

@@ -70,7 +70,7 @@
 }
 
 .tr__row--2 {
-  gap: calc(var(--t) * 30);
+  gap: calc(var(--t) * 24);
 }
 
 /* every card is a fixed-ratio miniature of its design frame; --cw is its
@@ -126,6 +126,13 @@
 
 .tc--emi .tc__copy {
   width: calc(var(--tc) * 556);
+}
+
+/* card 1's copy holds two clean lines — the dim intro, then the bold
+   "Gromor, an RBI-registered NBFC." whole on line two (the <br> forces
+   the split; this width keeps the bold phrase off a third line) */
+.tc--hand .tc__copy {
+  width: calc(var(--tc) * 400);
 }
 
 /* ════ card 1 · the financing handoff (bronze) ════ */
@@ -366,41 +373,39 @@
   line-height: calc(var(--tc) * 17.92);
 }
 
-/* the interest, absorbed at the flent mark (268:3379) */
-.tc__emi-interest {
+/* the interest, absorbed by Flent — a pill riding the middle of the wire
+   (the flent mark + promise). Centred in the gap between January's chip
+   (right edge x233) and Gromor's tile (left edge x497). */
+.tc__emi-pill {
   position: absolute;
-  left: calc(var(--tc) * 386.5);
-  top: calc(var(--tc) * 162);
-  transform: translateX(-50%);
-  font-family: var(--sans);
-  font-weight: 500;
-  font-style: normal;
-  font-size: calc(var(--tc) * 10);
-  letter-spacing: -0.03em;
-  color: #34c759;
+  left: calc(var(--tc) * 365);
+  top: calc(var(--tc) * 192);
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--tc) * 10);
+  padding: calc(var(--tc) * 10) calc(var(--tc) * 18);
+  border-radius: calc(var(--tc) * 100);
+  background: rgba(244, 240, 234, 0.94);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   white-space: nowrap;
 }
 
-/* the flent ghost-square riding the wire (268:3384) */
-.tc__emi-flent {
-  position: absolute;
-  left: calc(var(--tc) * 325);
-  top: calc(var(--tc) * 165);
-  width: calc(var(--tc) * 53.76);
-  height: calc(var(--tc) * 53.76);
-  border-radius: calc(var(--tc) * 14.08);
-  background: rgba(178, 96, 37, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.tc__emi-pill-logo {
+  width: calc(var(--tc) * 15);
+  height: calc(var(--tc) * 18);
+  display: block;
+  flex-shrink: 0;
 }
 
-.tc__emi-flent img {
-  width: calc(var(--tc) * 26.2);
-  height: calc(var(--tc) * 26.2);
-  display: block;
-  border-radius: calc(var(--tc) * 6);
-  filter: drop-shadow(0 calc(var(--tc) * 2) calc(var(--tc) * 6) rgba(0, 0, 0, 0.25));
+.tc__emi-pill-text {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--tc) * 13);
+  letter-spacing: -0.03em;
+  color: rgba(0, 0, 0, 0.75);
 }
 
 /* gromor, settled directly (268:3380) */
@@ -755,7 +760,7 @@
      ×1.145 enlargement scales each miniature whole. The stack is
      welcome to run past one viewport; the page scrolls. */
   .tr__inner {
-    width: calc(var(--tmx) * 362);
+    width: calc(var(--tmx) * 354);
     margin: 0 auto;
   }
 
@@ -779,15 +784,16 @@
 
   .tc {
     --tc: calc(var(--tmx) * 0.5865);
-    width: calc(var(--tmx) * 362);
+    width: calc(var(--tmx) * 354);
     height: calc(var(--tc) * 312.5);
     border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: calc(var(--tc) * 8.192 / 0.512);
   }
 
-  /* copy columns narrow to the phone card (418:718/728/854) */
+  /* copy columns narrow to the phone card (418:718/728/854); card 1 stays
+     wide enough for the bold "Gromor…NBFC." line to sit whole (two lines) */
   .tc--hand .tc__copy {
-    width: calc(var(--tc) * 312.5);
+    width: calc(var(--tc) * 400);
   }
 
   .tc--emi .tc__copy {
@@ -880,10 +886,6 @@
     font-size: max(calc(var(--tc) * 24), 15px);
   }
 
-  .tc__emi-interest {
-    font-size: max(calc(var(--tc) * 10), 9px);
-  }
-
   .tc__notice-label {
     font-size: max(calc(var(--tc) * 10), 9.5px);
   }
@@ -930,9 +932,9 @@
   }
 
   .tc--emi .tc__emi-chip {
-    left: calc(var(--fm) * 23.58);
+    left: calc(var(--fm) * 14);
     top: calc(var(--fm) * 112.47);
-    width: calc(var(--fm) * 94.72);
+    width: calc(var(--fm) * 90);
     padding: calc(var(--fm) * 6.144) calc(var(--fm) * 8.192);
     gap: calc(var(--fm) * 4);
     border-radius: calc(var(--fm) * 6.144);
@@ -949,22 +951,22 @@
     font-size: calc(var(--fm) * 6.144);
   }
 
-  .tc--emi .tc__emi-flent {
-    left: calc(var(--fm) * 165.4);
-    top: calc(var(--fm) * 123.74);
-    width: calc(var(--fm) * 27.525);
-    height: calc(var(--fm) * 27.525);
-    border-radius: calc(var(--fm) * 7.209);
+  /* the interest pill — a single-line clean capsule (no logo), centred on
+     the shorter mobile wire, sitting between January's chip and Gromor */
+  .tc--emi .tc__emi-pill {
+    left: calc(var(--fm) * 180);
+    top: calc(var(--fm) * 137.6);
+    gap: 0;
+    padding: calc(var(--fm) * 6) calc(var(--fm) * 11);
+    max-width: none;
+    white-space: nowrap;
   }
-  .tc--emi .tc__emi-flent img {
-    width: calc(var(--fm) * 13.422);
-    height: calc(var(--fm) * 13.422);
+  .tc--emi .tc__emi-pill-logo {
+    display: none;
   }
-
-  .tc--emi .tc__emi-interest {
-    left: calc(var(--fm) * 196.89);
-    top: calc(var(--fm) * 122.2);
-    font-size: calc(var(--fm) * 5.12);
+  .tc--emi .tc__emi-pill-text {
+    font-size: max(calc(var(--fm) * 7.4), 8px);
+    line-height: 1.15;
   }
 
   .tc--emi .tc__emi-gromor {

@@ -255,7 +255,7 @@ export default function Footer() {
 
         <div className="ft__slots">
           <p className="ft__slots-line">
-            We open a limited number of Flent&nbsp;11 slots every month.
+            A limited number of Flent&nbsp;11 slots open every month.
           </p>
           <p className="ft__slots-ask">
             <strong>Still unsure?</strong>

@@ -3,8 +3,8 @@ import "./nav.css";
 
 /* ────────────────────────────────────────────────────────────────────────
    Nav — the floating top bar (Figma 489:584 desktop / 489:759 mobile):
-   the flent wordmark on the left, a solid "Check Eligibility →" primary and
-   an outlined, glass "Talk to us" secondary on the right.
+   a glass flent-wordmark pill on the left and a solid "Check Eligibility →"
+   pill on the right, sized to the same height.
 
    It stays fixed over every section and wears a LIGHT or DARK skin depending
    on the section scrolling under it (the design ships both variants). The bar
@@ -56,8 +56,6 @@ const SECTION_SELECTORS = [
 
 const goRegister = () =>
   document.querySelector(".rg")?.scrollIntoView({ behavior: "smooth" });
-
-const toTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
 export default function Nav() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -128,14 +126,13 @@ export default function Nav() {
           scrolled content fades out ("disappearing" effect, daylight-style) */}
       <span className="nav__dock" aria-hidden />
       <nav className="nav__inner" aria-label="Primary">
-        <button
-          type="button"
+        <a
           className="nav__logo"
-          onClick={toTop}
-          aria-label="flent 11 — back to top"
+          href="https://flent.in"
+          aria-label="flent 11 — flent.in"
         >
           <span className="nav__logo-mark" aria-hidden />
-        </button>
+        </a>
         <div className="nav__ctas">
           <button
             type="button"
@@ -143,13 +140,6 @@ export default function Nav() {
             onClick={goRegister}
           >
             Check Eligibility <span aria-hidden>→</span>
-          </button>
-          <button
-            type="button"
-            className="nav__cta nav__cta--secondary"
-            onClick={goRegister}
-          >
-            Talk to us
           </button>
         </div>
       </nav>

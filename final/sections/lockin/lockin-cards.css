@@ -111,7 +111,7 @@
 /* ---- heading (394:524 @ (122,122), gap 32) ---- */
 .lc__head {
   position: absolute;
-  left: calc(var(--u) * 122);
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 122);
   width: calc(var(--u) * 972);
   display: flex;
@@ -148,8 +148,10 @@
   left: 50%;
   top: calc(50% + var(--u) * 169);
   transform: translate(-50%, -50%);
-  width: calc(var(--u) * 1298);
-  height: calc(var(--u) * 456);
+  width: calc(var(--u) * 1320);
+  /* height hugs the tallest card's content (no fixed 456u box — that left
+     dead space under the rows once the savings foot was removed); the
+     centred anchor keeps the row shrinking around the same point */
   display: flex;
   gap: calc(var(--u) * 24);
   align-items: stretch;
@@ -232,7 +234,6 @@
 
 /* rows — icon 16u + 16u text, 14u apart (443:443…) */
 .lc__rows {
-  flex: 1;
   margin: 0;
   padding: 0;
   list-style: none;

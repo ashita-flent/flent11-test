@@ -72,13 +72,18 @@
   opacity: 0;
 }
 
-/* the completion's darker evening rendition (39:310 fill, 1024×429 —
-   ratio 2.387): height = 2019 ÷ 2.387 ÷ 1132 = 74.722% */
+/* the completion's darker evening rendition (39:310 fill, 1024×429). Its
+   native ratio would sit at 74.722% tall, but that left its bottom edge
+   INSIDE the frame during the corner-dive — as it faded in over the olive
+   the short edge read as a bright seam (the base morning bg showing through
+   below it), breaking the "same image, zoomed" feel. Matched to the olive's
+   90.173% so its foot always clears the viewport through the whole dive; the
+   ~21% vertical stretch is invisible on the blurred foliage. */
 .how__bg img.how__bg-c {
   position: absolute;
   left: 0;
   top: 0;
-  height: 74.722%;
+  height: 90.173%;
   object-fit: fill;
   opacity: 0;
 }
@@ -476,6 +481,9 @@
 .how__copy--complete .how__body {
   width: calc(var(--u) * 577);
   margin-top: calc(var(--u) * 24);
+  /* honour the \n in the copy so "We make the terms work harder for you"
+     drops to its own line (Shail 39:309) */
+  white-space: pre-line;
 }
 
 /* move-in copy — white, vertically centred (Figma 34:438 @ 50% − 90):
@@ -568,7 +576,7 @@
 
 /* ── the financed-upfront beat (Figma 322:2083) ────────────────────── */
 .how__copy--fin3 {
-  left: calc(var(--u) * 94);
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 157);
 }
 
@@ -748,7 +756,7 @@
 
 /* ── the monthly-EMI beat (Figma 322:2152, 2026-07-16 redesign) ────── */
 .how__copy--mon {
-  left: calc(var(--u) * 85);
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 175);
 }
 
@@ -877,6 +885,11 @@
   line-height: calc(var(--u) * 20);
   letter-spacing: -0.03em;
   color: #fff;
+  /* centred, and "RBI registered" held on ONE line so the <br> gives a
+     clean TWO lines (not three) — it overflows the 68u tile symmetrically
+     into the open gutter to the right */
+  text-align: center;
+  white-space: nowrap;
 }
 
 .how__mon-gsum {
@@ -2424,26 +2437,50 @@
    card at its Frame-7 seat goes DARK GLASS — a black .09→.45 gradient
    under the same 22px blur, hairline white border, all-white ink — the
    EMI beat's white frost reads wrong on the candle-lit wall ── */
+/* ── the payment card (553:704): dark glass holding the full upfront price
+   for month 1. The tenant avatar (553:676) sits to its left and the flent
+   tile to its right, one dotted lead (553:675) running behind them all. ── */
 .how__fin2-card--ub {
-  /* the card hangs on the same 96u site column as the copy above it */
-  left: calc(var(--u) * 96);
-  top: calc(var(--u) * 520);
-  border-color: rgba(255, 255, 255, 0.5);
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.09),
-    rgba(0, 0, 0, 0.45)
-  );
+  left: calc(var(--u) * 290);
+  top: calc(var(--u) * 535);
+  width: calc(var(--u) * 297);
+  height: auto;
+  padding: calc(var(--u) * 16) calc(var(--u) * 20);
+  gap: calc(var(--u) * 12);
+  border-radius: calc(var(--u) * 12);
+  /* soft light hairline — matched to the mobile card (553:704) */
+  border-color: rgba(255, 255, 255, 0.28);
+  /* dark frosted glass (Figma 553:704) — the warm room reads through, softly
+     blurred. The dotted lead does NOT pass behind it: the wire is masked out
+     across the card's span (see .how__ub-wire), so nothing bleeds through and
+     the glass stays true to Figma instead of a flat black box. */
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 calc(var(--u) * 4) calc(var(--u) * 16) rgba(0, 0, 0, 0.1);
+  z-index: 2; /* over the dotted lead (the wire is also masked behind it) */
 }
 
-.how__fin2-card--ub .how__fin2-tname {
-  color: rgba(255, 255, 255, 0.5);
+/* "Full payment upfront  Month 1" (553:705) */
+.how__ub-cardhead {
+  margin: 0;
+  display: flex;
+  gap: calc(var(--u) * 4);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
 }
 
-.how__fin2-card--ub .how__fin2-tname strong {
-  color: rgba(255, 255, 255, 0.8);
+.how__ub-cardhead strong {
+  font-weight: 500;
+  color: #fff;
 }
 
+/* ₹4,05,000 over its struck original (553:725) — the base amts already sizes
+   28/20u; the candle wall just wants white ink */
 .how__fin2-card--ub .how__fin2-amts {
   color: #fff;
 }
@@ -2452,22 +2489,65 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-.how__fin2-card--ub .how__fin2-note {
-  color: rgba(255, 255, 255, 0.7);
+/* the tenant, paying upfront (553:676): a 60u avatar over "Flent Tenant" */
+.how__ub-tenant {
+  position: absolute;
+  left: calc(var(--u) * 68);
+  top: calc(var(--u) * 539);
+  width: calc(var(--u) * 120);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 11);
+  z-index: 2;
 }
 
-.how__fin2-card--ub .how__fin2-note strong {
-  color: #fff;
+.how__ub-tenant img {
+  width: calc(var(--u) * 60);
+  height: calc(var(--u) * 60);
+  border-radius: 50%;
+  border: 1px solid #fff;
+  object-fit: cover;
 }
 
+.how__ub-tenant span {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: calc(var(--u) * 14);
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* the dotted lead runs the WHOLE way, tenant → flent (553:675 @ 158,584 w532);
+   arrowhead at the tile end, the card floats over its middle. The 271.5×7.36
+   art centres its line, so top = 584 − (532·7.36/271.5)/2 ≈ 577. */
 .how__ub-wire {
   position: absolute;
-  left: calc(var(--u) * 411);
-  /* the painted line sits 3.14u into the art — top 596.86 puts it on
-     y 600, the tile's centreline */
-  top: calc(var(--u) * 596.86);
-  width: calc(var(--u) * 271);
+  left: calc(var(--u) * 158);
+  top: calc(var(--u) * 577);
+  /* stops just shy of the flent tile (left ≈683u) so the arrowhead doesn't
+     land on it */
+  width: calc(var(--u) * 520);
   display: block;
+  z-index: 1;
+  /* the payment card (290–587u) sits over this 158–678u lead ⇒ 25.4–82.5%.
+     Mask that span out (a hair of margin each side) so the dotted line runs
+     UP TO the card and resumes on the far side — never THROUGH the glass. Keep
+     in sync if the card/wire geometry moves. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0 24.5%,
+    transparent 24.5% 83.5%,
+    #000 83.5% 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0 24.5%,
+    transparent 24.5% 83.5%,
+    #000 83.5% 100%
+  );
 }
 
 .how__ub-wire .how__tflow-wire {
@@ -2480,41 +2560,40 @@
 
 .how__ub-flent {
   position: absolute;
-  /* 504:1215 — centred at (734.33, 600.33) */
+  /* sized + top-aligned to the "You" avatar (60u) so the two read as a matched
+     pair the dotted lead runs through (was 103u — nearly 2× the avatar) */
   left: calc(var(--u) * 683);
-  top: calc(var(--u) * 549);
-  width: calc(var(--u) * 103);
-  height: calc(var(--u) * 103);
+  top: calc(var(--u) * 539);
+  width: calc(var(--u) * 60);
+  height: calc(var(--u) * 60);
+  z-index: 2;
   display: block;
+  /* the EVEN white glow (Figma filter0_d) — a box-shadow on the rounded-square
+     box, NOT a drop-shadow on the img (which rasterised to a round halo). The
+     radius keeps the tile's rx ratio (17.3%); the blur scales down with it. */
+  border-radius: calc(var(--u) * 10.4);
+  box-shadow: 0 0 calc(var(--u) * 20) rgba(255, 255, 255, 0.5);
 }
 
-/* Frame 7 — the tile emits a soft warm glow into the dim room. A u-scaled
-   radial halo painted BEHIND the tile: it stays proportional at every screen
-   scale (a fixed-px drop-shadow read tight — and clipped by its own filter
-   region — on large displays) and, being a plain painted box, it can't hit
-   the drop-shadow filter-region clip at all. */
-.how__ub-flent::before {
-  content: "";
-  position: absolute;
-  inset: calc(var(--u) * -54);
-  border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    rgba(255, 240, 221, 0.55),
-    rgba(255, 231, 206, 0.34) 44%,
-    rgba(255, 224, 198, 0.13) 66%,
-    transparent 82%
-  );
-  pointer-events: none;
-}
-
+/* Frame 7 — the flent tile (504:1215): a WHITE rounded square with the black
+   mark, lifted off the dim wall by an EVEN white drop shadow, exactly the
+   Figma effect (filter0_d — 0/0 offset, blur stdDeviation 28.56 on the 88.66
+   tile ⇒ ~0.322×, white @ 0.5). The shared asset is a BLACK tile, so invert
+   flips it white; the shadow follows the ROUNDED-SQUARE alpha, not the hard
+   CIRCLE the old radial ::before painted around it. */
 .how__ub-flent img {
-  position: relative; /* sit crisp above the ::before glow */
+  position: relative;
   width: 100%;
   height: 100%;
   display: block;
-  /* just a whisper of dark ambient shadow to seat the tile on the wall */
-  filter: drop-shadow(0 calc(var(--u) * 3) calc(var(--u) * 12) rgba(0, 0, 0, 0.3));
+  /* glow moved to the parent's box-shadow (above); img just inverts */
+  filter: invert(1);
+}
+
+/* mobile-only card element (418:1102) — the tenant rides INSIDE the card;
+   off on desktop, which keeps the outside "You" avatar. */
+.how__ub-cardtenant {
+  display: none;
 }
 
 /* Frame 7 seats the copy high; its left edge joins the SITE column —
@@ -2640,14 +2719,20 @@
     width: 88vw;
   }
 
+  /* Shail (33:368): drop the "first rent payment starts in month two"
+     sentence on mobile — the deposit line alone carries the point on phones */
+  .how__body-desk {
+    display: none;
+  }
+
   /* ── intro (iPhone 17 - 2) — the kicker flows as ONE regular-weight
      paragraph, the clay headline sits tighter, the sub right under it,
      and the lead stands alone well below the copy ── */
   .how__intro-copy {
-    left: calc(var(--mx) * 41);
+    left: calc(var(--mx) * 24);
     top: calc(var(--my) * 340);
     transform: none;
-    width: calc(var(--mx) * 324);
+    width: calc(var(--mx) * 354);
     gap: 34px;
   }
 
@@ -2675,9 +2760,12 @@
   }
 
   .how__intro-lead {
-    left: calc(var(--mx) * 40);
+    /* align to the same left margin as the copy (24) instead of 40 */
+    left: calc(var(--mx) * 24);
     right: auto;
-    top: calc(var(--my) * 656);
+    /* 498:988 — the lead sits well below the copy, just above the
+       journey indicator (was 656, riding too high on the frame) */
+    top: calc(var(--my) * 764);
     bottom: auto;
     font-size: 16px;
     color: #656565;
@@ -2690,6 +2778,13 @@
     height: 22px;
   }
 
+  /* 498:988 — phones carry a heavier white opacity fill over the blurred
+     room so the dappled tree-shadow behind the copy can't sap its
+     contrast (desktop keeps the lighter 40% veil) */
+  .how__iwash {
+    background: rgba(255, 255, 255, 0.62);
+  }
+
   /* the wordmark rides EVERY journey slide on phones (405:386 …),
      turning white over the completion greenery.
      top-left "Flent 11" wordmark hidden for now (per request) — restore
@@ -2697,7 +2792,7 @@
   .how__mbrand {
     display: none;
     position: absolute;
-    left: calc(var(--mx) * 29);
+    left: calc(var(--mx) * 24);
     top: calc(var(--my) * 54);
     width: 63.1px;
     height: 18.6px;
@@ -3010,60 +3105,92 @@
     font-size: 13px;
   }
 
-  /* the tenant card — dark glass, not the emi-beat's white frost
-     (419:1170): black 0.09→0.45 gradient, hairline white border,
-     backdrop-blur, the price stacked over its struck original */
+  /* ── the redesigned payment flow (553:605, re-proportioned for the phone):
+     tenant avatar → the full-upfront payment card → flent tile, one dotted
+     lead behind them. Centres aligned on the wire (~360my). ── */
+  /* the outside "You" avatar is desktop-only now — on the phone the tenant
+     rides INSIDE the card (418:1102) */
+  .how__ub-tenant {
+    display: none;
+  }
+
+  /* the tenant row at the top of the card: small avatar + "Flent Tenant" */
+  .how__ub-cardtenant {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  .how__ub-cardtenant img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #fff;
+    object-fit: cover;
+    flex: none;
+  }
+
+  .how__ub-cardtenant span {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: -0.04em;
+    color: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
+  }
+
+  /* the payment card — dark glass (553:704): black 0.1→0.5, white 0.5
+     hairline, blur; header over the price row */
   .how__fin2-card--ub {
-    left: calc(var(--mx) * 24);
-    top: calc(var(--my) * 307);
-    width: calc(var(--mx) * 148);
+    /* aligned under the copy column (24mx), narrower so the flent tile + its
+       dashed lead have room to the right (418:1102) */
+    left: calc(var(--mx) * 28);
+    top: calc(var(--my) * 300);
+    width: calc(var(--mx) * 188);
     height: auto;
-    padding: calc(var(--mx) * 12) calc(var(--mx) * 16);
-    gap: calc(var(--mx) * 10.24);
-    border-radius: calc(var(--mx) * 12.8);
-    border: 0.7px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 14px;
+    gap: 6px;
+    border-radius: 12px;
+    /* a soft, light hairline (was a heavier 0.5 white that read too crisp
+       against the dark wall — 418:1102 keeps it delicate) */
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    /* Figma glass (553:704) — the dotted lead is masked out behind the card
+       (see .how__ub-wire), so it never bleeds through the glass */
     background: linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.09),
-      rgba(0, 0, 0, 0.45)
+      rgba(0, 0, 0, 0.1),
+      rgba(0, 0, 0, 0.5)
     );
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    z-index: 2;
   }
 
-  .how__fin2-card--ub .how__fin2-tenant {
-    gap: calc(var(--mx) * 7.68);
+  .how__ub-cardhead {
+    font-size: 11px;
+    /* "Out-of-pocket payment before move-in" is longer than the old label;
+       let it wrap to two lines on the narrow mobile card instead of
+       overflowing past the card edge onto the wire */
+    flex-wrap: wrap;
+    row-gap: 2px;
   }
 
-  .how__fin2-card--ub .how__fin2-tenant img {
-    width: calc(var(--mx) * 23.04);
-    height: calc(var(--mx) * 23.04);
-  }
-
-  .how__fin2-card--ub .how__fin2-tname {
-    gap: calc(var(--mx) * 1.28);
-    font-size: calc(var(--mx) * 7.68);
-    letter-spacing: -0.04em;
-    color: rgba(255, 255, 255, 0.5);
-  }
-
-  .how__fin2-card--ub .how__fin2-tname strong {
-    font-size: calc(var(--mx) * 8.96);
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  /* ₹4,05,000 over its struck original — a stacked pair, not a row */
+  /* ₹4,05,000 over its struck original — a ROW here (553:725); nowrap so the
+     ₹ never breaks onto its own line */
   .how__fin2-card--ub .how__fin2-amts {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: calc(var(--mx) * 5.12);
-    font-size: calc(var(--mx) * 17.92);
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 17px;
     letter-spacing: -0.04em;
     color: #fff;
+    white-space: nowrap;
   }
 
   .how__fin2-card--ub .how__fin2-amts s {
-    font-size: calc(var(--mx) * 12.8);
+    font-size: 12px;
     color: rgba(255, 255, 255, 0.5);
   }
 
@@ -3072,14 +3199,25 @@
     display: none;
   }
 
-  /* the dashed run from the card to flent (Vector 9 @ 177,358 w111) —
-     a light hairline + chevron over the dark wall */
+  /* the dotted lead runs the WHOLE way, tenant (~66) → flent (~288), behind
+     the card; light hairline + chevron over the dark wall */
+  /* NO z-index: with one, the wire promotes to its own layer that the
+     card's backdrop-filter can't sample, so the dashed line reads SHARP
+     through the translucent card (553:704). Left in normal flow (it's
+     DOM-before the card), it falls into the card's backdrop and the card
+     blurs + dims it away — the line only shows in the tenant→card and
+     card→flent gaps, exactly like desktop. */
+  /* the dotted lead now runs ONLY from the card's right edge → flent tile
+     (the tenant moved INSIDE the card), so it never crosses the card — no
+     mask needed */
   .how__ub-wire {
-    left: calc(var(--mx) * 172);
+    left: calc(var(--mx) * 222);
     right: auto;
-    top: calc(var(--my) * 358);
-    width: calc(var(--mx) * 111);
+    top: calc(var(--my) * 350);
+    width: calc(var(--mx) * 60);
     height: 8px;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .how__ub-wire .how__tflow-wire {
@@ -3114,19 +3252,19 @@
   .how__ub-flent {
     left: calc(var(--mx) * 285.84);
     right: auto;
-    top: calc(var(--my) * 332);
-    width: calc(var(--mx) * 52.77);
-    height: calc(var(--mx) * 52.77);
-  }
-
-  /* the phone tile carries its OWN white halo via the invert drop-shadow
-     below, so the desktop warm ::before halo is off here */
-  .how__ub-flent::before {
-    display: none;
+    /* matched to the "You" avatar (44mx, top 338) — same size + top, like
+       the desktop pair (was 52.77 — bigger than the avatar) */
+    top: calc(var(--my) * 338);
+    width: calc(var(--mx) * 44);
+    height: calc(var(--mx) * 44);
+    /* SAME even white glow as desktop — box-shadow on the rounded box
+       (0.322× blur, rx 17.3%), not a drop-shadow (which went round) */
+    border-radius: calc(var(--mx) * 7.6);
+    box-shadow: 0 0 calc(var(--mx) * 14) rgba(255, 255, 255, 0.5);
   }
 
   .how__ub-flent img {
-    filter: invert(1) drop-shadow(0 0 calc(var(--mx) * 14) rgba(255, 255, 255, 0.28));
+    filter: invert(1);
   }
 
   /* ── journey indicator — near the designed line (405:369 @ y775; was
@@ -3174,7 +3312,7 @@
      assembly scales as one piece (the .how__tflow trick). ── */
   .how__copy--fin3,
   .how__copy--mon {
-    left: calc(var(--mx) * 29);
+    left: calc(var(--mx) * 24);
     /* pulled up from the designed 112 — the empty crown above the copy
        becomes spacing BETWEEN the flow's pieces instead; +crown-pad keeps
        the headline clear of the floating nav */
@@ -3183,7 +3321,7 @@
 
   .how__title--fin3,
   .how__title--mon {
-    max-width: calc(var(--mx) * 344);
+    max-width: calc(var(--mx) * 354);
     font-size: 28px;
     line-height: 38px;
   }
@@ -3204,26 +3342,26 @@
      squeeze, never these gaps. The --my terms are only the pre-JS
      first-paint fallbacks. */
   .how__fin3 {
-    --u: calc(var(--mx) * 344 / 486);
-    left: calc(var(--mx) * 29);
+    --u: calc(var(--mx) * 354 / 486);
+    left: calc(var(--mx) * 24);
     top: var(--f3top, calc(var(--my) * 228));
-    width: calc(var(--mx) * 344);
+    width: calc(var(--mx) * 354);
   }
 
   .how__fin3-sub {
-    left: calc(var(--mx) * 29);
+    left: calc(var(--mx) * 24);
     top: var(--f3subtop, calc(var(--my) * 352));
-    width: calc(var(--mx) * 344);
+    width: calc(var(--mx) * 354);
     font-size: 13px;
     line-height: 19px;
   }
 
   /* monthly diagram row (iPhone 17 - 5): avatar · card deck · gromor */
   .how__mon {
-    --u: calc(var(--mx) * 344 / 672);
-    left: calc(var(--mx) * 29);
+    --u: calc(var(--mx) * 354 / 672);
+    left: calc(var(--mx) * 24);
     top: var(--montop, calc(var(--my) * 300));
-    width: calc(var(--mx) * 344);
+    width: calc(var(--mx) * 354);
   }
 
   /* the deck must READ on a phone — floors keep the card's figures at
@@ -3266,14 +3404,40 @@
     font-size: max(calc(var(--u) * 14), 10px);
   }
 
+  /* give the gromor label real width so "RBI registered NBFC" sits on TWO
+     lines (the 35px tile box was cramping it to three) with clean spacing;
+     it overflows the tile symmetrically into the open gutter to the right */
+  .how__mon-gname {
+    width: 88px;
+    line-height: 1.3;
+    text-align: center;
+  }
+
   .how__mon-gsum {
     font-size: max(calc(var(--u) * 12), 9px);
+    width: 88px;
+    margin-top: 4px;
+    text-align: center;
+    /* keep "₹ 1,35,000" on one line instead of breaking the ₹ off */
+    white-space: nowrap;
   }
 
   /* the frames keep the small resting window CLEAN — no month labels
      on phones (the ₹0 month-1 card stays). The payment flights still
      land their ₹ + bank mark on each pane, same story as desktop. */
   .how__plabel {
+    display: none;
+  }
+
+  /* …but the upfront detail (418:1102) shows every month's label — dim white,
+     small — so the window reads as month 1 → 11 laid out individually */
+  .is-upfront.is-uB .how__plabel {
+    display: block;
+    font-size: max(calc(var(--u) * 11), 10px);
+  }
+
+  /* …except month 2, whose lit ₹0 block already carries its own label */
+  .is-upfront.is-uB .how__pane--m2 .how__plabel {
     display: none;
   }
 
@@ -3314,7 +3478,7 @@
   /* completion (iPhone 17 - 6): white copy low-left over the dive —
      411:790: block (29,510) w333, 40/50 title, 24 gap, 14/18 body */
   .how__copy--complete {
-    left: calc(var(--mx) * 29);
+    left: calc(var(--mx) * 24);
     top: calc(var(--my) * 510);
   }
 
@@ -3330,6 +3494,10 @@
     margin-top: 24px;
     font-size: 14px;
     line-height: 18px;
+    /* on the phone let the two sentences flow as one paragraph (the
+       desktop keeps the forced line break) — avoids the orphaned
+       "stay." widow above a lone "We make the terms…" line */
+    white-space: normal;
   }
 
   /* the caption tracks its dot and wraps at the edges (END OF / MONTH 11) */

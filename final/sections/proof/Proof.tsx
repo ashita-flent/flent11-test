@@ -32,7 +32,7 @@ const STATS: Stat[] = [
     decimals: 1,
     tail: "+",
     unit: "stars",
-    label: "Average rating across stays",
+    label: "Average resident rating",
   },
   { value: 15, unit: "months", label: "Average stay duration" },
   { value: 25, pre: "₹", tail: " Cr+", label: "Raised since inception" },
@@ -209,8 +209,16 @@ export default function Proof() {
       <div className="pr__pin">
         <div className="pr__inner">
           <div className="pr__head">
-            {/* the flent pill (Figma 398:813) */}
-            <img className="pr__brand" src="/proof-flent-pill.svg" alt="flent" />
+            {/* the flent pill (Figma 398:813) — links to the main site */}
+            <a
+              className="pr__brand-link"
+              href="https://flent.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="flent — flent.in (opens in a new tab)"
+            >
+              <img className="pr__brand" src="/proof-flent-pill.svg" alt="flent" />
+            </a>
             <h2 className="pr__title">
               <span className="pr__title-soft">Flent&nbsp;11 is new.</span>
               <br />

@@ -42,12 +42,36 @@
 /* the flent pill (398:813 — 102.4×42.5). The exported svg carries
    percentage dimensions (no intrinsic size), so the box is pinned by
    width + aspect-ratio or it stretches. */
+/* the pill links to the main site — display:contents lets the anchor carry
+   the href while the img keeps its own centering + spacing untouched */
+.pr__brand-link {
+  display: contents;
+}
+
 .pr__brand {
   display: block;
   width: clamp(84px, 6.8vw, 102px);
   height: auto;
   aspect-ratio: 102.4 / 42.533;
   margin: 0 auto clamp(20px, 2.1vw, 32px);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+/* the pill is a link to flent.in — lift + soft throw on hover, a pill
+   focus ring for keyboard (the anchor is display:contents, so the state
+   rides its child) */
+.pr__brand-link:hover .pr__brand {
+  transform: translateY(-2px) scale(1.03);
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.22));
+}
+
+.pr__brand-link:focus-visible .pr__brand {
+  outline: 2px solid rgba(26, 23, 20, 0.55);
+  outline-offset: 3px;
+  border-radius: 9999px;
 }
 
 /* 56u Regular, the opening line softened (398:781) */
@@ -113,10 +137,12 @@
   color: transparent;
 }
 
-/* "stars" / "months" — the 36u run (398:788 / 398:791) */
+/* "stars" / "months" — the 36u run (398:788 / 398:791). SAME weight as
+   the figure (400): the unit was 500, which read bolder than the number,
+   most obviously on phones where it sizes up to 1em. */
 .pr__stat-unit {
   font-size: 0.643em;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .pr__stat-label {

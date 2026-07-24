@@ -42,7 +42,7 @@ const SLIP_ROWS: {
     ),
     dim: true,
   },
-  { k: "Deposit with-held", v: "₹1,35,000", dim: true },
+  { k: "Deposit you paid", v: "₹1,35,000", dim: true },
   {
     k: "Exit fee",
     v: (
@@ -132,11 +132,10 @@ export default function Trust() {
             "-=0.1"
           )
           .from(
-            ".tc__emi-flent",
-            { autoAlpha: 0, scale: 0.7, duration: 0.4, ease: "back.out(1.6)" },
+            ".tc__emi-pill",
+            { autoAlpha: 0, scale: 0.8, duration: 0.4, ease: "back.out(1.5)" },
             "-=0.3"
           )
-          .from(".tc__emi-interest", { autoAlpha: 0, y: 6, duration: 0.35 }, "-=0.15")
           .from(
             ".tc__emi-gromor",
             { autoAlpha: 0, scale: 0.85, duration: 0.4, ease: "back.out(1.4)" },
@@ -240,7 +239,7 @@ export default function Trust() {
     <section className="tr" ref={rootRef}>
       <div className="tr__inner">
         <h2 className="tr__head">
-          Read everything,{" "}
+          Read everything{" "}
           <br className="tr__head-br" />
           <em className="tr__head-em">before you sign anything.</em>
         </h2>
@@ -251,7 +250,8 @@ export default function Trust() {
             {/* 1 · financing handoff — light glass, ink copy */}
             <article className="tc tc--hand">
               <p className="tc__copy">
-                Your rent is financed through{" "}
+                Your rent is financed through
+                <br />
                 <strong>Gromor, an RBI-registered NBFC.</strong>
               </p>
               <span className="tc__tile tc__tile--gromor">
@@ -279,9 +279,9 @@ export default function Trust() {
             {/* 2 · no-cost EMI loop — glass (268:3359) */}
             <article className="tc tc--emi">
               <p className="tc__copy">
-                Your schedule shows <strong>ten No-cost EMIs</strong>, each
-                exactly your rent. <strong>The interest line reads zero</strong>
-                . We settle it with Gromor directly
+                Your schedule shows <strong>ten no-cost EMIs</strong>, each
+                equal to your rent.{" "}
+                <strong>Flent covers the financing cost directly with Gromor.</strong>
               </p>
 
               {/* the wire: chip » gromor, the flent mark riding it */}
@@ -309,11 +309,19 @@ export default function Trust() {
                 <span className="tc__emi-chip-sub">Paid to Flent</span>
               </div>
 
-              <em className="tc__emi-interest">+ interest</em>
-
-              {/* the interest is absorbed at the flent mark (268:3384) */}
-              <span className="tc__emi-flent" aria-hidden>
-                <img src="/trust-flent-tile.svg" alt="" />
+              {/* the interest is absorbed by Flent — a pill on the wire,
+                  the flent mark leading the promise */}
+              <span className="tc__emi-pill" aria-hidden>
+                {/* the flent mark — black glyph, no tile (matches Figma) */}
+                <svg className="tc__emi-pill-logo" viewBox="56 53 28 34">
+                  <path
+                    d="M71.0756 53C62.565 53 57.257 59.8871 59.194 66.6087L56 66.6203V70.9436H59.1997V87H66.5046V70.9436H72.1698V66.5797H69.5786C65.9876 66.5797 63.9135 64.5472 63.9135 61.7076C63.9135 59.3354 66.2761 57.5033 68.953 57.5033C74.9324 57.5033 76.695 62.7442 76.695 62.7442V87H84V59.1903C82.3402 56.9952 77.7692 53 71.0756 53Z"
+                    fill="#111"
+                  />
+                </svg>
+                <span className="tc__emi-pill-text">
+                  Flent covers Interest on EMI
+                </span>
               </span>
 
               <div className="tc__emi-gromor">
@@ -405,7 +413,6 @@ export default function Trust() {
                   720
                 </span>
               </div>
-              <span className="tc__dial-plus">+ 6 points</span>
             </article>
           </div>
         </div>

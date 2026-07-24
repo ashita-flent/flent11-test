@@ -136,7 +136,12 @@
 /* the way back — quiet white, top-left of the opened detail */
 .upf__back {
   position: absolute;
-  left: calc(var(--u) * 96);
+  /* the copy lives INSIDE the centred contain-fit frame (.how__frame,
+     1512u wide), but Back is a viewport-level sibling — so a plain 96u
+     left sat at the viewport edge while the copy shifted right with the
+     frame's side margins on wide/short screens (1440×900, wide monitors).
+     Anchor to the frame's content edge instead: 50% − 756u + 96u. */
+  left: calc(50% - var(--u) * 660);
   /* clear the fixed nav pill (~77px): on smaller frames 64u falls under
      it. The detail copy sits far below (~194px), so only Back moves. */
   top: max(calc(var(--u) * 64), calc(env(safe-area-inset-top, 0px) + 88px));
@@ -156,6 +161,20 @@
   opacity: 0;
   visibility: hidden;
   transition: color 0.2s ease;
+}
+
+/* a masked SVG arrow, NOT the ← glyph: Plus Jakarta has no arrow, so ←
+   fell back to SF whose wide advance sat the ink ~5px in from the box —
+   Back never met the gutter. The SVG stroke spans its box, so its left
+   ink lands right on the margin, level with the copy below. */
+.upf__back-arrow {
+  flex: none;
+  width: 1.05em;
+  height: 0.85em;
+  background: currentColor;
+  mask: url(/exit-ic-arrow.svg) center / contain no-repeat;
+  -webkit-mask: url(/exit-ic-arrow.svg) center / contain no-repeat;
+  transform: scaleX(-1);
 }
 
 .upf__back:hover {

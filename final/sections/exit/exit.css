@@ -85,7 +85,7 @@
 /* ---- face 1 · the exit story (Figma 383:420) --------------------------- */
 .ex__shead {
   position: absolute;
-  left: calc(var(--u) * 94);
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 100);
   width: calc(var(--u) * 1163);
   display: flex;
@@ -217,7 +217,7 @@
 /* ---- pledges (391:819…) + the CTA resting on the thread (383:540) ----- */
 .ex__pledges {
   position: absolute;
-  left: calc(var(--u) * 94);
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 779);
   width: calc(var(--u) * 1353);
   display: flex;
@@ -285,10 +285,18 @@
   white-space: nowrap;
   cursor: pointer;
   z-index: 2;
+  /* a soft bronze glow at rest (was only on hover), gently pulsing to pull
+     the eye to the primary CTA. --glow-u tracks the button's own unit so
+     the halo scales right on desktop (--u) AND phone (--ue). */
+  --glow-u: var(--u);
+  box-shadow:
+    0 calc(var(--glow-u) * 6) calc(var(--glow-u) * 18) rgba(178, 96, 37, 0.38),
+    0 0 calc(var(--glow-u) * 22) rgba(178, 96, 37, 0.32);
   transition:
     background-color 0.25s ease,
     transform 0.25s ease,
     box-shadow 0.25s ease;
+  animation: ex-cta-glow 2.6s ease-in-out infinite;
 }
 
 .ex__mathcta-arrow {
@@ -298,9 +306,12 @@
 }
 
 .ex__mathcta:hover {
+  animation: none;
   background: #9a501c;
   transform: translateY(-1px);
-  box-shadow: 0 calc(var(--u) * 8) calc(var(--u) * 22) rgba(178, 96, 37, 0.4);
+  box-shadow:
+    0 calc(var(--glow-u) * 8) calc(var(--glow-u) * 24) rgba(178, 96, 37, 0.5),
+    0 0 calc(var(--glow-u) * 30) rgba(178, 96, 37, 0.45);
 }
 
 .ex__mathcta:hover .ex__mathcta-arrow {
@@ -308,6 +319,7 @@
 }
 
 .ex__mathcta:active {
+  animation: none;
   transform: translateY(0);
   box-shadow: 0 calc(var(--u) * 4) calc(var(--u) * 12) rgba(178, 96, 37, 0.35);
 }
@@ -317,12 +329,33 @@
   outline-offset: 3px;
 }
 
+@keyframes ex-cta-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 calc(var(--glow-u) * 5) calc(var(--glow-u) * 16) rgba(178, 96, 37, 0.32),
+      0 0 calc(var(--glow-u) * 15) rgba(178, 96, 37, 0.22);
+  }
+  50% {
+    box-shadow:
+      0 calc(var(--glow-u) * 8) calc(var(--glow-u) * 24) rgba(178, 96, 37, 0.46),
+      0 0 calc(var(--glow-u) * 34) rgba(178, 96, 37, 0.5);
+  }
+}
+
+/* keep the glow, drop the pulse for reduced-motion users */
+@media (prefers-reduced-motion: reduce) {
+  .ex__mathcta {
+    animation: none;
+  }
+}
+
 /* ---- face 2 · the calculator (Figma 316:1755) -------------------------- */
 
 /* the way back — arrow-left + Back in clay (316:1860) */
 .ex__back {
   position: absolute;
-  left: calc(var(--u) * 93);
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 86);
   display: inline-flex;
   align-items: center;
@@ -353,12 +386,146 @@
   transform: scaleX(-1) translateX(calc(var(--u) * 3));
 }
 
+/* ── the grass band + its way-back — DESKTOP redesign (Figma 548:630) ──
+   A full-bleed grass photo (548:626) rising from the foot; its top fades
+   to transparent so it DISSOLVES up into the live exit→trust wash rather
+   than meeting a baked-in colour. Figma's band fades into an opaque
+   #f5ebdd (which matches the frame there) — but the wash colour at this
+   line shifts with viewport height, so any baked colour seams. Fading to
+   nothing lets whatever the wash is show through, blending at any height.
+   The "Go back" control is a real glassy pill (548:631), not a baked
+   label. Phone-hidden — the phone keeps the top-left Back. */
+/* the clip frame — full-bleed, carries the top fade, and (crucially) hides
+   the blurred photo's feathered edges so the foot reads as SOLID grass
+   rather than the thin bright line the blur leaves where it thins to
+   transparent. The frame is horizontally centred, so 50% is the viewport
+   centre — left/width reach both edges at any width (fixes the band sitting
+   inset on wide/short screens). */
+.ex__grass {
+  position: absolute;
+  left: calc(50% - 50vw);
+  /* bottom stays pinned at the frame foot (982u); the band is grown UPWARD
+     so it rises higher into the wash and the dissolve gets more room */
+  top: calc(var(--u) * 709);
+  width: 100vw;
+  height: calc(var(--u) * 273);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+  /* a smoothstep alpha ramp over the FULL band height: a gentle slope at
+     both ends kills the Mach-band line a plain linear ramp leaves where it
+     meets the wash — the grass just materialises out of it */
+  -webkit-mask: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.03) 20%,
+    rgba(0, 0, 0, 0.13) 35%,
+    rgba(0, 0, 0, 0.32) 50%,
+    rgba(0, 0, 0, 0.58) 66%,
+    rgba(0, 0, 0, 0.82) 83%,
+    #000 100%
+  );
+  mask: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.03) 20%,
+    rgba(0, 0, 0, 0.13) 35%,
+    rgba(0, 0, 0, 0.32) 50%,
+    rgba(0, 0, 0, 0.58) 66%,
+    rgba(0, 0, 0, 0.82) 83%,
+    #000 100%
+  );
+}
+
+/* the photo, blown out ~20px past the frame on every side and softened
+   (Figma's 7px band blur, 548:628). The parent's overflow clips the blur
+   feather, so every visible edge — the foot especially — stays solid. */
+.ex__grass-img {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  object-fit: cover;
+  object-position: center bottom;
+  filter: blur(6px);
+}
+
+/* the way back — a glassy pill at the band's left (Figma 548:631): a
+   translucent black fill under a 12px blur with a hairline white border.
+   Sized to the nav's "Check Eligibility" CTA (fixed px, not frame units,
+   so it doesn't scale up oversized on big monitors): 18px/500 label,
+   14.4×24 padding, 100px radius. Position stays in frame units so it rides
+   the grass. */
+.ex__grassback {
+  position: absolute;
+  left: calc(var(--u) * 94);
+  top: calc(var(--u) * 870);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  padding: 14.4px 24px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 100px;
+  /* full-opacity white — a solid button that pops against the grass */
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: normal;
+  letter-spacing: -0.02em;
+  color: #522d12;
+  white-space: nowrap;
+  cursor: pointer;
+  z-index: 2;
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.ex__grassback:hover {
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+
+/* the arrow asset is white-stroked — currentColor (white) fills the mask,
+   flipped to point back the way the page will slide */
+.ex__grassback-arrow {
+  width: 17px;
+  height: 14px;
+  background: currentColor;
+  mask: url(/exit-ic-arrow.svg) center / contain no-repeat;
+  -webkit-mask: url(/exit-ic-arrow.svg) center / contain no-repeat;
+  transform: scaleX(-1);
+  transition: transform 0.25s ease;
+}
+
+.ex__grassback:hover .ex__grassback-arrow {
+  transform: scaleX(-1) translateX(3px);
+}
+
+.ex__grassback:focus-visible {
+  outline: 2px solid var(--ex-accent);
+  outline-offset: 2px;
+}
+
+/* the grass band only replaces the top-left Back on wide screens */
+@media (min-width: 641px) {
+  .ex__back {
+    display: none;
+  }
+}
+
 /* ---- header row (394:523) — title left, the rent block right ---------- */
 .ex__head {
   position: absolute;
-  left: calc(var(--u) * 94);
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 135);
-  width: calc(var(--u) * 1318);
+  width: calc(var(--u) * 1320);
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -395,7 +562,9 @@
   font-size: calc(var(--u) * 16);
   letter-spacing: -0.02em;
   color: rgba(0, 0, 0, 0.6);
-  white-space: nowrap;
+  /* long labels (e.g. "Under Flent 11 monthly plan") wrap within the
+     column instead of overflowing onto the value */
+  line-height: 1.25;
 }
 
 .ex__rent-k i {
@@ -456,6 +625,13 @@
 .ex__rent-v s {
   font-size: calc(var(--u) * 14);
   color: rgba(0, 0, 0, 0.5);
+}
+
+/* the Flent price is the number that matters — green highlight against the
+   plain 11-month reference value above it (368:521 green) */
+.ex__rent-v--flent {
+  color: #008247;
+  font-weight: 600;
 }
 
 /* ---- flanking stat chips (316:1789 / 316:1795) ------------------------- */
@@ -774,7 +950,7 @@
   position: absolute;
   top: calc(var(--u) * 281);
   box-sizing: border-box;
-  width: calc(var(--u) * 434);
+  width: calc(var(--u) * 500);
   padding: calc(var(--u) * 24) calc(var(--u) * 28);
   border-radius: calc(var(--u) * 20);
   background: linear-gradient(
@@ -811,11 +987,14 @@
 
 .ex__row-k {
   flex: none;
-  width: calc(var(--u) * 120);
+  /* wide enough that every label ("Security deposit held" is the longest)
+     holds one line, so the card can't grow tall enough to strike the pill */
+  width: calc(var(--u) * 175);
   font-weight: 600;
   font-size: calc(var(--u) * 16);
   letter-spacing: -0.02em;
   color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
 }
 
 .ex__row-v {
@@ -918,7 +1097,10 @@
     inset: auto;
     /* the steps screen claims a full viewport (or the design's 700u
        foot, whichever is taller); the pledge band adds its own run */
-    --sfoot: max(100svh, calc(var(--ue) * 700));
+    /* the steps screen no longer claims a whole viewport — it ends just
+       below the 4th step so the pledge band peeks in at the foot of the
+       pinned frame (still ≥ the steps' own height on short viewports) */
+    --sfoot: max(calc(var(--ue) * 573), calc(100svh - 108px));
     height: calc(var(--sfoot) + var(--ue) * 86 + 64px);
   }
 
@@ -926,9 +1108,11 @@
   .ex__thread {
     left: calc(var(--ue) * 112);
     right: auto;
-    top: calc(var(--ue) * 305);
+    top: calc(var(--ue) * 270);
     bottom: auto;
-    height: calc(var(--ue) * 303);
+    /* end the line AT the 4th step's pill centre (was 303, poking ~27u
+       below the last pill) */
+    height: calc(var(--ue) * 258);
     width: 1px;
     margin-left: -0.5px;
     border-top: 0;
@@ -945,8 +1129,10 @@
 
   /* head (413:853) */
   .ex__shead {
-    left: calc(var(--ue) * 40);
-    top: calc(var(--ue) * 60);
+    left: calc(var(--ue) * 24);
+    /* the whole story lifts up (was 60) to use the dead space under the
+       nav after the frame pins — the steps + pledges follow in step */
+    top: calc(var(--ue) * 25);
     width: calc(var(--ue) * 332);
     gap: calc(var(--ue) * 18);
   }
@@ -968,19 +1154,19 @@
   }
 
   .ex__tl-when--0 {
-    top: calc(var(--ue) * 290);
+    top: calc(var(--ue) * 255);
   }
 
   .ex__tl-when--1 {
-    top: calc(var(--ue) * 400);
+    top: calc(var(--ue) * 348);
   }
 
   .ex__tl-when--2 {
-    top: calc(var(--ue) * 524);
+    top: calc(var(--ue) * 437);
   }
 
   .ex__tl-when--3 {
-    top: calc(var(--ue) * 622);
+    top: calc(var(--ue) * 518);
   }
 
   .ex__tl-stem {
@@ -1001,27 +1187,29 @@
     gap: calc(var(--ue) * 8);
   }
 
+  /* even pitch (86), lifted with the head so all four steps + the pledge
+     band below fit the pinned frame */
   .ex__tls--0 {
     left: calc(var(--ue) * 96) !important;
-    top: calc(var(--ue) * 290) !important;
+    top: calc(var(--ue) * 255) !important;
     width: calc(var(--ue) * 276) !important;
   }
 
   .ex__tls--1 {
     left: calc(var(--ue) * 96) !important;
-    top: calc(var(--ue) * 393) !important;
+    top: calc(var(--ue) * 341) !important;
     width: calc(var(--ue) * 276) !important;
   }
 
   .ex__tls--2 {
     left: calc(var(--ue) * 96) !important;
-    top: calc(var(--ue) * 514) !important;
+    top: calc(var(--ue) * 427) !important;
     width: calc(var(--ue) * 276) !important;
   }
 
   .ex__tls--3 {
     left: calc(var(--ue) * 96) !important;
-    top: calc(var(--ue) * 617) !important;
+    top: calc(var(--ue) * 513) !important;
     width: calc(var(--ue) * 276) !important;
   }
 
@@ -1044,7 +1232,7 @@
   }
 
   .ex__tls-copy {
-    margin-left: calc(var(--ue) * 40);
+    margin-left: calc(var(--ue) * 24);
     width: calc(var(--ue) * 236) !important;
     font-size: max(calc(var(--ue) * 12), 10px);
     line-height: 1.5;
@@ -1096,8 +1284,10 @@
   /* the way in — a HUG-CONTENTS pill under the copy (413:1014 @ (40,226),
      w151, px12 py8, 14px); arrow points the way the page will slide */
   .ex__mathcta {
-    left: calc(var(--ue) * 40);
-    top: calc(var(--ue) * 226);
+    left: calc(var(--ue) * 24);
+    top: calc(var(--ue) * 191);
+    /* scale the glow to the phone's unit, not the tiny desktop --u */
+    --glow-u: var(--ue);
     height: auto;
     padding: calc(var(--ue) * 8) calc(var(--ue) * 12);
     gap: calc(var(--ue) * 6);
@@ -1153,14 +1343,18 @@
 
   .ex__stat,
   .ex__rail,
-  .ex__bar {
+  .ex__bar,
+  .ex__grass,
+  .ex__grassback {
     display: none;
   }
 
   /* head (416:243 @ x40) — Back, the title, the rent rows */
   .ex__back {
-    left: calc(var(--ue) * 40);
-    top: calc(var(--ue) * 60);
+    left: calc(var(--ue) * 24);
+    /* pulled up (was 60) — there was ~45px of dead space above Back,
+       pushing the settlement content off the bottom of the viewport */
+    top: calc(var(--ue) * 26);
     gap: calc(var(--ue) * 5.3);
     font-size: max(calc(var(--ue) * 14), 12px);
     color: #864728;
@@ -1172,12 +1366,12 @@
   }
 
   .ex__head {
-    left: calc(var(--ue) * 40);
-    top: calc(var(--ue) * 96);
+    left: calc(var(--ue) * 24);
+    top: calc(var(--ue) * 62);
     width: calc(var(--ue) * 332);
     flex-direction: column;
     align-items: flex-start;
-    gap: calc(var(--ue) * 18);
+    gap: calc(var(--ue) * 10);
   }
 
   /* 416:244 — 20px Medium (the redesign shrank the title from 28) */
@@ -1192,7 +1386,7 @@
 
   .ex__rent {
     align-items: flex-start;
-    gap: calc(var(--ue) * 8);
+    gap: calc(var(--ue) * 5);
   }
 
   .ex__rent-row {
@@ -1249,7 +1443,7 @@
   /* month labels in the gutter (416:433 @ x40, w62 — right edge x102) */
   .ex__vmonth {
     position: absolute;
-    left: calc(var(--ue) * 40);
+    left: calc(var(--ue) * 24);
     width: calc(var(--ue) * 62);
     transform: translateY(-50%);
     font-family: var(--sans);

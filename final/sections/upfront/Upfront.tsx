@@ -229,12 +229,13 @@ export default function Upfront({ rent }: { rent: number }) {
           q(".how__ub-flent"),
           { autoAlpha: 1, scale: 1, duration: 0.35 * D, ease: "back.out(1.4)" },
           2.05
-        )
-        // 4 · …only NOW does the window tell the payoff: the months GATHER into
-        //     the one upfront payment — every label drifts to the wprice seat
-        //     and fades as the "month 1 – 11 / ₹total" block settles in.
-        //     (504:1147 is the pre-gather pose; this beat is the payoff.)
-        .to(
+        );
+      // 4 · the payoff — DESKTOP only: the months GATHER into the one upfront
+      //     payment (every label drifts to the wprice seat and fades as the
+      //     "month 1 – 11 / ₹total" block settles in). The PHONE (418:1102)
+      //     holds the pre-gather pose — every month stays laid out individually.
+      if (!mobile) {
+        tl.to(
           labels,
           {
             x: (i: number) => {
@@ -253,8 +254,8 @@ export default function Upfront({ rent }: { rent: number }) {
             stagger: 0.05 * D,
           },
           2.5
-        )
-        .to(q(".how__wprice"), { autoAlpha: 1, duration: 0.45 * D }, 3.25);
+        ).to(q(".how__wprice"), { autoAlpha: 1, duration: 0.45 * D }, 3.25);
+      }
     } else {
       // collapse: the detail folds away, the card shrinks back to a preview
       tl.to(q(".how__ustep--b, .upf__back"), {
@@ -296,11 +297,11 @@ export default function Upfront({ rent }: { rent: number }) {
     >
       {/* the offer copy, on the shared cream ground */}
       <div className="upf__copy">
-        <p className="upf__kicker">Prefer to skip the financing entirely?</p>
+        <p className="upf__kicker">Have the cash?</p>
         <p className="upf__line">
           Pay upfront{" "}
           <em>
-            and get <span className="upf__off">2 months off</span>
+            and stay <span className="upf__off">2 months free</span>
           </em>
         </p>
       </div>
@@ -326,39 +327,44 @@ export default function Upfront({ rent }: { rent: number }) {
           <div className="how__step how__ustep--b">
             <div className="how__copy how__copy--scaffold how__copy--monthly">
               <h3 className="how__title">
-                No EMIs, No financer,
+                No EMIs. No NBFC.
                 <br />
-                just you and Flent
+                Just you and Flent
               </h3>
               <p className="how__body">
-                Nine months cover the whole stay — the discount is applied
-                into the price, so money never comes back because it never
-                leaves. You pay Flent directly.
+                Pay 9 months of rent upfront. Stay for 11. The 2 free months
+                are adjusted in the price before you pay.
               </p>
             </div>
+            {/* the dotted lead runs the WHOLE way, tenant → flent, behind the
+                card (553:675); drawn left→right by the clipPath tween */}
+            <span className="how__ub-wire" aria-hidden>
+              <img src="/upfront-wire.svg" className="how__tflow-wire" alt="" />
+            </span>
+            {/* the tenant, paying upfront (553:676) — avatar + label */}
+            <div className="how__ub-tenant" aria-hidden>
+              <img src="/how-tenant.png" alt="" />
+              <span>You</span>
+            </div>
+            {/* the payment card (553:704) — the full upfront price for month 1 */}
             <div className="how__fin2-card how__fin2-card--ub">
-              <div className="how__fin2-tenant">
+              {/* mobile (418:1102): the tenant rides INSIDE the card, avatar +
+                  label at the top; hidden on desktop (which keeps the outside
+                  "You" avatar above) */}
+              <div className="how__ub-cardtenant" aria-hidden>
                 <img src="/how-tenant.png" alt="" />
-                <span className="how__fin2-tname">
-                  <strong>Akanksha Mishra</strong>
-                  Flent Tenant
-                </span>
+                <span>Flent Tenant</span>
               </div>
+              <p className="how__ub-cardhead">
+                Out-of-pocket payment <strong>before move-in</strong>
+              </p>
               <div className="how__fin2-amts">
                 ₹ {inr(rent * 9)} <s>₹ {inr(rent * 11)}</s>
               </div>
-              <p className="how__fin2-note">
-                Your 11 months rent upfront <strong>with 2 months off</strong>
-              </p>
             </div>
-            <span className="how__ub-wire" aria-hidden>
-              {/* Frame 7 (504:1203) — the dotted white 0.7 lead, arrowhead at
-                  the tile end; drawn in left→right by the clipPath tween */}
-              <img src="/upfront-wire.svg" className="how__tflow-wire" alt="" />
-            </span>
             <span className="how__ub-flent" aria-hidden>
-              {/* Frame 7 (504:1215) — BLACK tile, WHITE mark, wrapped in a
-                  warm glow (the glow lives in .how__ub-flent img's filter) */}
+              {/* Frame 7 (553:673) — WHITE tile, BLACK mark, wrapped in an even
+                  white glow (the glow lives in .how__ub-flent img's filter) */}
               <img src="/trust-flent-tile.svg" alt="" />
             </span>
           </div>
@@ -382,7 +388,7 @@ export default function Upfront({ rent }: { rent: number }) {
 
         {/* the way back out of the expanded detail */}
         <button type="button" className="upf__back" onClick={() => setOpen(false)}>
-          <span aria-hidden>&larr;</span> Back
+          <span className="upf__back-arrow" aria-hidden />Back
         </button>
       </div>
 

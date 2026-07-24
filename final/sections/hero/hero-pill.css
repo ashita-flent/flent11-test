@@ -70,7 +70,7 @@
 .hp__title {
   position: absolute;
   z-index: 3;
-  left: calc(var(--u) * 83);
+  left: calc(var(--u) * 96);
   top: calc(var(--u) * 717);
   margin: 0;
   font-family: var(--sans);
@@ -171,7 +171,7 @@
 
   .hp__slat {
     position: absolute;
-    left: calc(var(--ux) * 29);
+    left: calc(var(--ux) * 24);
     width: calc(var(--ux) * 352);
     /* capsule ends at any height (CSS clamps the oversize radius) */
     clip-path: inset(0 round 999px);
@@ -198,7 +198,7 @@
      scene behind the sheet */
   .hp__slat img {
     position: absolute;
-    left: calc(var(--ux) * (-270 - 29));
+    left: calc(var(--ux) * (-270 - 24));
     top: calc(var(--uy) * (30 - var(--sy)));
     width: calc(var(--ux) * 941);
     height: calc(var(--uy) * 529);
@@ -208,7 +208,7 @@
   }
 
   .hp__brand {
-    left: calc(var(--ux) * 29);
+    left: calc(var(--ux) * 24);
     top: calc(var(--uy) * 54);
     width: 63.1px;
     height: 18.6px;
@@ -217,7 +217,7 @@
   /* the copy stack (404:283 @ (29,548), gap 20) — text at design px,
      offsets fixed so the block never stretches with the viewport */
   .hp__title {
-    left: calc(var(--ux) * 29);
+    left: calc(var(--ux) * 24);
     top: calc(var(--uy) * 548);
     font-size: 36px;
     line-height: normal;
@@ -225,7 +225,7 @@
   }
 
   .hp__sub {
-    left: calc(var(--ux) * 29);
+    left: calc(var(--ux) * 24);
     top: calc(var(--uy) * 548 + 110px);
     width: min(313px, 84vw);
     font-size: 14px;

@@ -194,7 +194,7 @@
 /* ---- the slots copy — the band's clear left third (400:852) ---------- */
 .ft__slots {
   position: absolute;
-  left: calc(var(--fx) + var(--uf) * 91);
+  left: calc(var(--fx) + var(--uf) * 96);
   top: calc(var(--uf) * 300);
   width: calc(var(--uf) * 524);
   display: flex;

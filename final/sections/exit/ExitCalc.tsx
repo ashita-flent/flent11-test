@@ -105,8 +105,8 @@ const STORY: {
     pill: "We close your loan",
     copy: (
       <>
-        We settle the outstanding amount with Gromor directly. No foreclosure
-        charge. <strong>Nothing for you to pay or chase</strong>.
+        Flent settles the outstanding financing with Gromor{" "}
+        <strong>within 7 days of your exit notice</strong>.
       </>
     ),
     x: 420,
@@ -123,8 +123,7 @@ const STORY: {
     pill: "Exit fee is deducted",
     copy: (
       <>
-        We deduct <strong>21 days of rent from your deposit</strong> as an
-        exit fee. Not the full deposit.
+        Only <strong>21 days of rent</strong> is charged as an early exit fee.
       </>
     ),
     x: 721,
@@ -141,7 +140,7 @@ const STORY: {
     pill: "Your balance deposit returned",
     copy: (
       <>
-        The remaining deposit comes back to you <strong>within 30 days</strong>{" "}
+        The remaining deposit is returned <strong>within 30 days</strong>{" "}
         of your move-out date.
       </>
     ),
@@ -480,8 +479,9 @@ export default function ExitCalc({
   const pct = (x: number) => ((x - BAR_L) / TRACK_W) * 100;
   const P = pct(X);
   /* the deductions card hugs the marker but stays inside the frame
-     (card 434u ≈ 32.9% of the rail wide on desktop) */
-  const cardLeftPct = Math.min(Math.max(P - 16.45, 0), 100 - 32.9);
+     (card 500u ≈ 37.9% of the rail wide on desktop — widened so the
+     row labels hold one line and the card no longer grows into the pill) */
+  const cardLeftPct = Math.min(Math.max(P - 18.95, 0), 100 - 37.9);
 
   /* the calculator rides in FULLY FORMED — the whole face slides as one
      piece so its track visibly picks up the thread; only the demo (the
@@ -547,7 +547,9 @@ export default function ExitCalc({
       const mTop = math.getBoundingClientRect().top;
       const mH = math.clientHeight;
       const headBottom = head.getBoundingClientRect().bottom - mTop;
-      const vtop = headBottom + 40; // breathing room under the rent block
+      const vtop = headBottom + 16; // breathing room under the rent block
+      // (tightened from 40: the 3-line rent block made the head taller, so
+      //  the timeline + pending chip were spilling past the viewport foot)
       const vfoot = 64; // room below Month 11 for its label + the pending chip
       const pitch = Math.max(34, (mH - vtop - vfoot) / TERM);
       math.style.setProperty("--vtop", `${Math.round(vtop)}px`);
@@ -572,7 +574,7 @@ export default function ExitCalc({
         >
           <div className="ex__shead">
             <h2 className="ex__title">
-              If life changes, the maths is already on this page.
+              Built for commitment. Prepared for change.
             </h2>
             <p className="ex__sub">
               Flent 11 is for tenants who intend to stay 11 months. But if
@@ -662,16 +664,37 @@ export default function ExitCalc({
             Back
           </button>
 
+          {/* DESKTOP redesign (Figma 548:630) — a full-bleed grass photo
+              rising from the foot, its top fading into the live wash; the
+              "Go back" control is a real glassy pill (548:631). Both are
+              phone-hidden, where the top-left Back stays. */}
+          <div className="ex__grass">
+            <img
+              className="ex__grass-img"
+              src="/exit-grass.png"
+              alt=""
+              aria-hidden
+            />
+          </div>
+          <button
+            type="button"
+            className="ex__grassback"
+            onClick={() => setView("story")}
+          >
+            <span className="ex__grassback-arrow" aria-hidden />
+            Go back to understanding exit
+          </button>
+
           {/* ── header row (394:523) — title + the rent block ── */}
           <div className="ex__head">
             <h2 className="ex__mtitle">
-              Slide to the month you wish to leave,{" "}
+              Choose your exit month{" "}
               <br />
-              and see the math work for you
+              and see how your settlement works.
             </h2>
             <div className="ex__rent">
               <div className="ex__rent-row">
-                <span className="ex__rent-k">Your monthly rent</span>
+                <span className="ex__rent-k">Monthly rent</span>
                 <label className="ex__rent-field">
                   <span>₹</span>
                   <input
@@ -688,11 +711,13 @@ export default function ExitCalc({
                 </label>
               </div>
               <div className="ex__rent-row">
-                <span className="ex__rent-k">
-                  Total rent <i>( {TERM} months )</i>
-                </span>
-                <span className="ex__rent-v">
-                  ₹{inr(TOTAL_RENT)} <s>₹{inr(TERM * rent)}</s>
+                <span className="ex__rent-k">11-month rent value</span>
+                <span className="ex__rent-v">₹{inr(TERM * rent)}</span>
+              </div>
+              <div className="ex__rent-row">
+                <span className="ex__rent-k">Under Flent 11 monthly plan</span>
+                <span className="ex__rent-v ex__rent-v--flent">
+                  ₹{inr(TOTAL_RENT)}
                 </span>
               </div>
             </div>
@@ -769,7 +794,7 @@ export default function ExitCalc({
             >
               <span className="ex__vcard-title">Deductions</span>
               <div className="ex__vrow">
-                <span className="ex__vrow-k">Total deposit</span>
+                <span className="ex__vrow-k">Deposit you paid</span>
                 <span className="ex__vrow-v">
                   ₹{inr(DEPOSIT)} <i>( 3 months )</i>
                 </span>
@@ -785,7 +810,7 @@ export default function ExitCalc({
                 </span>
               </div>
               <div className="ex__vrow">
-                <span className="ex__vrow-k">Witheld deposit</span>
+                <span className="ex__vrow-k">Security deposit held</span>
                 <span className="ex__vrow-v ex__vrow-v--ded">
                   -₹{inr(WITHHELD)}{" "}
                   <i>
@@ -923,7 +948,7 @@ export default function ExitCalc({
               <span className="ex__card-title">Deductions</span>
               <div className="ex__card-rows">
                 <div className="ex__row">
-                  <span className="ex__row-k">Total deposit</span>
+                  <span className="ex__row-k">Deposit you paid</span>
                   <span className="ex__row-v">
                     ₹{inr(DEPOSIT)} <i>( 3 months )</i>
                   </span>
@@ -939,7 +964,7 @@ export default function ExitCalc({
                   </span>
                 </div>
                 <div className="ex__row">
-                  <span className="ex__row-k">Witheld deposit</span>
+                  <span className="ex__row-k">Security deposit held</span>
                   <span className="ex__row-v ex__row-v--ded">
                     -₹{inr(WITHHELD)}{" "}
                     <i>

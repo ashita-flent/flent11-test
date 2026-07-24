@@ -76,7 +76,7 @@ const COLS: Col[] = [
         icon: IC.check,
         text: (
           <>
-            Lock-in breakage fee capped at{" "}
+            Early exit fee capped at{" "}
             <strong>21 days of rent</strong>
           </>
         ),
